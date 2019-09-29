@@ -1,28 +1,41 @@
 package cookie
 
 import (
+	"../config"
 	"net/http"
 )
 
-func CreateCookie(value string, c config.SessionConfig) (cookie *http.Cookie) {
+func makeHashCookie(login string) string {
+	salt := "pdfnw;lsdvp"
+	hash := 0
+	for char := range login + salt {
+		// TODO: update make cookie
+		hash = hash + char
+	}
+	return string(hash)
+}
+
+func CreateCookie(c config.SessionConfig, login string) (cookie *http.Cookie) {
+	value := makeHashCookie(login)
 	cookie = &http.Cookie{
 		Name:     c.Name,
 		Value:    value,
 		MaxAge:   c.LifetimeSeconds,
+		Secure:   c.Secure,
 		HttpOnly: c.HTTPOnly,
-		Path:     c.Path,
 	}
 	return
 }
 
-func GetSessionCookie(r *http.Request, c config.SessionConfig) (string, error) {
-	session, err := r.Cookie(c.Name)
-	if err != nil || session == nil {
-		return "", err
-	}
-	return session.Value, err
+func SetUserCookie(w http.ResponseWriter, c config.SessionConfig, login string) {
+	http.SetCookie(w, CreateCookie(c, login))
 }
 
-func CreateAndSet(w http.ResponseWriter, c config.SessionConfig, value string) {
-	http.SetCookie(w, CreateCookie(value, c))
+func DeleteCookie(w http.ResponseWriter, c http.Cookie) {
+	c.MaxAge = -1
+	http.SetCookie(w, &c)
+}
+
+func IsInDB(c http.Cookie) bool { //
+	return false
 }
