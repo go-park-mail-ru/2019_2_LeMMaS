@@ -10,6 +10,13 @@ import (
 	"os"
 )
 
+
+func setupCORS(w *http.ResponseWriter, req *http.Request) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
 func MethodMiddleware(method string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -23,6 +30,7 @@ func MethodMiddleware(method string) func(next http.Handler) http.Handler {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	setupCORS(&w, r)
 	decoder := json.NewDecoder(r.Body)
 	var curUser config.AuthConfig
 	err := decoder.Decode(&curUser)
@@ -44,6 +52,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	setupCORS(&w, r)
 	curCookie, err := r.Cookie("sessionId")
 	if err == http.ErrNoCookie || curCookie == nil{
 		w.WriteHeader(403) // если куки не найдены
@@ -54,6 +63,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	setupCORS(&w, r)
 	decoder := json.NewDecoder(r.Body)
 	var curUser config.AuthConfig
 	err := decoder.Decode(&curUser)
@@ -76,6 +86,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserDataHandler(w http.ResponseWriter, r *http.Request) {
+	setupCORS(&w, r)
 	curUser := getUser(w, r)
 	var nullUser db.User
 	if curUser == nullUser {
@@ -90,6 +101,7 @@ func GetUserDataHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
+	setupCORS(&w, r)
 	curUser := getUser(w, r)
 	var nullUser db.User
 	if curUser == nullUser {
@@ -116,6 +128,7 @@ func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ChangeUserDataHandler(w http.ResponseWriter, r *http.Request) {
+	setupCORS(&w, r)
 	curUser := getUser(w, r)
 	var nullUser db.User
 	if curUser == nullUser {
@@ -135,7 +148,7 @@ func ChangeUserDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-func getUser(w http.ResponseWriter, r *http.Request) db.User { // TODO убрать возвраты заголовков
+func getUser(w http.ResponseWriter, r *http.Request) db.User { // TODO убрать возвраты заголовков (сейчас в вызывающей функции стоит return)
 	curCookie, err := r.Cookie("sessionId")
 	var nullUser db.User
 	if err != nil || curCookie == nil || !cookie.IsInDB(*curCookie) {

@@ -1,0 +1,25 @@
+{
+  "name": "2019_2_lemmas",
+  "version": "1.0.0",
+  "description": "Game Agario",
+  "main": "main.go",
+  "dependencies": {},
+  "scripts": {
+    "build": "go run main.go"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/go-park-mail-ru/2019_2_LeMMaS.git"
+  },
+  "keywords": [
+    "Agario",
+    "game",
+    "multiplayer"
+  ],
+  "author": "Sudarev M, Mozhevikina L",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/go-park-mail-ru/2019_2_LeMMaS/issues"
+  },
+  "homepage": "https://github.com/go-park-mail-ru/2019_2_LeMMaS#readme"
+}
