@@ -3,13 +3,12 @@ package handlers
 import (
 	"../config"
 	"../cookie"
-	"../database"
+	db "../database"
 	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 )
-
 
 func setupCORS(w *http.ResponseWriter, req *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")

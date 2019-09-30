@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./handlers"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/handlers"
 	"fmt"
 	"log"
 	"net/http"
