@@ -1,7 +1,7 @@
 package db
 
 import (
-	"../config"
+	"LeMMas/config"
 	"errors"
 )
 
@@ -11,15 +11,15 @@ var (
 
 func CreateNewUser(curUser config.AuthConfig) error {
 	if isInEmail(curUser.Email) || isInLogin(curUser.Login) {
-		return  errors.New("user is already have") // TODO отправить нормальную ошибку
+		return errors.New("user is already have") // TODO отправить нормальную ошибку
 	}
 	users.mu.Lock()
 	user := User{
-		Id:            len(users.Users),
-		Login:         curUser.Login,
-		Password:      curUser.Password,
-		Email:		   curUser.Email,
-		Role:          "activeUser",
+		Id:       len(users.Users),
+		Login:    curUser.Login,
+		Password: curUser.Password,
+		Email:    curUser.Email,
+		Role:     "activeUser",
 	}
 	users.Users = append(users.Users, user)
 	users.mu.Unlock()
@@ -66,6 +66,3 @@ func IsUserAuthCorrect(login string, password string) bool {
 	}
 	return false
 }
-
-
-

@@ -1,7 +1,7 @@
 package cookie
 
 import (
-	"../config"
+	"LeMMas/config"
 	"net/http"
 )
 
