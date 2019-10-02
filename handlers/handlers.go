@@ -54,7 +54,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	setupCORS(&w, r)
 	curCookie, err := r.Cookie("sessionId")
-	if err == http.ErrNoCookie || curCookie == nil{
+	if err == http.ErrNoCookie || curCookie == nil {
 		w.WriteHeader(403) // если куки не найдены
 		return
 	}
@@ -98,7 +98,7 @@ func GetUserDataHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	_, _  = w.Write(res)
+	_, _ = w.Write(res)
 }
 
 func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
@@ -118,7 +118,7 @@ func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 	// TODO удалять старые аватарки пользователя
-	f, err := os.OpenFile(db.PathAvatar + curUser.Login + fileHandler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(db.PathAvatar+curUser.Login+fileHandler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		panic(err)
 	}

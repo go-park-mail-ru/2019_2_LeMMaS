@@ -9,7 +9,7 @@ func makeHashCookie(login string) string {
 	salt := "pdfnw;lsdvp"
 	hash := 0
 	for char := range login + salt {
-		// TODO: update make cookie
+		// TODO: update hash cookie
 		hash = hash + char
 	}
 	return string(hash)

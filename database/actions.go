@@ -11,15 +11,15 @@ var (
 
 func CreateNewUser(curUser config.AuthConfig) error {
 	if isInEmail(curUser.Email) || isInLogin(curUser.Login) {
-		return  errors.New("user is already have") // TODO отправить нормальную ошибку
+		return errors.New("user is already have") // TODO отправить нормальную ошибку
 	}
 	users.mu.Lock()
 	user := User{
-		Id:            len(users.Users),
-		Login:         curUser.Login,
-		Password:      curUser.Password,
-		Email:		   curUser.Email,
-		Role:          "activeUser",
+		Id:       len(users.Users),
+		Login:    curUser.Login,
+		Password: curUser.Password,
+		Email:    curUser.Email,
+		Role:     "activeUser",
 	}
 	users.Users = append(users.Users, user)
 	users.mu.Unlock()
@@ -27,7 +27,19 @@ func CreateNewUser(curUser config.AuthConfig) error {
 }
 
 func ChangeUserData(curUser User, newDataUser User) {
-	// TODO изменить данные юзера
+	for _, user := range users.Users {
+		if user.Cookie == curUser.Cookie {
+			if newDataUser.Login != "" && user.Login != newDataUser.Login {
+				user.Login = newDataUser.Login
+			}
+			if newDataUser.Password != "" && user.Password != newDataUser.Password {
+				user.Password = newDataUser.Password
+			}
+			if newDataUser.Email != "" && user.Email != newDataUser.Email {
+				user.Email = newDataUser.Email
+			}
+		}
+	}
 }
 
 func GetUserByCookie(cookieValue string) User {
@@ -37,7 +49,7 @@ func GetUserByCookie(cookieValue string) User {
 			return user
 		}
 	}
-	return nullUser // TODO как вернуть пустого юзера
+	return nullUser
 }
 
 func isInLogin(login string) bool {
@@ -66,6 +78,3 @@ func IsUserAuthCorrect(login string, password string) bool {
 	}
 	return false
 }
-
-
-
