@@ -1,11 +1,22 @@
 package db
 
-type UserID int32
+import "sync"
+
+var (
+	PathAvatar = "usersAvatar/"
+)
+
+type AllUsers struct {
+	Users []User
+	mu    sync.RWMutex
+}
 
 type User struct {
-	Id 				UserID `json:"-"`// pk
+	Id 				int    `json:"-"`// pk
 	Login 			string `json:"login"`// имя
-	password		string `json:"-"` // пароль (не передается)
+	Password		string `json:"-"` // пароль (не передается)
+	Cookie 			string `json:"-"` // куки (не передаются)
+	Email			string `json:"email"` // почта
 	AvatarAddress	string `json:"avatarAddress"`// адрес, где хранится аватар
 	Role			string `json:"role"`// игрок залогинен или нет
 }
@@ -15,8 +26,8 @@ type UserResults struct {
 	Xp		int `json:"xp"`// количество очков
 }
 
-type TableScore struct {
-	UserID	UserID `json:"-"`// id пользователя
+type LeaderBoard struct {
+	UserID	int    `json:"-"`// id пользователя
 	Login	string `json:"login"`// логин пользователя для отображения в таблице чемпионов
 	Xp		int    `json:"xp"`// очки пользователя
 }

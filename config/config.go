@@ -14,14 +14,15 @@ type DatabaseConfig struct {
 }
 
 type SessionConfig struct {
-	Name            string `json:"name"`
-	Length          int    `json:"length"`
-	LifetimeSeconds int    `json:"lifetime"`
-	Path            string `json:"path"`
-	HTTPOnly        bool   `json:"httpOnly"`
+	Name            string		`json:"name"`
+	Value           string		`json:"length"`
+	LifetimeSeconds int    		`json:"lifetime"`
+	Secure			bool		`json:"secure"`
+	HTTPOnly        bool		`json:"httpOnly"`
 }
 
-type AuthClient struct {
-	URL     string `json:"url"`
-	Address string `json:"address"`
+type AuthConfig struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+	Email 	 string `json:"email"`
 }
