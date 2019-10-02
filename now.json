@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "name": "agario",
+  "builds": [
+    {
+      "src": "main.go",
+      "use": "@now/go@canary"
+    }
+  ],
+  "build": {
+    "env": {
+      "GO111MODULE": "off"
+    }
+  }
+}

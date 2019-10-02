@@ -1,0 +1,260 @@
+swagger: "2.0"
+info:
+  description: "This is a game like Agar.io"
+  version: "1.0.0"
+  title: "Swagger Agario"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "lemmasteam@agar.io"
+host: "agario.swagger.io"
+basePath: "/v1"
+tags:
+  - name: "user"
+    description: "Info about user, settings, avatar"
+  - name: "userResults"
+    description: "Everything about score, money"
+  - name: "leaderBoard"
+      description: "About you and other people in list"
+  - name: "shop"
+    description: "Access to shop user"
+schemes:
+  - "https"
+  - "http"
+paths:
+  /user/upload:
+    put:
+      summary: "uploads a user's image"
+      description: ""
+      operationId: "uploadFile"
+      consumes:
+        - "multipart/form-data"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "userId"
+          in: "path"
+          required: true
+          type: "integer"
+          format: "int64"
+        - name: "additionalMetadata"
+          in: "formData"
+          description: "Additional data to pass to server"
+          required: false
+          type: "string"
+        - name: "file"
+          in: "formData"
+          description: "file to upload"
+          required: false
+          type: "file"
+      responses:
+        200:
+          description: "successful operation"
+  /shop:
+    get:
+      summary: "Returns available items in shop"
+      operationId: "getItemsShop"
+      produces:
+        - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            additionalProperties:
+              type: "integer"
+              format: "int32"
+  /register:
+    post:
+      tags:
+        - "user"
+      summary: "Create user"
+      description: "Register new user."
+      operationId: "createUser"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Created user object"
+          required: true
+      responses:
+        200:
+          description: "successful operation"
+        409:
+          description: "user is already exists"
+  /user:
+    get:
+      tags:
+        - "user"
+      summary: "Information about user"
+      description: ""
+      operationId: "userData"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "List of user object"
+          required: true
+      responses:
+        200:
+          description: "successful operation"
+        403:
+          description: "cookie not found"
+        404:
+          description: "user not found"
+
+  /login:
+    post:
+      tags:
+        - "user"
+      summary: "Login user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "login"
+          description: "The user name for login"
+          required: true
+          type: "string"
+        - name: "password"
+          description: "The new password for login"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+          headers:
+            X-Expires-After:
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+        400:
+          description: "Invalid username/password supplied"
+  /logout:
+    post:
+      tags:
+        - "user"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      produces:
+        - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+        403:
+          description: "cookies not found"
+  /user/settings:
+    patch:
+      tags:
+        - "user"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "login"
+          in: "path"
+          description: "name that need to be updated"
+          required: true
+          type: "string"
+        - name: "password"
+          in: "path"
+          description: "password that need to be updated"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Updated user object"
+          required: true
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+    delete:
+      tags:
+        - "user"
+      summary: "Delete user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+        - name: "username"
+          in: "path"
+          description: "The name that needs to be deleted"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+definitions:
+  Shop:
+    type: "object"
+    properties:
+      itemId:
+        type: "integer"
+        format: "int64"
+      item:
+        type: "string"
+        description: "Name of item"
+      price:
+        type: "integer"
+        format: "int32"
+  LeaderBoard:
+    type: "object"
+    properties:
+      userId:
+        type: "integer"
+        format: "int64"
+      login:
+        type: "string"
+      xp:
+        type: "int"
+        format: "int32"
+  User:
+    type: "object"
+    properties:
+      userId:
+        type: "integer"
+        format: "int64"
+      login:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      avatarAddress:
+        type: "string"
+      role:
+        type: "string"
+  UserResults:
+    type: "object"
+    properties:
+      userId:
+        type: "integer"
+        format: "int64"
+      money:
+        type: "integer"
+        format: "int32"
+      xp:
+        type: "integer"
+        format: "int32"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
