@@ -1,8 +1,8 @@
 package db
 
 import (
-	"../config"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/config"
 )
 
 var (

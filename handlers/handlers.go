@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"../config"
-	"../cookie"
-	db "../database"
 	"encoding/json"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/config"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/cookie"
+	db "github.com/go-park-mail-ru/2019_2_LeMMaS/database"
 	"io"
 	"net/http"
 	"os"

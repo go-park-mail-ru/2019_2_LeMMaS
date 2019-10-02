@@ -1,7 +1,7 @@
 package cookie
 
 import (
-	"../config"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/config"
 	"net/http"
 )
 
