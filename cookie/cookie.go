@@ -21,6 +21,7 @@ func CreateCookie(c config.SessionConfig, login string) (cookie *http.Cookie) {
 		Name:     c.Name,
 		Value:    value,
 		MaxAge:   c.LifetimeSeconds,
+		Path: 	  c.Path,
 		Secure:   c.Secure,
 		HttpOnly: c.HTTPOnly,
 	}

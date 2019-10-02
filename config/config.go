@@ -18,6 +18,7 @@ type SessionConfig struct {
 	Value           string		`json:"length"`
 	LifetimeSeconds int    		`json:"lifetime"`
 	Secure			bool		`json:"secure"`
+	Path 			string		`json:"path"`
 	HTTPOnly        bool		`json:"httpOnly"`
 }
 
