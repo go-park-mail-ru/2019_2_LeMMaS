@@ -37,12 +37,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if !db.IsUserAuthCorrect(curUser.Login, curUser.Password) {
-		w.WriteHeader(403)
+		w.WriteHeader(400)
 		return
 	}
 	c := config.SessionConfig{
 		Name:            "sessionId",
 		LifetimeSeconds: 86400,
+		Path:			 "/",
 		Secure:          true,
 		HTTPOnly:        true,
 	}
@@ -77,6 +78,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	c := config.SessionConfig{
 		Name:            "sessionId",
 		LifetimeSeconds: 86400,
+		Path:			 "/",
 		Secure:          true,
 		HTTPOnly:        true,
 	}
