@@ -22,6 +22,7 @@ type User struct {
 }
 
 type UserResults struct {
+	UserId  int `json:"-"`
 	Money	int `json:"money"`// количество монет
 	Xp		int `json:"xp"`// количество очков
 }
