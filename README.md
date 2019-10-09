@@ -7,3 +7,4 @@ Project "Agario"
 
 - [Sudarev Maxim](https://github.com/smi97)
 - [Mozhevikina Leonarda](https://github.com/ledka17)
+- [Kobzev Anton](https://github.com/kzon)
