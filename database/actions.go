@@ -14,7 +14,7 @@ func CreateNewUser(curUser config.AuthConfig) error {
 		return errors.New("user is already have") // TODO отправить нормальную ошибку
 	}
 	users.mu.Lock()
-	user := User{
+	user := User {
 		Id:       len(users.Users),
 		Login:    curUser.Login,
 		Password: curUser.Password,

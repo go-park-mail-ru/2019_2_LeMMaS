@@ -91,6 +91,7 @@ func GetUserDataHandler(w http.ResponseWriter, r *http.Request) {
 	curUser := getUser(w, r)
 	var nullUser db.User
 	if curUser == nullUser {
+		w.WriteHeader(401)
 		return
 	}
 	w.WriteHeader(200)
@@ -117,7 +118,10 @@ func UploadAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err) // здесь может отправлять ответ с определенным заголовком?
 	}
 	defer file.Close()
-	// TODO удалять старые аватарки пользователя
+	err = os.Remove(db.PathAvatar+curUser.Login)
+	if err != nil {
+		panic(err)
+	}
 	f, err := os.OpenFile(db.PathAvatar+curUser.Login+fileHandler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		panic(err)

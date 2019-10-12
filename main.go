@@ -12,13 +12,10 @@ var (
 	PORT    = ":8080"
 )
 
-func Cors(w http.ResponseWriter, r *http.Request) { // TODO сделатьчерез мультиплексор
-	w.Header().Set("Content-Type", "text/html; charset=ascii")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
-}
-
 func main() {
+	//mux := http.NewServeMux() // TODO сделать через мультиплексор
+
+	//mux.HandleFunc()
 	// TODO парсить из командной строки параметры конфигурации
 	loginHandler := http.HandlerFunc(handlers.LoginHandler)
 	logoutHandler := http.HandlerFunc(handlers.LogoutHandler)

@@ -2,6 +2,7 @@ package cookie
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/config"
+	db "github.com/go-park-mail-ru/2019_2_LeMMaS/database"
 	"net/http"
 )
 
@@ -38,5 +39,10 @@ func DeleteCookie(w http.ResponseWriter, c http.Cookie) {
 }
 
 func IsInDB(c http.Cookie) bool { //
-	return false
+	var nullUser db.User
+	curUser := db.GetUserByCookie(c.Value)
+	if curUser == nullUser {
+		return false
+	}
+	return true
 }

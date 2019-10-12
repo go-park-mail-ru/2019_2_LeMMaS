@@ -13,7 +13,7 @@ type DatabaseConfig struct {
 	MaxOpenConnections	int    `json:"maxOpenConnections"`
 }
 
-type SessionConfig struct {
+type SessionConfig struct { // TODO как сделать конфиг с дефолтными значениями?
 	Name            string		`json:"name"`
 	Value           string		`json:"length"`
 	LifetimeSeconds int    		`json:"lifetime"`
