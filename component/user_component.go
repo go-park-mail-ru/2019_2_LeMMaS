@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/storage"
 	"github.com/google/uuid"
+	"io"
 )
 
 type UserComponent struct {
 	userStorage *storage.UserStorage
-	sessions    map[string]*storage.User
+	fileStorage *storage.FileStorage
+	sessions    map[string]int
 }
 
 func NewUserComponent() *UserComponent {
 	return &UserComponent{
 		userStorage: storage.NewUserStorage(),
-		sessions:    map[string]*storage.User{},
+		fileStorage: storage.NewFileStorage(),
+		sessions:    map[string]int{},
 	}
 }
 
@@ -24,7 +27,8 @@ func (c UserComponent) GetAllUsers() []storage.User {
 }
 
 func (c UserComponent) GetUserBySessionID(sessionID string) *storage.User {
-	return c.sessions[sessionID]
+	userID := c.sessions[sessionID]
+	return c.userStorage.GetByID(userID)
 }
 
 func (c UserComponent) UpdateUser(id int, password, name string) {
@@ -33,6 +37,16 @@ func (c UserComponent) UpdateUser(id int, password, name string) {
 		passwordHash = c.getPasswordHash(password)
 	}
 	c.userStorage.Update(id, passwordHash, name)
+}
+
+func (c UserComponent) UpdateUserAvatar(user *storage.User, avatarFile io.Reader, avatarPath string) error {
+	c.fileStorage.DeleteFileIfExists(user.AvatarPath)
+	newAvatarPath, err := c.fileStorage.StoreUserAvatar(user.ID, avatarFile, avatarPath)
+	if err != nil {
+		return err
+	}
+	c.userStorage.UpdateAvatarPath(user.ID, newAvatarPath)
+	return nil
 }
 
 func (c UserComponent) Register(email, password, name string) error {
@@ -53,7 +67,7 @@ func (c UserComponent) Login(email, password string) (string, error) {
 		return "", fmt.Errorf("incorrect password")
 	}
 	sessionID := c.getNewSessionID()
-	c.sessions[sessionID] = user
+	c.sessions[sessionID] = user.ID
 	return sessionID, nil
 }
 

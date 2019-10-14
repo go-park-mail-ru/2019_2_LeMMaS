@@ -10,6 +10,7 @@ type User struct {
 	Email        string
 	PasswordHash string
 	Name         string
+	AvatarPath   string
 }
 
 type UserStorage struct {
@@ -42,7 +43,13 @@ func (s *UserStorage) Update(id int, passwordHash string, name string) {
 	if name != "" {
 		user.Name = name
 	}
-	s.usersByID[id] = user
+	s.storeUser(&user)
+}
+
+func (s *UserStorage) UpdateAvatarPath(id int, avatarPath string) {
+	user := s.usersByID[id]
+	user.AvatarPath = avatarPath
+	s.storeUser(&user)
 }
 
 func (s *UserStorage) GetAll() []User {
@@ -54,6 +61,13 @@ func (s *UserStorage) GetAll() []User {
 		return result[i].ID < result[j].ID
 	})
 	return result
+}
+
+func (s UserStorage) GetByID(id int) *User {
+	if user, ok := s.usersByID[id]; ok {
+		return &user
+	}
+	return nil
 }
 
 func (s *UserStorage) GetByEmail(email string) *User {

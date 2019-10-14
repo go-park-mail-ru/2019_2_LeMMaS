@@ -26,9 +26,10 @@ func NewUserController() *UserController {
 }
 
 type UserToOutput struct {
-	ID    int    `json:"id"`
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	ID         int    `json:"id"`
+	Email      string `json:"email"`
+	Name       string `json:"name"`
+	AvatarPath string `json:"avatar_path"`
 }
 
 func (c UserController) HandleUserList(w http.ResponseWriter, r *http.Request) {
@@ -50,14 +51,14 @@ func (c UserController) convertUsersForOutput(users []storage.User) []UserToOutp
 
 func (c UserController) convertUserForOutput(user storage.User) UserToOutput {
 	return UserToOutput{
-		ID:    user.ID,
-		Email: user.Email,
-		Name:  user.Name,
+		ID:         user.ID,
+		Email:      user.Email,
+		Name:       user.Name,
+		AvatarPath: user.AvatarPath,
 	}
 }
 
 type UserToUpdate struct {
-	ID       int    `json:"id"`
 	Password string `json:"password"`
 	Name     string `json:"name"`
 }
@@ -65,27 +66,53 @@ type UserToUpdate struct {
 func (c UserController) HandleUserUpdate(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	c.writeCommonHeaders(w)
-	decoder := json.NewDecoder(r.Body)
-	user := new(UserToUpdate)
-	err := decoder.Decode(user)
+	currentUser, err := c.getCurrentUser(r)
 	if err != nil {
 		c.writeError(w, err)
 		return
 	}
-	c.userComponent.UpdateUser(user.ID, user.Password, user.Name)
+	decoder := json.NewDecoder(r.Body)
+	user := new(UserToUpdate)
+	err = decoder.Decode(user)
+	if err != nil {
+		c.writeError(w, err)
+		return
+	}
+	c.userComponent.UpdateUser(currentUser.ID, user.Password, user.Name)
+	c.writeOk(w)
+}
+
+func (c UserController) HandleAvatarUpload(w http.ResponseWriter, r *http.Request) {
+	c.writeCommonHeaders(w)
+	currentUser, err := c.getCurrentUser(r)
+	if err != nil {
+		c.writeError(w, err)
+		return
+	}
+	err = r.ParseMultipartForm(32 << 20)
+	if err != nil {
+		c.writeError(w, err)
+		return
+	}
+	avatarFile, avatarFileHeader, err := r.FormFile("avatar")
+	if err != nil {
+		c.writeError(w, err)
+		return
+	}
+	defer avatarFile.Close()
+	err = c.userComponent.UpdateUserAvatar(currentUser, avatarFile, avatarFileHeader.Filename)
+	if err != nil {
+		c.writeError(w, err)
+		return
+	}
 	c.writeOk(w)
 }
 
 func (c UserController) HandleUserProfile(w http.ResponseWriter, r *http.Request) {
 	c.writeCommonHeaders(w)
-	sessionIDCookie, err := r.Cookie(SessionIDCookieName)
+	currentUser, err := c.getCurrentUser(r)
 	if err != nil {
-		c.writeError(w, fmt.Errorf("no session cookie"))
-		return
-	}
-	currentUser := c.userComponent.GetUserBySessionID(sessionIDCookie.Value)
-	if currentUser == nil {
-		c.writeError(w, fmt.Errorf("invalid session id"))
+		c.writeError(w, err)
 		return
 	}
 	c.writeOkWithBody(w, map[string]interface{}{
@@ -163,29 +190,14 @@ func (c UserController) HandleUserLogout(w http.ResponseWriter, r *http.Request)
 	c.writeOk(w)
 }
 
-func (c UserController) HandleAvatarUpload(w http.ResponseWriter, r *http.Request) {
-	c.writeCommonHeaders(w)
-	//curUser := getUser(w, r)
-	//var nullUser db.User
-	//if curUser == nullUser {
-	//	return
-	//}
-	//err := r.ParseMultipartForm(32 << 20)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//file, fileHandler, err := r.FormFile("avatar")
-	//if err != nil {
-	//	panic(err) // здесь может отправлять ответ с определенным заголовком?
-	//}
-	//defer file.Close()
-	//// TODO удалять старые аватарки пользователя
-	//f, err := os.OpenFile(db.PathAvatar+curUser.Login+fileHandler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer f.Close()
-	//io.Copy(f, file)
-	//curUser.AvatarAddress = db.PathAvatar + curUser.Login // директория, где хранится файл с аватаром юзера
-	//w.WriteHeader(200)
+func (c UserController) getCurrentUser(r *http.Request) (*storage.User, error) {
+	sessionIDCookie, err := r.Cookie(SessionIDCookieName)
+	if err != nil {
+		return nil, err
+	}
+	currentUser := c.userComponent.GetUserBySessionID(sessionIDCookie.Value)
+	if currentUser == nil {
+		return nil, fmt.Errorf("invalid session id")
+	}
+	return currentUser, nil
 }
