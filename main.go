@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/handlers"
-	"log"
 	"net/http"
 	"os"
 )
@@ -39,5 +38,5 @@ func main() {
 		port = "8080"
 	}
 	fmt.Printf("starting server at port %s\n", port)
-	log.Fatal(http.ListenAndServe(port, nil))
+	http.ListenAndServe(":"+port, nil)
 }
