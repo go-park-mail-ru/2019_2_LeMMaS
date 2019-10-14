@@ -5,17 +5,17 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/handlers"
 	"log"
 	"net/http"
+	"os"
 )
 
 var (
 	apiPath = "/api/v1"
-	PORT    = ":8080"
 )
 
 func Cors(w http.ResponseWriter, r *http.Request) { // TODO сделатьчерез мультиплексор
 	w.Header().Set("Content-Type", "text/html; charset=ascii")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 }
 
 func main() {
@@ -34,6 +34,10 @@ func main() {
 	http.Handle(apiPath+"/user/upload", handlers.MethodMiddleware("PUT")(uploadAvatarHandler))
 	http.Handle(apiPath+"/user/settings", handlers.MethodMiddleware("PATCH")(changeUserDataHandler))
 
-	fmt.Printf("starting server at %s\n", PORT)
-	log.Fatal(http.ListenAndServe(PORT, nil))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	fmt.Printf("starting server at port %s\n", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
