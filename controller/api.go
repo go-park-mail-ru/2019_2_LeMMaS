@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -15,17 +16,20 @@ const (
 	ApiV1UserLogoutPath       = "/api/v1/user/logout"
 )
 
-func InitAPIRouter() *mux.Router {
-	r := mux.NewRouter()
+func InitAPIHandler() http.Handler {
+	router := mux.NewRouter()
 
 	userController := NewUserController()
-	r.HandleFunc(ApiV1UserListPath, userController.HandleUserList).Methods(http.MethodGet)
-	r.HandleFunc(ApiV1UserUpdatePath, userController.HandleUserUpdate).Methods(http.MethodPost)
-	r.HandleFunc(ApiV1UserAvatarUploadPath, userController.HandleAvatarUpload).Methods(http.MethodPost)
-	r.HandleFunc(ApiV1UserProfilePath, userController.HandleUserProfile).Methods(http.MethodGet)
-	r.HandleFunc(ApiV1UserRegisterPath, userController.HandleUserRegister).Methods(http.MethodPost)
-	r.HandleFunc(ApiV1UserLoginPath, userController.HandleUserLogin).Methods(http.MethodPost)
-	r.HandleFunc(ApiV1UserLogoutPath, userController.HandleUserLogout).Methods(http.MethodPost)
+	router.HandleFunc(ApiV1UserListPath, userController.HandleUserList).Methods(http.MethodGet)
+	router.HandleFunc(ApiV1UserUpdatePath, userController.HandleUserUpdate).Methods(http.MethodPost)
+	router.HandleFunc(ApiV1UserAvatarUploadPath, userController.HandleAvatarUpload).Methods(http.MethodPost)
+	router.HandleFunc(ApiV1UserProfilePath, userController.HandleUserProfile).Methods(http.MethodGet)
+	router.HandleFunc(ApiV1UserRegisterPath, userController.HandleUserRegister).Methods(http.MethodPost)
+	router.HandleFunc(ApiV1UserLoginPath, userController.HandleUserLogin).Methods(http.MethodPost)
+	router.HandleFunc(ApiV1UserLogoutPath, userController.HandleUserLogout).Methods(http.MethodPost)
 
-	return r
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "DELETE"})
+	return handlers.CORS(originsOk, headersOk, methodsOk)(router)
 }
