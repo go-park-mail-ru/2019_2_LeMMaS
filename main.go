@@ -13,5 +13,8 @@ func main() {
 		port = "8080"
 	}
 	r := controller.InitAPIRouter()
-	http.ListenAndServe(":"+port, handlers.CORS()(r))
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "DELETE"})
+	http.ListenAndServe(":"+port, handlers.CORS(originsOk, headersOk, methodsOk)(r))
 }
