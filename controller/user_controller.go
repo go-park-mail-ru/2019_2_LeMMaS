@@ -165,12 +165,7 @@ func (c UserController) HandleUserLogin(w http.ResponseWriter, r *http.Request) 
 		c.writeError(w, err)
 		return
 	}
-	sessionIDCookie := &http.Cookie{
-		Name:    SessionIDCookieName,
-		Value:   sessionID,
-		Expires: time.Now().Add(SessionIDCookieExpire),
-	}
-	http.SetCookie(w, sessionIDCookie)
+	c.setCookie(w, SessionIDCookieName, sessionID, time.Now().Add(SessionIDCookieExpire))
 	c.writeOk(w)
 }
 

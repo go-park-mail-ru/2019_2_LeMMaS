@@ -40,6 +40,17 @@ func (c Controller) writeError(w http.ResponseWriter, err error) {
 	w.Write(response)
 }
 
+func (c Controller) setCookie(w http.ResponseWriter, name, value string, expires time.Time) {
+	cookie := &http.Cookie{
+		Name:     name,
+		Value:    value,
+		Expires:  expires,
+		SameSite: http.SameSiteDefaultMode,
+		Secure:   true,
+	}
+	http.SetCookie(w, cookie)
+}
+
 func (c Controller) deleteCookie(w http.ResponseWriter, cookie *http.Cookie) {
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, cookie)
