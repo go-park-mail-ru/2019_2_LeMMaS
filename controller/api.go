@@ -29,7 +29,7 @@ func InitAPIHandler() http.Handler {
 	router.HandleFunc(ApiV1UserLogoutPath, userController.HandleUserLogout).Methods(http.MethodPost)
 
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
-	originsOk := handlers.AllowedOrigins([]string{"localhost", ".now.sh"})
+	originsOk := handlers.AllowedOrigins([]string{"http://localhost:3000", ".now.sh"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "DELETE"})
 	return handlers.CORS(originsOk, headersOk, methodsOk)(router)
 }
