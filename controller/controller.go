@@ -42,11 +42,10 @@ func (c Controller) writeError(w http.ResponseWriter, err error) {
 
 func (c Controller) setCookie(w http.ResponseWriter, name, value string, expires time.Time) {
 	cookie := &http.Cookie{
-		Name:     name,
-		Value:    value,
-		Expires:  expires,
-		SameSite: http.SameSiteDefaultMode,
-		Secure:   true,
+		Name:    name,
+		Value:   value,
+		Expires: expires,
+		Secure:  true,
 	}
 	http.SetCookie(w, cookie)
 }
