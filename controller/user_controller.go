@@ -112,7 +112,9 @@ func (c UserController) HandleUserProfile(w http.ResponseWriter, r *http.Request
 	c.writeCommonHeaders(w)
 	currentUser, err := c.getCurrentUser(r)
 	if err != nil {
-		c.writeError(w, err)
+		c.writeOkWithBody(w, map[string]interface{}{
+			"user": nil,
+		})
 		return
 	}
 	c.writeOkWithBody(w, map[string]interface{}{
