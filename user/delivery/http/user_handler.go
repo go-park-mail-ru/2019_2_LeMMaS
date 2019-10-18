@@ -1,11 +1,12 @@
 package http
 
 import (
+	"fmt"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/labstack/echo"
-	"net/http"
+	"time"
 )
 
 const (
@@ -20,19 +21,25 @@ const (
 	ApiV1UserLogoutPath       = ApiV1PathPrefix + "/user/logout"
 )
 
-//const (
-//	SessionIDCookieName   = "session_id"
-//	SessionIDCookieExpire = 10 * time.Hour
-//)
+const (
+	SessionIDCookieName   = "session_id"
+	SessionIDCookieExpire = 10 * time.Hour
+)
 
 type UserHandler struct {
 	userUsecase user.Usecase
+	httpDelivery.Handler
 }
 
 func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) {
 	handler := UserHandler{userUsecase: userUsecase}
 	e.GET(ApiV1UserListPath, handler.HandleUserList)
 	e.POST(ApiV1UserRegisterPath, handler.HandleUserRegister)
+	e.POST(ApiV1UserLoginPath, handler.HandleUserLogin)
+	e.POST(ApiV1UserLogoutPath, handler.HandleUserLogout)
+	e.GET(ApiV1UserProfilePath, handler.HandleUserProfile)
+	e.POST(ApiV1UserUpdatePath, handler.HandleUserUpdate)
+	e.POST(ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
 }
 
 type userToOutput struct {
@@ -45,9 +52,9 @@ type userToOutput struct {
 func (h *UserHandler) HandleUserList(c echo.Context) error {
 	users := h.userUsecase.GetAllUsers()
 	usersToOutput := h.convertUsersForOutput(users)
-	return c.JSON(http.StatusOK, httpDelivery.OkWithBody(map[string]interface{}{
+	return h.OkWithBody(c, map[string]interface{}{
 		"users": usersToOutput,
-	}))
+	})
 }
 
 func (h *UserHandler) convertUsersForOutput(users []model.User) []userToOutput {
@@ -67,66 +74,62 @@ func (h *UserHandler) convertUserForOutput(user model.User) userToOutput {
 	}
 }
 
-//type userToUpdate struct {
-//	Password string `json:"password"`
-//	Name     string `json:"name"`
-//}
+type userToUpdate struct {
+	Password string `json:"password"`
+	Name     string `json:"name"`
+}
 
-//func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
-//currentUser, err := h.getCurrentUser(c.Request())
-//if err != nil {
-//	return err
-//}
-//decoder := json.NewDecoder(r.Body)
-//user := new(userToUpdate)
-//err = decoder.Decode(user)
-//if err != nil {
-//	h.writeError(w, err)
-//	return
-//}
-//h.userComponent.UpdateUser(currentUser.ID, user.Password, user.Name)
-//h.writeOk(w)
-//}
+func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
+	currentUser, err := h.getCurrentUser(c)
+	if err != nil {
+		return h.Error(c, err)
+	}
+	userToUpdate := &userToUpdate{}
+	if err := c.Bind(userToUpdate); err != nil {
+		return h.Error(c, err)
+	}
+	h.userUsecase.UpdateUser(currentUser.ID, userToUpdate.Password, userToUpdate.Name)
+	return h.Ok(c)
+}
 
-//func (h *UserHandler) HandleAvatarUpload(w http.ResponseWriter, r *http.Request) {
-//h.writeCommonHeaders(w)
-//currentUser, err := h.getCurrentUser(r)
-//if err != nil {
-//	h.writeError(w, err)
-//	return
-//}
-//err = r.ParseMultipartForm(32 << 20)
-//if err != nil {
-//	h.writeError(w, err)
-//	return
-//}
-//avatarFile, avatarFileHeader, err := r.FormFile("avatar")
-//if err != nil {
-//	h.writeError(w, err)
-//	return
-//}
-//defer avatarFile.Close()
-//err = h.userComponent.UpdateUserAvatar(currentUser, avatarFile, avatarFileHeader.Filename)
-//if err != nil {
-//	h.writeError(w, err)
-//	return
-//}
-//h.writeOk(w)
-//}
+func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
+	return nil
+	//h.writeCommonHeaders(w)
+	//currentUser, err := h.getCurrentUser(r)
+	//if err != nil {
+	//	h.writeError(w, err)
+	//	return
+	//}
+	//err = r.ParseMultipartForm(32 << 20)
+	//if err != nil {
+	//	h.writeError(w, err)
+	//	return
+	//}
+	//avatarFile, avatarFileHeader, err := r.FormFile("avatar")
+	//if err != nil {
+	//	h.writeError(w, err)
+	//	return
+	//}
+	//defer avatarFile.Close()
+	//err = h.userComponent.UpdateUserAvatar(currentUser, avatarFile, avatarFileHeader.Filename)
+	//if err != nil {
+	//	h.writeError(w, err)
+	//	return
+	//}
+	//h.writeOk(w)
+}
 
-//func (h *UserHandler) HandleUserProfile(w http.ResponseWriter, r *http.Request) {
-//h.writeCommonHeaders(w)
-//currentUser, err := h.getCurrentUser(r)
-//if err != nil {
-//	h.writeOkWithBody(w, map[string]interface{}{
-//		"user": nil,
-//	})
-//	return
-//}
-//h.writeOkWithBody(w, map[string]interface{}{
-//	"user": h.convertUserForOutput(*currentUser),
-//})
-//}
+func (h *UserHandler) HandleUserProfile(c echo.Context) error {
+	currentUser, err := h.getCurrentUser(c)
+	if err != nil {
+		return h.OkWithBody(c, map[string]interface{}{
+			"user": nil,
+		})
+	}
+	return h.OkWithBody(c, map[string]interface{}{
+		"user": h.convertUserForOutput(*currentUser),
+	})
+}
 
 type userToRegister struct {
 	Email    string `json:"email" valid:"email,required"`
@@ -139,65 +142,58 @@ func (h *UserHandler) HandleUserRegister(c echo.Context) error {
 	if err := c.Bind(userToRegister); err != nil {
 		return err
 	}
-	if ok, errors := httpDelivery.Validate(userToRegister); !ok {
-		return c.JSON(http.StatusBadRequest, httpDelivery.ValidatorErrors(errors))
+	if ok, errors := h.Validate(userToRegister); !ok {
+		return h.Errors(c, errors)
 	}
 	err := h.userUsecase.Register(userToRegister.Email, userToRegister.Password, userToRegister.Name)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, httpDelivery.Error(err))
+		return h.Error(c, err)
 	}
-	return c.JSON(http.StatusOK, httpDelivery.Ok())
+	return h.Ok(c)
 }
 
-//type UserToLogin struct {
-//	Email    string `json:"email"`
-//	Password string `json:"password"`
-//}
-//
-//func (h *UserHandler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
-//	defer r.Body.Close()
-//	h.writeCommonHeaders(w)
-//	decoder := json.NewDecoder(r.Body)
-//	user := new(UserToLogin)
-//	err := decoder.Decode(user)
-//	if err != nil {
-//		h.writeError(w, err)
-//		return
-//	}
-//	var sessionID string
-//	sessionID, err = h.userComponent.Login(user.Email, user.Password)
-//	if err != nil {
-//		h.writeError(w, err)
-//		return
-//	}
-//	h.setCookie(w, SessionIDCookieName, sessionID, time.Now().Add(SessionIDCookieExpire))
-//	h.writeOk(w)
-//}
-//
-//func (h *UserHandler) HandleUserLogout(w http.ResponseWriter, r *http.Request) {
-//	h.writeCommonHeaders(w)
-//	sessionIDCookie, err := r.Cookie(SessionIDCookieName)
-//	if err != nil {
-//		h.writeError(w, fmt.Errorf("no session cookie"))
-//		return
-//	}
-//	h.deleteCookie(w, sessionIDCookie)
-//	err = h.userComponent.Logout(sessionIDCookie.Value)
-//	if err != nil {
-//		h.writeError(w, err)
-//		return
-//	}
-//	h.writeOk(w)
-//}
-//
-//func (h *UserHandler) getCurrentUser(r *http.Request) (*storage.User, error) {
-//	sessionIDCookie, err := r.Cookie(SessionIDCookieName)
-//	if err != nil {
-//		return nil, err
-//	}
-//	currentUser := h.userComponent.GetUserBySessionID(sessionIDCookie.Value)
-//	if currentUser == nil {
-//		return nil, fmt.Errorf("invalid session id")
-//	}
-//	return currentUser, nil
-//}
+type userToLogin struct {
+	Email    string `json:"email" valid:"email,required"`
+	Password string `json:"password" valid:"required"`
+}
+
+func (h *UserHandler) HandleUserLogin(c echo.Context) error {
+	userToLogin := &userToLogin{}
+	if err := c.Bind(userToLogin); err != nil {
+		return err
+	}
+	if ok, errors := h.Validate(userToLogin); !ok {
+		return h.Errors(c, errors)
+	}
+	sessionID, err := h.userUsecase.Login(userToLogin.Email, userToLogin.Password)
+	if err != nil {
+		return h.Error(c, err)
+	}
+	h.SetCookie(c, SessionIDCookieName, sessionID, time.Now().Add(SessionIDCookieExpire))
+	return h.Ok(c)
+}
+
+func (h *UserHandler) HandleUserLogout(c echo.Context) error {
+	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
+	if err != nil {
+		return h.Error(c, fmt.Errorf("no session cookie"))
+	}
+	h.DeleteCookie(c, SessionIDCookieName)
+	err = h.userUsecase.Logout(sessionIDCookie.Value)
+	if err != nil {
+		return h.Error(c, err)
+	}
+	return h.Ok(c)
+}
+
+func (h *UserHandler) getCurrentUser(c echo.Context) (*model.User, error) {
+	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
+	if err != nil {
+		return nil, err
+	}
+	currentUser := h.userUsecase.GetUserBySessionID(sessionIDCookie.Value)
+	if currentUser == nil {
+		return nil, fmt.Errorf("invalid session id")
+	}
+	return currentUser, nil
+}
