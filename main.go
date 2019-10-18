@@ -1,8 +1,12 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/controller"
-	"net/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
+	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
+	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
+	"github.com/labstack/echo"
+	"log"
 	"os"
 )
 
@@ -11,6 +15,15 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	handler := controller.InitAPIHandler()
-	http.ListenAndServe(":"+port, handler)
+
+	e := echo.New()
+	http.InitMiddlewares(e)
+	initUserHandler(e)
+	log.Fatal(e.Start("localhost:" + port))
+}
+
+func initUserHandler(e *echo.Echo) {
+	repo := userRepository.NewMemoryUserRepository()
+	usecase := userUsecase.NewUserUsecase(repo)
+	userHttpDelivery.NewUserHandler(e, usecase)
 }
