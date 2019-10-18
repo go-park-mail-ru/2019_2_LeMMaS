@@ -1,4 +1,4 @@
-package middleware
+package http
 
 import (
 	"github.com/labstack/echo"
@@ -6,14 +6,12 @@ import (
 	"net/http"
 )
 
-type Middleware struct {
+func InitMiddlewares(e *echo.Echo) {
+	e.Use(corsMiddleware)
+	e.Use(panicMiddleware)
 }
 
-func NewMiddleware() *Middleware {
-	return &Middleware{}
-}
-
-func (m *Middleware) CORS(next echo.HandlerFunc) echo.HandlerFunc {
+func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		c.Response().Header().Set("Access-Control-Allow-Origin", "*")
 		//	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
@@ -30,7 +28,7 @@ func (m *Middleware) CORS(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func (m *Middleware) Panic(next echo.HandlerFunc) echo.HandlerFunc {
+func panicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		defer func() {
 			if err := recover(); err != nil {

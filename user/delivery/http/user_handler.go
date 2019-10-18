@@ -1,7 +1,7 @@
 package http
 
 import (
-	baseHttp "github.com/go-park-mail-ru/2019_2_LeMMaS/internal/delivery/http"
+	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/labstack/echo"
@@ -9,14 +9,15 @@ import (
 )
 
 const (
-	ApiV1PathPrefix   = "/api/v1"
-	ApiV1UserListPath = ApiV1PathPrefix + "/user/list"
-	//ApiV1UserUpdatePath       = ApiV1PathPrefix + "/user/update"
-	//ApiV1UserAvatarUploadPath = ApiV1PathPrefix + "/user/avatar/upload"
-	//ApiV1UserProfilePath      = ApiV1PathPrefix + "/user/me"
-	ApiV1UserRegisterPath = ApiV1PathPrefix + "/user/register"
-	//ApiV1UserLoginPath        = ApiV1PathPrefix + "/user/login"
-	//ApiV1UserLogoutPath       = ApiV1PathPrefix + "/user/logout"
+	ApiV1PathPrefix = "/api/v1"
+
+	ApiV1UserListPath         = ApiV1PathPrefix + "/user/list"
+	ApiV1UserUpdatePath       = ApiV1PathPrefix + "/user/update"
+	ApiV1UserAvatarUploadPath = ApiV1PathPrefix + "/user/avatar/upload"
+	ApiV1UserProfilePath      = ApiV1PathPrefix + "/user/me"
+	ApiV1UserRegisterPath     = ApiV1PathPrefix + "/user/register"
+	ApiV1UserLoginPath        = ApiV1PathPrefix + "/user/login"
+	ApiV1UserLogoutPath       = ApiV1PathPrefix + "/user/logout"
 )
 
 //const (
@@ -44,7 +45,7 @@ type userToOutput struct {
 func (h *UserHandler) HandleUserList(c echo.Context) error {
 	users := h.userUsecase.GetAllUsers()
 	usersToOutput := h.convertUsersForOutput(users)
-	return c.JSON(http.StatusOK, baseHttp.OkWithBody(map[string]interface{}{
+	return c.JSON(http.StatusOK, httpDelivery.OkWithBody(map[string]interface{}{
 		"users": usersToOutput,
 	}))
 }
@@ -140,9 +141,9 @@ func (h *UserHandler) HandleUserRegister(c echo.Context) error {
 	}
 	err := h.userUsecase.Register(userToRegister.Email, userToRegister.Password, userToRegister.Name)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, baseHttp.Error(err))
+		return c.JSON(http.StatusBadRequest, httpDelivery.Error(err))
 	}
-	return c.JSON(http.StatusOK, baseHttp.Ok())
+	return c.JSON(http.StatusOK, httpDelivery.Ok())
 }
 
 //type UserToLogin struct {

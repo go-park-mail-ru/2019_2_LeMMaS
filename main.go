@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/middleware"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
+	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
+	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
 	"github.com/labstack/echo"
 	"log"
 	"os"
@@ -17,13 +17,13 @@ func main() {
 	}
 
 	e := echo.New()
-	mw := middleware.NewMiddleware()
-	e.Use(mw.CORS)
-	e.Use(mw.Panic)
-
-	userRepo := repository.NewMemoryUserRepository()
-	userUsecase := usecase.NewUserUsecase(userRepo)
-	httpDelivery.NewUserHandler(e, userUsecase)
-
+	http.InitMiddlewares(e)
+	initUserHandler(e)
 	log.Fatal(e.Start("localhost:" + port))
+}
+
+func initUserHandler(e *echo.Echo) {
+	repo := userRepository.NewMemoryUserRepository()
+	usecase := userUsecase.NewUserUsecase(repo)
+	userHttpDelivery.NewUserHandler(e, usecase)
 }
