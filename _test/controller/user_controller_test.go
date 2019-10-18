@@ -71,13 +71,13 @@ func TestUserLogout(t *testing.T) {
 }
 
 type UserControllerTestSuite struct {
-	test.ControllerTestSuite
+	_test.ControllerTestSuite
 	userController *controller.UserController
 }
 
 func NewUserControllerTestSuite() *UserControllerTestSuite {
 	return &UserControllerTestSuite{
-		ControllerTestSuite: *test.NewControllerTestSuite(),
+		ControllerTestSuite: *_test.NewControllerTestSuite(),
 		userController:      controller.NewUserController(),
 	}
 }
