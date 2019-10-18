@@ -1,5 +1,9 @@
 package http
 
+import (
+	"fmt"
+)
+
 type Response struct {
 	Status string      `json:"status"`
 	Body   interface{} `json:"body"`
@@ -27,4 +31,12 @@ func Error(err error) Response {
 		Status: "error",
 		Body:   errorResponseBody{Message: err.Error()},
 	}
+}
+
+func ValidatorErrors(errors []error) Response {
+	message := ""
+	for _, err := range errors {
+		message += "field " + err.Error() + "\n\n"
+	}
+	return Error(fmt.Errorf(message))
 }

@@ -67,10 +67,10 @@ func (h *UserHandler) convertUserForOutput(user model.User) userToOutput {
 	}
 }
 
-type userToUpdate struct {
-	Password string `json:"password"`
-	Name     string `json:"name"`
-}
+//type userToUpdate struct {
+//	Password string `json:"password"`
+//	Name     string `json:"name"`
+//}
 
 //func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
 //currentUser, err := h.getCurrentUser(c.Request())
@@ -129,15 +129,18 @@ type userToUpdate struct {
 //}
 
 type userToRegister struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name"`
+	Email    string `json:"email" valid:"email,required"`
+	Password string `json:"password" valid:"required"`
+	Name     string `json:"name" valid:"required"`
 }
 
 func (h *UserHandler) HandleUserRegister(c echo.Context) error {
 	userToRegister := &userToRegister{}
 	if err := c.Bind(userToRegister); err != nil {
 		return err
+	}
+	if ok, errors := httpDelivery.Validate(userToRegister); !ok {
+		return c.JSON(http.StatusBadRequest, httpDelivery.ValidatorErrors(errors))
 	}
 	err := h.userUsecase.Register(userToRegister.Email, userToRegister.Password, userToRegister.Name)
 	if err != nil {
