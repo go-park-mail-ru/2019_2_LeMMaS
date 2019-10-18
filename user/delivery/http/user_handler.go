@@ -31,7 +31,7 @@ type UserHandler struct {
 	httpDelivery.Handler
 }
 
-func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) {
+func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) *UserHandler {
 	handler := UserHandler{userUsecase: userUsecase}
 	e.GET(ApiV1UserListPath, handler.HandleUserList)
 	e.POST(ApiV1UserRegisterPath, handler.HandleUserRegister)
@@ -40,6 +40,7 @@ func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) {
 	e.GET(ApiV1UserProfilePath, handler.HandleUserProfile)
 	e.POST(ApiV1UserUpdatePath, handler.HandleUserUpdate)
 	e.POST(ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
+	return &handler
 }
 
 type userToOutput struct {

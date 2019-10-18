@@ -26,16 +26,16 @@ func NewUserUsecase(userRepository user.Repository) *userUsecase {
 	}
 }
 
-func (u userUsecase) GetAllUsers() []model.User {
+func (u *userUsecase) GetAllUsers() []model.User {
 	return u.userRepository.GetAll()
 }
 
-func (u userUsecase) GetUserBySessionID(sessionID string) *model.User {
+func (u *userUsecase) GetUserBySessionID(sessionID string) *model.User {
 	userID := u.sessions[sessionID]
 	return u.userRepository.GetByID(userID)
 }
 
-func (u userUsecase) UpdateUser(id int, password, name string) {
+func (u *userUsecase) UpdateUser(id int, password, name string) {
 	passwordHash := ""
 	if password != "" {
 		passwordHash = u.getPasswordHash(password)
@@ -43,7 +43,7 @@ func (u userUsecase) UpdateUser(id int, password, name string) {
 	u.userRepository.Update(id, passwordHash, name)
 }
 
-func (u userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {
+func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {
 	u.deleteFileIfExists(user.AvatarPath)
 	newAvatarPath, err := u.storeUserAvatar(user.ID, avatarFile, avatarPath)
 	if err != nil {
@@ -53,7 +53,7 @@ func (u userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, av
 	return nil
 }
 
-func (u userUsecase) Register(email, password, name string) error {
+func (u *userUsecase) Register(email, password, name string) error {
 	if u.userRepository.GetByEmail(email) != nil {
 		return fmt.Errorf("user with email %v already registered", email)
 	}
@@ -62,7 +62,7 @@ func (u userUsecase) Register(email, password, name string) error {
 	return nil
 }
 
-func (u userUsecase) Login(email, password string) (string, error) {
+func (u *userUsecase) Login(email, password string) (string, error) {
 	userToLogin := u.userRepository.GetByEmail(email)
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
@@ -75,7 +75,7 @@ func (u userUsecase) Login(email, password string) (string, error) {
 	return sessionID, nil
 }
 
-func (u userUsecase) Logout(sessionID string) error {
+func (u *userUsecase) Logout(sessionID string) error {
 	if _, ok := u.sessions[sessionID]; !ok {
 		return fmt.Errorf("session id not found")
 	}
@@ -83,15 +83,15 @@ func (u userUsecase) Logout(sessionID string) error {
 	return nil
 }
 
-func (u userUsecase) getPasswordHash(password string) string {
+func (u *userUsecase) getPasswordHash(password string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(password)))
 }
 
-func (u userUsecase) getNewSessionID() string {
+func (u *userUsecase) getNewSessionID() string {
 	return uuid.New().String()
 }
 
-func (u userUsecase) storeUserAvatar(userID int, avatarFile io.Reader, avatarPath string) (string, error) {
+func (u *userUsecase) storeUserAvatar(userID int, avatarFile io.Reader, avatarPath string) (string, error) {
 	storageAvatarPath := UserAvatarDirectory + "/" + strconv.Itoa(userID) + filepath.Ext(avatarPath)
 	storageAvatarFile, err := os.OpenFile(storageAvatarPath, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
@@ -102,13 +102,13 @@ func (u userUsecase) storeUserAvatar(userID int, avatarFile io.Reader, avatarPat
 	return storageAvatarPath, nil
 }
 
-func (u userUsecase) deleteFileIfExists(fileName string) {
+func (u *userUsecase) deleteFileIfExists(fileName string) {
 	if u.fileExists(fileName) {
 		os.Remove(fileName)
 	}
 }
 
-func (u userUsecase) fileExists(file string) bool {
+func (u *userUsecase) fileExists(file string) bool {
 	info, err := os.Stat(file)
 	if os.IsNotExist(err) {
 		return false
