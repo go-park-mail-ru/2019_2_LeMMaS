@@ -2,6 +2,8 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -53,4 +55,17 @@ func (c Controller) setCookie(w http.ResponseWriter, name, value string, expires
 func (c Controller) deleteCookie(w http.ResponseWriter, cookie *http.Cookie) {
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, cookie)
+}
+
+func (c Controller) PanicMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Printf("panic during request to %s: %s", r.URL.Path, err)
+				w.WriteHeader(http.StatusInternalServerError)
+				c.writeError(w, fmt.Errorf("internal error"))
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
 }
