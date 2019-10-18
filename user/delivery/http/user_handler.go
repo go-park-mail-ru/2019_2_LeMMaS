@@ -93,30 +93,24 @@ func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
 }
 
 func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
-	return nil
-	//h.writeCommonHeaders(w)
-	//currentUser, err := h.getCurrentUser(r)
-	//if err != nil {
-	//	h.writeError(w, err)
-	//	return
-	//}
-	//err = r.ParseMultipartForm(32 << 20)
-	//if err != nil {
-	//	h.writeError(w, err)
-	//	return
-	//}
-	//avatarFile, avatarFileHeader, err := r.FormFile("avatar")
-	//if err != nil {
-	//	h.writeError(w, err)
-	//	return
-	//}
-	//defer avatarFile.Close()
-	//err = h.userComponent.UpdateUserAvatar(currentUser, avatarFile, avatarFileHeader.Filename)
-	//if err != nil {
-	//	h.writeError(w, err)
-	//	return
-	//}
-	//h.writeOk(w)
+	currentUser, err := h.getCurrentUser(c)
+	if err != nil {
+		return h.Error(c, err)
+	}
+	err = c.Request().ParseMultipartForm(32 << 20)
+	if err != nil {
+		return h.Error(c, err)
+	}
+	avatarFile, avatarFileHeader, err := c.Request().FormFile("avatar")
+	if err != nil {
+		return h.Error(c, err)
+	}
+	defer avatarFile.Close()
+	err = h.userUsecase.UpdateUserAvatar(currentUser, avatarFile, avatarFileHeader.Filename)
+	if err != nil {
+		return h.Error(c, err)
+	}
+	return h.Ok(c)
 }
 
 func (h *UserHandler) HandleUserProfile(c echo.Context) error {
