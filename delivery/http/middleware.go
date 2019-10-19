@@ -27,7 +27,9 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		allowedMethods := []string{http.MethodGet, http.MethodHead, http.MethodPost, http.MethodPut, http.MethodOptions, http.MethodDelete}
 		c.Response().Header().Set(echo.HeaderAccessControlAllowMethods, strings.Join(allowedMethods, ","))
 		c.Response().Header().Set(echo.HeaderAccessControlAllowCredentials, "true")
-		c.Response().Header().Set(echo.HeaderAccessControlAllowHeaders, "*")
+
+		allowedHeaders := []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"}
+		c.Response().Header().Set(echo.HeaderAccessControlAllowHeaders, strings.Join(allowedHeaders, ","))
 
 		if c.Request().Method == http.MethodOptions {
 			return c.NoContent(http.StatusNoContent)
