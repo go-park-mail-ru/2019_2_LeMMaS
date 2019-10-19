@@ -39,6 +39,10 @@ func (s *HandlerTestSuite) SetupRequest(method, path string, requestBody string)
 	}
 }
 
+func (s *HandlerTestSuite) NewHandlerContext() echo.Context {
+	return s.E.NewContext(s.Request, s.Response)
+}
+
 func (s HandlerTestSuite) TestResponse(expectedResponse string) {
 	s.TestResponseStatus()
 	s.TestResponseBody(expectedResponse)
