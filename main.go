@@ -6,7 +6,6 @@ import (
 	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
 	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
 	"github.com/labstack/echo"
-	"log"
 	"os"
 )
 
@@ -19,7 +18,7 @@ func main() {
 	e := echo.New()
 	http.InitMiddlewares(e)
 	initUserHandler(e)
-	log.Fatal(e.Start("localhost:" + port))
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func initUserHandler(e *echo.Echo) {
