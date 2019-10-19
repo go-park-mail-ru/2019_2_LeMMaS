@@ -4,6 +4,8 @@ import (
 	"github.com/labstack/echo"
 	"log"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 func InitMiddlewares(e *echo.Echo) {
@@ -13,19 +15,27 @@ func InitMiddlewares(e *echo.Echo) {
 
 func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		c.Response().Header().Set("Access-Control-Allow-Origin", "*")
-		//	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"})
-		//originsOk := handlers.AllowedOriginValidator(func(origin string) bool {
-		//	isNowSh, _ := regexp.MatchString(`^https:\/\/20192lemmas-.*\.now\.sh$`, origin)
-		//	isLocalhost, _ := regexp.MatchString(`^http:\/\/localhost:\d*$`, origin)
-		//	return isNowSh || isLocalhost
-		//})
-		//methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "DELETE"})
-		//credentials := handlers.AllowCredentials()
-		//return handlers.CORS(originsOk, headersOk, methodsOk, credentials)(router)
+		origin := c.Request().Header.Get(echo.HeaderOrigin)
+		var allowOrigin string
+		if isOriginAllowed(origin) {
+			allowOrigin = origin
+		} else {
+			allowOrigin = ""
+		}
+		c.Response().Header().Set(echo.HeaderAccessControlAllowOrigin, allowOrigin)
+
+		allowedMethods := []string{http.MethodGet, http.MethodHead, http.MethodPost, http.MethodPut, http.MethodOptions, http.MethodDelete}
+		c.Response().Header().Set(echo.HeaderAccessControlAllowMethods, strings.Join(allowedMethods, ","))
+		c.Response().Header().Set(echo.HeaderAccessControlAllowCredentials, "true")
 
 		return next(c)
 	}
+}
+
+func isOriginAllowed(origin string) bool {
+	isNowSh, _ := regexp.MatchString(`^https:\/\/20192lemmas-.*\.now\.sh$`, origin)
+	isLocalhost, _ := regexp.MatchString(`^http:\/\/localhost:\d*$`, origin)
+	return isNowSh || isLocalhost
 }
 
 func panicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
