@@ -28,6 +28,9 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Response().Header().Set(echo.HeaderAccessControlAllowMethods, strings.Join(allowedMethods, ","))
 		c.Response().Header().Set(echo.HeaderAccessControlAllowCredentials, "true")
 
+		if c.Request().Method == http.MethodOptions {
+			return c.NoContent(http.StatusNoContent)
+		}
 		return next(c)
 	}
 }
