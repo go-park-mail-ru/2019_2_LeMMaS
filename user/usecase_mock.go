@@ -35,11 +35,12 @@ func (m *MockUsecase) EXPECT() *MockUsecaseMockRecorder {
 }
 
 // GetAllUsers mocks base method
-func (m *MockUsecase) GetAllUsers() []model.User {
+func (m *MockUsecase) GetAllUsers() ([]model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllUsers")
 	ret0, _ := ret[0].([]model.User)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetAllUsers indicates an expected call of GetAllUsers
@@ -49,11 +50,12 @@ func (mr *MockUsecaseMockRecorder) GetAllUsers() *gomock.Call {
 }
 
 // GetUserBySessionID mocks base method
-func (m *MockUsecase) GetUserBySessionID(sessionID string) *model.User {
+func (m *MockUsecase) GetUserBySessionID(sessionID string) (*model.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserBySessionID", sessionID)
 	ret0, _ := ret[0].(*model.User)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetUserBySessionID indicates an expected call of GetUserBySessionID
@@ -63,9 +65,11 @@ func (mr *MockUsecaseMockRecorder) GetUserBySessionID(sessionID interface{}) *go
 }
 
 // UpdateUser mocks base method
-func (m *MockUsecase) UpdateUser(id int, password, name string) {
+func (m *MockUsecase) UpdateUser(id int, password, name string) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "UpdateUser", id, password, name)
+	ret := m.ctrl.Call(m, "UpdateUser", id, password, name)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // UpdateUser indicates an expected call of UpdateUser

@@ -51,7 +51,10 @@ type userToOutput struct {
 }
 
 func (h *UserHandler) HandleUserList(c echo.Context) error {
-	users := h.userUsecase.GetAllUsers()
+	users, err := h.userUsecase.GetAllUsers()
+	if err != nil {
+		return h.Error(c, err)
+	}
 	usersToOutput := h.convertUsersForOutput(users)
 	return h.OkWithBody(c, map[string]interface{}{
 		"users": usersToOutput,
@@ -89,7 +92,10 @@ func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
 	if err := c.Bind(userToUpdate); err != nil {
 		return h.Error(c, err)
 	}
-	h.userUsecase.UpdateUser(currentUser.ID, userToUpdate.Password, userToUpdate.Name)
+	err = h.userUsecase.UpdateUser(currentUser.ID, userToUpdate.Password, userToUpdate.Name)
+	if err != nil {
+		return h.Error(c, err)
+	}
 	return h.Ok(c)
 }
 
@@ -186,7 +192,7 @@ func (h *UserHandler) getCurrentUser(c echo.Context) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	currentUser := h.userUsecase.GetUserBySessionID(sessionIDCookie.Value)
+	currentUser, _ := h.userUsecase.GetUserBySessionID(sessionIDCookie.Value)
 	if currentUser == nil {
 		return nil, fmt.Errorf("invalid session id")
 	}

@@ -14,9 +14,7 @@ var s = NewUserHandlerTestSuite()
 func TestUserHandler_HandleUserList(t *testing.T) {
 	s.SetTesting(t)
 
-	s.ExpectUsecase().GetAllUsers().Return([]model.User{
-		{Name: "Ivan"},
-	})
+	s.ExpectUsecase().GetAllUsers().Return([]model.User{{Name: "Ivan"}}, nil)
 	s.TestUserList(`{"status":"ok","body":{"users":[{"id":0,"email":"","name":"Ivan","avatar_path":""}]}}`)
 }
 
@@ -26,7 +24,7 @@ func TestUserHandler_HandleUserRegister(t *testing.T) {
 	user1 := model.User{ID: 1, Email: "testik1@mail.ru", Name: "Test The Best 1"}
 	password := "ssc-tuatara"
 	s.ExpectUsecase().Register(user1.Email, password, user1.Name).Return(nil)
-	s.ExpectUsecase().GetAllUsers().Return([]model.User{user1})
+	s.ExpectUsecase().GetAllUsers().Return([]model.User{user1}, nil)
 
 	s.TestUserRegister(`{"email": "testik1@mail.ru","name": "Test The Best 1","password": "ssc-tuatara"}`, s.Ok())
 	s.TestUserList(`{"status":"ok","body":{"users":[{"id":1,"email":"testik1@mail.ru","name":"Test The Best 1","avatar_path":""}]}}`)
@@ -37,8 +35,8 @@ func TestUserHandler_HandleUserUpdate(t *testing.T) {
 
 	sessionID := "sess"
 	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(sessionID, nil)
-	s.ExpectUsecase().GetUserBySessionID(sessionID).Return(&model.User{ID: 1})
-	s.ExpectUsecase().UpdateUser(1, "", "New Name").Return()
+	s.ExpectUsecase().GetUserBySessionID(sessionID).Return(&model.User{ID: 1}, nil)
+	s.ExpectUsecase().UpdateUser(1, "", "New Name").Return(nil)
 
 	s.TestUserLogin(
 		`{"email":"testik1@mail.ru","password":"ssc-tuatara"}`,
