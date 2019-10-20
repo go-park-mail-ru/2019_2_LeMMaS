@@ -30,8 +30,7 @@ func main() {
 }
 
 func getDB() (*sqlx.DB, error) {
-	dsn := "host=localhost port=5432 dbname=lemmas user=root password=temppassword"
-	db, err := sqlx.Connect("pgx", dsn)
+	db, err := sqlx.Connect("pgx", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		return nil, err
 	}

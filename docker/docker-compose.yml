@@ -3,13 +3,16 @@ services:
   go:
     build: images/go
     working_dir: /home/app
+    env_file: .env
+    depends_on:
+      - postgres
     volumes:
       - ./..:/home/app
     ports:
       - 8080:8080
 
   postgres:
-    image: postgres:12
+    image: postgres:11.5
     restart: always
     environment:
       POSTGRES_DB: lemmas
