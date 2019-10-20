@@ -26,21 +26,28 @@ func NewUserUsecase(userRepository user.Repository) *userUsecase {
 	}
 }
 
-func (u *userUsecase) GetAllUsers() []model.User {
+func (u *userUsecase) GetAllUsers() ([]model.User, error) {
 	return u.userRepository.GetAll()
 }
 
-func (u *userUsecase) GetUserBySessionID(sessionID string) *model.User {
+func (u *userUsecase) GetUserBySessionID(sessionID string) (*model.User, error) {
 	userID := u.sessions[sessionID]
 	return u.userRepository.GetByID(userID)
 }
 
-func (u *userUsecase) UpdateUser(id int, password, name string) {
-	passwordHash := ""
-	if password != "" {
-		passwordHash = u.getPasswordHash(password)
+func (u *userUsecase) UpdateUser(id int, password, name string) error {
+	userToUpdate, err := u.userRepository.GetByID(id)
+	if err != nil {
+		return err
 	}
-	u.userRepository.Update(id, passwordHash, name)
+	if password != "" {
+		userToUpdate.PasswordHash = u.getPasswordHash(password)
+	}
+	if name != "" {
+		userToUpdate.Name = name
+	}
+	u.userRepository.Update(userToUpdate)
+	return nil
 }
 
 func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {
@@ -49,21 +56,26 @@ func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, a
 	if err != nil {
 		return err
 	}
-	u.userRepository.UpdateAvatarPath(user.ID, newAvatarPath)
-	return nil
+	return u.userRepository.UpdateAvatarPath(user.ID, newAvatarPath)
 }
 
 func (u *userUsecase) Register(email, password, name string) error {
-	if u.userRepository.GetByEmail(email) != nil {
+	userWithSameEmail, err := u.userRepository.GetByEmail(email)
+	if err != nil {
+		return err
+	}
+	if userWithSameEmail != nil {
 		return fmt.Errorf("user with email %v already registered", email)
 	}
 	passwordHash := u.getPasswordHash(password)
-	u.userRepository.Create(email, passwordHash, name)
-	return nil
+	return u.userRepository.Create(email, passwordHash, name)
 }
 
 func (u *userUsecase) Login(email, password string) (string, error) {
-	userToLogin := u.userRepository.GetByEmail(email)
+	userToLogin, err := u.userRepository.GetByEmail(email)
+	if err != nil {
+		return "", err
+	}
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
 	}
