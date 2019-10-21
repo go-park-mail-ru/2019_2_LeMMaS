@@ -1,39 +1,50 @@
 package main
 
 import (
-	"fmt"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/handlers"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
+	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
+	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
+	_ "github.com/jackc/pgx/stdlib"
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo"
 	"log"
-	"net/http"
+	"os"
 )
-
-var (
-	apiPath = "/api/v1"
-	PORT    = ":8080"
-)
-
-func Cors(w http.ResponseWriter, r *http.Request) { // TODO сделатьчерез мультиплексор
-	w.Header().Set("Content-Type", "text/html; charset=ascii")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers","Content-Type,access-control-allow-origin, access-control-allow-headers")
-}
 
 func main() {
-	// TODO парсить из командной строки параметры конфигурации
-	loginHandler := http.HandlerFunc(handlers.LoginHandler)
-	logoutHandler := http.HandlerFunc(handlers.LogoutHandler)
-	registerHandler := http.HandlerFunc(handlers.RegisterHandler)
-	userDataHandler := http.HandlerFunc(handlers.GetUserDataHandler)
-	changeUserDataHandler := http.HandlerFunc(handlers.ChangeUserDataHandler)
-	uploadAvatarHandler := http.HandlerFunc(handlers.UploadAvatarHandler)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-	http.Handle(apiPath+"/login", handlers.MethodMiddleware("POST")(loginHandler))
-	http.Handle(apiPath+"/logout", handlers.MethodMiddleware("POST")(logoutHandler))
-	http.Handle(apiPath+"/register", handlers.MethodMiddleware("POST")(registerHandler))
-	http.Handle(apiPath+"/user", handlers.MethodMiddleware("GET")(userDataHandler))
-	http.Handle(apiPath+"/user/upload", handlers.MethodMiddleware("PUT")(uploadAvatarHandler))
-	http.Handle(apiPath+"/user/settings", handlers.MethodMiddleware("PATCH")(changeUserDataHandler))
+	e := echo.New()
+	e.Static("static", "static")
+	http.InitMiddlewares(e)
+	db, err := getDB()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	initUserHandler(e, db)
+	log.Fatal(e.Start(":" + port))
+}
 
-	fmt.Printf("starting server at %s\n", PORT)
-	log.Fatal(http.ListenAndServe(PORT, nil))
+func getDB() (*sqlx.DB, error) {
+	db, err := sqlx.Connect("pgx", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
+
+func initUserHandler(e *echo.Echo, db *sqlx.DB) {
+	userRepo := userRepository.NewDatabaseUserRepository(db)
+	userFileRepo := userRepository.NewUserFileRepository()
+	usecase := userUsecase.NewUserUsecase(userRepo, userFileRepo)
+	userHttpDelivery.NewUserHandler(e, usecase)
 }
