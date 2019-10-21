@@ -19,6 +19,7 @@ func main() {
 	}
 
 	e := echo.New()
+	e.Static("static", "static")
 	http.InitMiddlewares(e)
 	db, err := getDB()
 	if err != nil {

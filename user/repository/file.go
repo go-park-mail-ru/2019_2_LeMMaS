@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-const UserAvatarDirectory = "_storage/user/avatar"
+const UserAvatarDirectory = "static/user/avatar"
 
 const (
 	FilePerm      = 0666
