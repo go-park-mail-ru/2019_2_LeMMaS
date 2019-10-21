@@ -42,7 +42,8 @@ func getDB() (*sqlx.DB, error) {
 }
 
 func initUserHandler(e *echo.Echo, db *sqlx.DB) {
-	repo := userRepository.NewDatabaseUserRepository(db)
-	usecase := userUsecase.NewUserUsecase(repo)
+	userRepo := userRepository.NewDatabaseUserRepository(db)
+	userFileRepo := userRepository.NewUserFileRepository()
+	usecase := userUsecase.NewUserUsecase(userRepo, userFileRepo)
 	userHttpDelivery.NewUserHandler(e, usecase)
 }

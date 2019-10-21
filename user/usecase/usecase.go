@@ -7,22 +7,19 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/google/uuid"
 	"io"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
-const UserAvatarDirectory = "_storage/user/avatar"
-
 type userUsecase struct {
-	userRepository user.Repository
-	sessions       map[string]int
+	userRepository     user.UserRepository
+	userFileRepository user.UserFileRepository
+	sessions           map[string]int
 }
 
-func NewUserUsecase(userRepository user.Repository) *userUsecase {
+func NewUserUsecase(userRepository user.UserRepository, userFileRepository user.UserFileRepository) *userUsecase {
 	return &userUsecase{
-		userRepository: userRepository,
-		sessions:       map[string]int{},
+		userRepository:     userRepository,
+		userFileRepository: userFileRepository,
+		sessions:           map[string]int{},
 	}
 }
 
@@ -51,8 +48,7 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 }
 
 func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {
-	u.deleteFileIfExists(user.AvatarPath)
-	newAvatarPath, err := u.storeUserAvatar(user.ID, avatarFile, avatarPath)
+	newAvatarPath, err := u.userFileRepository.StoreAvatar(user, avatarFile, avatarPath)
 	if err != nil {
 		return err
 	}
@@ -101,29 +97,4 @@ func (u *userUsecase) getPasswordHash(password string) string {
 
 func (u *userUsecase) getNewSessionID() string {
 	return uuid.New().String()
-}
-
-func (u *userUsecase) storeUserAvatar(userID int, avatarFile io.Reader, avatarPath string) (string, error) {
-	storageAvatarPath := UserAvatarDirectory + "/" + strconv.Itoa(userID) + filepath.Ext(avatarPath)
-	storageAvatarFile, err := os.OpenFile(storageAvatarPath, os.O_WRONLY|os.O_CREATE, 0666)
-	if err != nil {
-		return "", err
-	}
-	defer storageAvatarFile.Close()
-	io.Copy(storageAvatarFile, avatarFile)
-	return storageAvatarPath, nil
-}
-
-func (u *userUsecase) deleteFileIfExists(fileName string) {
-	if u.fileExists(fileName) {
-		os.Remove(fileName)
-	}
-}
-
-func (u *userUsecase) fileExists(file string) bool {
-	info, err := os.Stat(file)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
 }
