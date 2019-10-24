@@ -10,15 +10,13 @@ import (
 )
 
 const (
-	ApiV1PathPrefix = "/api/v1"
-
-	ApiV1UserListPath         = ApiV1PathPrefix + "/user/list"
-	ApiV1UserUpdatePath       = ApiV1PathPrefix + "/user/update"
-	ApiV1UserAvatarUploadPath = ApiV1PathPrefix + "/user/avatar/upload"
-	ApiV1UserProfilePath      = ApiV1PathPrefix + "/user/me"
-	ApiV1UserRegisterPath     = ApiV1PathPrefix + "/user/register"
-	ApiV1UserLoginPath        = ApiV1PathPrefix + "/user/login"
-	ApiV1UserLogoutPath       = ApiV1PathPrefix + "/user/logout"
+	ApiV1UserListPath         = httpDelivery.ApiV1PathPrefix + "/user/list"
+	ApiV1UserUpdatePath       = httpDelivery.ApiV1PathPrefix + "/user/update"
+	ApiV1UserAvatarUploadPath = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
+	ApiV1UserProfilePath      = httpDelivery.ApiV1PathPrefix + "/user/me"
+	ApiV1UserRegisterPath     = httpDelivery.ApiV1PathPrefix + "/user/register"
+	ApiV1UserLoginPath        = httpDelivery.ApiV1PathPrefix + "/user/login"
+	ApiV1UserLogoutPath       = httpDelivery.ApiV1PathPrefix + "/user/logout"
 )
 
 const (
