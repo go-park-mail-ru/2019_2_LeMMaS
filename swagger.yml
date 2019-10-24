@@ -1,0 +1,195 @@
+swagger: '2.0'
+info:
+  title: LeMMaS API
+  version: '1'
+host: quiet-depths-50475.herokuapp.com
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+  - https
+
+
+paths:
+
+  /user/list:
+    get:
+      tags:
+        - "user"
+      summary: "List all registered users"
+      responses:
+        200:
+          description: ""
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/UserToOutput"
+
+
+  /user/register:
+    post:
+      tags:
+        - "user"
+      summary: "Register new user"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/UserToRegister"
+      responses:
+        200:
+          description: "User registered"
+        400:
+          description: "Error"
+          schema:
+            type: "string"
+            example: "user with email ... already registered"
+
+
+  /user/login:
+    post:
+      tags:
+        - "user"
+      summary: "Login user"
+      description: "Login user and set session cookie"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/UserToLogin"
+      responses:
+        200:
+          description: "User logged in"
+        400:
+          description: "Error"
+          schema:
+            type: "string"
+            example: "invalid password"
+
+
+  /user/logout:
+    post:
+      tags:
+        - "user"
+      summary: "Logout user"
+      description: "Logout user and remove session cookie"
+      responses:
+        200:
+          description: "User logged out"
+        400:
+          description: "Error"
+          schema:
+            type: "string"
+            example: "no session cookie"
+
+
+  /user/me:
+    get:
+      tags:
+        - "user"
+      summary: "Get current logged in user"
+      description: ""
+      responses:
+        200:
+          description: "Current user or null if no session cookie"
+          schema:
+            $ref: "#/definitions/UserToOutput"
+
+
+  /user/update:
+    post:
+      tags:
+        - "user"
+      summary: "Update current logged in user"
+      description: ""
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/UserToUpdate"
+      responses:
+        200:
+          description: "User updated"
+        400:
+          description: "Error"
+          schema:
+            type: "string"
+            example: "no session cookie"
+
+
+  /user/avatar/upload:
+    post:
+      tags:
+        - "user"
+      summary: "Upload current logged in user avatar"
+      description: ""
+      consumes:
+        - "multipart/form-data"
+      parameters:
+        - in: "formData"
+          name: "avatar"
+          description: "Avatar to upload"
+          required: true
+          type: "file"
+      responses:
+        200:
+          description: "Avatar updated"
+        400:
+          description: "Error"
+          schema:
+            type: "string"
+            example: "no session cookie"
+
+
+
+definitions:
+
+  UserToOutput:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        example: "21"
+      email:
+        type: "string"
+        format: "email"
+      name:
+        type: "string"
+        example: "Mark Pip"
+      avatar_path:
+        type: "string"
+        example: "static/user/avatar/21.jpg"
+
+  UserToRegister:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      password:
+        type: "string"
+      name:
+        type: "string"
+
+  UserToLogin:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      password:
+        type: "string"
+
+  UserToUpdate:
+    type: "object"
+    properties:
+      password:
+        type: "string"
+      name:
+        type: "string"

@@ -11,12 +11,12 @@ import (
 
 const (
 	ApiV1UserListPath         = httpDelivery.ApiV1PathPrefix + "/user/list"
-	ApiV1UserUpdatePath       = httpDelivery.ApiV1PathPrefix + "/user/update"
-	ApiV1UserAvatarUploadPath = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
-	ApiV1UserProfilePath      = httpDelivery.ApiV1PathPrefix + "/user/me"
 	ApiV1UserRegisterPath     = httpDelivery.ApiV1PathPrefix + "/user/register"
 	ApiV1UserLoginPath        = httpDelivery.ApiV1PathPrefix + "/user/login"
 	ApiV1UserLogoutPath       = httpDelivery.ApiV1PathPrefix + "/user/logout"
+	ApiV1UserProfilePath      = httpDelivery.ApiV1PathPrefix + "/user/me"
+	ApiV1UserUpdatePath       = httpDelivery.ApiV1PathPrefix + "/user/update"
+	ApiV1UserAvatarUploadPath = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
 )
 
 const (
@@ -188,7 +188,7 @@ func (h *UserHandler) HandleUserLogout(c echo.Context) error {
 func (h *UserHandler) getCurrentUser(c echo.Context) (*model.User, error) {
 	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("no session cookie")
 	}
 	currentUser, _ := h.userUsecase.GetUserBySessionID(sessionIDCookie.Value)
 	if currentUser == nil {
