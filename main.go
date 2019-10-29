@@ -21,12 +21,12 @@ func main() {
 	e := echo.New()
 	e.Static("static", "static")
 	http.InitMiddlewares(e)
-	//db, err := getDB()
-	//if err != nil {
-	//	log.Fatal(err)
-	//	return
-	//}
-	initUserHandler(e, nil)
+	db, err := getDB()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	initUserHandler(e, db)
 	log.Fatal(e.Start(":" + port))
 }
 
