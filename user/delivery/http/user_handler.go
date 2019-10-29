@@ -10,13 +10,14 @@ import (
 )
 
 const (
-	ApiV1UserListPath         = httpDelivery.ApiV1PathPrefix + "/user/list"
-	ApiV1UserRegisterPath     = httpDelivery.ApiV1PathPrefix + "/user/register"
-	ApiV1UserLoginPath        = httpDelivery.ApiV1PathPrefix + "/user/login"
-	ApiV1UserLogoutPath       = httpDelivery.ApiV1PathPrefix + "/user/logout"
-	ApiV1UserProfilePath      = httpDelivery.ApiV1PathPrefix + "/user/me"
-	ApiV1UserUpdatePath       = httpDelivery.ApiV1PathPrefix + "/user/update"
-	ApiV1UserAvatarUploadPath = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
+	ApiV1UserListPath          = httpDelivery.ApiV1PathPrefix + "/user/list"
+	ApiV1UserRegisterPath      = httpDelivery.ApiV1PathPrefix + "/user/register"
+	ApiV1UserLoginPath         = httpDelivery.ApiV1PathPrefix + "/user/login"
+	ApiV1UserLogoutPath        = httpDelivery.ApiV1PathPrefix + "/user/logout"
+	ApiV1UserProfilePath       = httpDelivery.ApiV1PathPrefix + "/user/me"
+	ApiV1UserUpdatePath        = httpDelivery.ApiV1PathPrefix + "/user/update"
+	ApiV1UserAvatarUploadPath  = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
+	ApiV1UserAvatarPreviewPath = httpDelivery.ApiV1PathPrefix + "/user/avatar/preview"
 )
 
 const (
@@ -38,6 +39,7 @@ func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) *UserHandler {
 	e.GET(ApiV1UserProfilePath, handler.HandleUserProfile)
 	e.POST(ApiV1UserUpdatePath, handler.HandleUserUpdate)
 	e.POST(ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
+	e.GET(ApiV1UserAvatarPreviewPath, handler.HandleAvatarPreview)
 	return &handler
 }
 
@@ -116,6 +118,17 @@ func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
 		return h.Error(c, err)
 	}
 	return h.Ok(c)
+}
+
+func (h *UserHandler) HandleAvatarPreview(c echo.Context) error {
+	name := c.FormValue("name")
+	avatarPreviewUrl, err := h.userUsecase.GetAvatarPreviewUrl(name)
+	if err != nil {
+		return h.Error(c, err)
+	}
+	return h.OkWithBody(c, map[string]string{
+		"avatar_url": avatarPreviewUrl,
+	})
 }
 
 func (h *UserHandler) HandleUserProfile(c echo.Context) error {
