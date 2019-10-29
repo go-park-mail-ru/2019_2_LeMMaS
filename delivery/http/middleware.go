@@ -2,8 +2,10 @@ package http
 
 import (
 	"github.com/labstack/echo"
+	middleware "github.com/labstack/echo/middleware"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -11,6 +13,25 @@ import (
 func InitMiddlewares(e *echo.Echo) {
 	e.Use(corsMiddleware)
 	e.Use(panicMiddleware)
+	e.Use(middleware.LoggerWithConfig(setLoggerConfig()))
+}
+
+func setLoggerConfig() LoggerConfig {
+	f, err := os.OpenFile("agario.log",
+		os.O_RDWR | os.O_CREATE | os.O_APPEND,
+		0666)
+	if err != nil {
+		log.Fatalf("error opening log file: %v", err)
+	}
+	defer f.Close()
+
+	return LoggerConfig{
+		Format: `{"time":"${time_rfc3339}","id":"${id}","remote_ip":"${remote_ip}",` +
+			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
+			`"status":${status},"error":"${error}","file":"${long_file}"` + "\n",
+		CustomTimeFormat: "2000-01-01 15:01:02",
+		Output: f,
+	}
 }
 
 func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {

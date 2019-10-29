@@ -1,7 +1,9 @@
 package main
 
 import (
+	"2019_2_LeMMaS/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	// logger "github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
 	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
 	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
@@ -21,9 +23,11 @@ func main() {
 	e := echo.New()
 	e.Static("static", "static")
 	http.InitMiddlewares(e)
+	// logger.InitLogger()
 	db, err := getDB()
+
 	if err != nil {
-		log.Fatal(err)
+		logger.Log.Fatal(err)
 		return
 	}
 	initUserHandler(e, db)
