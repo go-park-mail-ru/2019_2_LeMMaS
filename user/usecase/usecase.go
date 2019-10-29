@@ -55,6 +55,16 @@ func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, a
 	return u.userRepository.UpdateAvatarPath(user.ID, newAvatarPath)
 }
 
+func (u *userUsecase) GetAvatarPreviewUrl(name string) (string, error) {
+	avatarsByName := map[string]string{
+		"eath":   "http://www.i2clipart.com/cliparts/3/d/1/e/clipart-earth-3d1e.png",
+		"trump":  "https://cdn.dribbble.com/users/44323/screenshots/3077941/nevertrumpdrib.png",
+		"heroku": "https://dashboard.snapcraft.io/site_media/appmedia/2017/09/heroku.png",
+		"cat":    "https://i.pinimg.com/originals/95/f1/93/95f193e3bd4d3ee30043ca746be79cb8.png",
+	}
+	return avatarsByName[name], nil
+}
+
 func (u *userUsecase) Register(email, password, name string) error {
 	userWithSameEmail, err := u.userRepository.GetByEmail(email)
 	if err != nil {
