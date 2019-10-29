@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/google/uuid"
 	"io"
+	"strings"
 )
 
 type userUsecase struct {
@@ -66,7 +67,7 @@ func (u *userUsecase) GetAvatarUrlByName(name string) string {
 		"heroku": "https://railsware.com/blog/wp-content/uploads/2017/12/How-to-set-up-the-Heroku.png",
 		"cat":    "https://i.pinimg.com/originals/90/a8/56/90a856d434dd9df24d8d5fdf4bf3ce72.png",
 	}
-	return avatarsByName[name]
+	return avatarsByName[strings.ToLower(name)]
 }
 
 func (u *userUsecase) Register(email, password, name string) error {
