@@ -16,7 +16,7 @@ func InitMiddlewares(e *echo.Echo) {
 	e.Use(middleware.LoggerWithConfig(setLoggerConfig()))
 }
 
-func setLoggerConfig() LoggerConfig {
+func setLoggerConfig() middleware.LoggerConfig {
 	f, err := os.OpenFile("agario.log",
 		os.O_RDWR | os.O_CREATE | os.O_APPEND,
 		0666)
@@ -25,7 +25,7 @@ func setLoggerConfig() LoggerConfig {
 	}
 	defer f.Close()
 
-	return LoggerConfig{
+	return middleware.LoggerConfig{
 		Format: `{"time":"${time_rfc3339}","id":"${id}","remote_ip":"${remote_ip}",` +
 			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
 			`"status":${status},"error":"${error}","file":"${long_file}"` + "\n",
@@ -51,6 +51,8 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		allowedHeaders := []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"}
 		c.Response().Header().Set(echo.HeaderAccessControlAllowHeaders, strings.Join(allowedHeaders, ","))
+
+		//println(c.Logger)
 
 		if c.Request().Method == http.MethodOptions {
 			return c.NoContent(http.StatusNoContent)

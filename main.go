@@ -1,7 +1,8 @@
 package main
 
 import (
-	"2019_2_LeMMaS/logger"
+	//"2019_2_LeMMaS/logger"
+	"github.com/getsentry/sentry-go"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	// logger "github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
@@ -23,11 +24,14 @@ func main() {
 	e := echo.New()
 	e.Static("static", "static")
 	http.InitMiddlewares(e)
+	sentry.Init(sentry.ClientOptions{
+		Dsn: "https://23f2e9b5b60c448c87463bc49ffc8396@sentry.io/1801031",
+	})
 	// logger.InitLogger()
 	db, err := getDB()
 
 	if err != nil {
-		logger.Log.Fatal(err)
+		log.Fatal(err)
 		return
 	}
 	initUserHandler(e, db)
