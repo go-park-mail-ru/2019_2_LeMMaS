@@ -10,13 +10,14 @@ import (
 )
 
 const (
-	ApiV1UserListPath         = httpDelivery.ApiV1PathPrefix + "/user/list"
-	ApiV1UserUpdatePath       = httpDelivery.ApiV1PathPrefix + "/user/update"
-	ApiV1UserAvatarUploadPath = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
-	ApiV1UserProfilePath      = httpDelivery.ApiV1PathPrefix + "/user/me"
-	ApiV1UserRegisterPath     = httpDelivery.ApiV1PathPrefix + "/user/register"
-	ApiV1UserLoginPath        = httpDelivery.ApiV1PathPrefix + "/user/login"
-	ApiV1UserLogoutPath       = httpDelivery.ApiV1PathPrefix + "/user/logout"
+	ApiV1UserListPath            = httpDelivery.ApiV1PathPrefix + "/user/list"
+	ApiV1UserRegisterPath        = httpDelivery.ApiV1PathPrefix + "/user/register"
+	ApiV1UserLoginPath           = httpDelivery.ApiV1PathPrefix + "/user/login"
+	ApiV1UserLogoutPath          = httpDelivery.ApiV1PathPrefix + "/user/logout"
+	ApiV1UserProfilePath         = httpDelivery.ApiV1PathPrefix + "/user/me"
+	ApiV1UserUpdatePath          = httpDelivery.ApiV1PathPrefix + "/user/update"
+	ApiV1UserAvatarUploadPath    = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
+	ApiV1UserGetAvatarByNamePath = httpDelivery.ApiV1PathPrefix + "/user/avatar/getByName"
 )
 
 const (
@@ -38,6 +39,7 @@ func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) *UserHandler {
 	e.GET(ApiV1UserProfilePath, handler.HandleUserProfile)
 	e.POST(ApiV1UserUpdatePath, handler.HandleUserUpdate)
 	e.POST(ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
+	e.GET(ApiV1UserGetAvatarByNamePath, handler.HandleGetAvatarByName)
 	return &handler
 }
 
@@ -118,6 +120,14 @@ func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
 	return h.Ok(c)
 }
 
+func (h *UserHandler) HandleGetAvatarByName(c echo.Context) error {
+	name := c.FormValue("name")
+	avatarUrl := h.userUsecase.GetAvatarUrlByName(name)
+	return h.OkWithBody(c, map[string]string{
+		"avatar_url": avatarUrl,
+	})
+}
+
 func (h *UserHandler) HandleUserProfile(c echo.Context) error {
 	currentUser, err := h.getCurrentUser(c)
 	if err != nil {
@@ -188,7 +198,7 @@ func (h *UserHandler) HandleUserLogout(c echo.Context) error {
 func (h *UserHandler) getCurrentUser(c echo.Context) (*model.User, error) {
 	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("no session cookie")
 	}
 	currentUser, _ := h.userUsecase.GetUserBySessionID(sessionIDCookie.Value)
 	if currentUser == nil {

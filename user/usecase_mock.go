@@ -92,6 +92,20 @@ func (mr *MockUsecaseMockRecorder) UpdateUserAvatar(user, avatarFile, avatarPath
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserAvatar", reflect.TypeOf((*MockUsecase)(nil).UpdateUserAvatar), user, avatarFile, avatarPath)
 }
 
+// GetAvatarUrlByName mocks base method
+func (m *MockUsecase) GetAvatarUrlByName(name string) string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAvatarUrlByName", name)
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetAvatarUrlByName indicates an expected call of GetAvatarUrlByName
+func (mr *MockUsecaseMockRecorder) GetAvatarUrlByName(name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAvatarUrlByName", reflect.TypeOf((*MockUsecase)(nil).GetAvatarUrlByName), name)
+}
+
 // Register mocks base method
 func (m *MockUsecase) Register(email, password, name string) error {
 	m.ctrl.T.Helper()
