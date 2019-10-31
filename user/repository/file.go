@@ -2,10 +2,10 @@ package repository
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
+	"github.com/google/uuid"
 	"io"
 	"os"
 	"path/filepath"
-	"strconv"
 )
 
 const UserAvatarDirectory = "static/user/avatar"
@@ -29,7 +29,7 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 	if err := r.deleteFileIfExists(user.AvatarPath); err != nil {
 		return "", err
 	}
-	storageAvatarPath := UserAvatarDirectory + "/" + strconv.Itoa(user.ID) + filepath.Ext(avatarPath)
+	storageAvatarPath := UserAvatarDirectory + "/" + uuid.New().String() + filepath.Ext(avatarPath)
 	storageAvatarFile, err := os.OpenFile(storageAvatarPath, os.O_WRONLY|os.O_CREATE, FilePerm)
 	if err != nil {
 		return "", err
