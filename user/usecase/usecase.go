@@ -41,7 +41,7 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 	if password != "" {
 		userToUpdate.PasswordHash = u.getPasswordHash(password)
 	}
-	if name != "" {
+	if name != "" && userToUpdate.Name != name {
 		userToUpdate.Name = name
 		avatarPath := u.GetAvatarUrlByName(name)
 		if avatarPath != "" {
