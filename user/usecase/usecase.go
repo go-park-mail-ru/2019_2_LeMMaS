@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/google/uuid"
 	"io"
+	"strings"
 )
 
 type userUsecase struct {
@@ -40,8 +41,12 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 	if password != "" {
 		userToUpdate.PasswordHash = u.getPasswordHash(password)
 	}
-	if name != "" {
+	if name != "" && userToUpdate.Name != name {
 		userToUpdate.Name = name
+		avatarPath := u.GetAvatarUrlByName(name)
+		if avatarPath != "" {
+			userToUpdate.AvatarPath = avatarPath
+		}
 	}
 	u.userRepository.Update(userToUpdate)
 	return nil
@@ -55,14 +60,14 @@ func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, a
 	return u.userRepository.UpdateAvatarPath(user.ID, newAvatarPath)
 }
 
-func (u *userUsecase) GetAvatarPreviewUrl(name string) (string, error) {
+func (u *userUsecase) GetAvatarUrlByName(name string) string {
 	avatarsByName := map[string]string{
 		"eath":   "http://www.i2clipart.com/cliparts/3/d/1/e/clipart-earth-3d1e.png",
-		"trump":  "https://cdn.dribbble.com/users/44323/screenshots/3077941/nevertrumpdrib.png",
-		"heroku": "https://dashboard.snapcraft.io/site_media/appmedia/2017/09/heroku.png",
-		"cat":    "https://i.pinimg.com/originals/95/f1/93/95f193e3bd4d3ee30043ca746be79cb8.png",
+		"trump":  "https://www.jing.fm/clipimg/full/21-213906_trump-clipart-overload-trump-thinking-transparent.png",
+		"heroku": "https://railsware.com/blog/wp-content/uploads/2017/12/How-to-set-up-the-Heroku.png",
+		"cat":    "https://i.pinimg.com/originals/90/a8/56/90a856d434dd9df24d8d5fdf4bf3ce72.png",
 	}
-	return avatarsByName[name], nil
+	return avatarsByName[strings.ToLower(name)]
 }
 
 func (u *userUsecase) Register(email, password, name string) error {

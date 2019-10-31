@@ -10,7 +10,7 @@ type Usecase interface {
 	GetUserBySessionID(sessionID string) (*model.User, error)
 	UpdateUser(id int, password, name string) error
 	UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error
-	GetAvatarPreviewUrl(name string) (string, error)
+	GetAvatarUrlByName(name string) string
 	Register(email, password, name string) error
 	Login(email, password string) (string, error)
 	Logout(sessionID string) error
