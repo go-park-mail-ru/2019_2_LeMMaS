@@ -39,7 +39,7 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func isOriginAllowed(origin string) bool {
-	isNowSh, _ := regexp.MatchString(`^https:\/\/20192lemmas-.*\.now\.sh$`, origin)
+	isNowSh, _ := regexp.MatchString(`^https:\/\/20192lemmas.*\.now\.sh$`, origin)
 	isLocalhost, _ := regexp.MatchString(`^http:\/\/localhost:\d*$`, origin)
 	return isNowSh || isLocalhost
 }
