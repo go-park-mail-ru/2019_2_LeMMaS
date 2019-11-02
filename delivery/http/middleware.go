@@ -16,6 +16,10 @@ func InitMiddlewares(e *echo.Echo) {
 	e.Use(middleware.LoggerWithConfig(setLoggerConfig()))
 }
 
+func Logger() echo.MiddlewareFunc {
+	return middleware.LoggerWithConfig(setLoggerConfig())
+}
+
 func setLoggerConfig() middleware.LoggerConfig {
 	f, err := os.OpenFile("agario.log",
 		os.O_RDWR | os.O_CREATE | os.O_APPEND,
@@ -52,7 +56,7 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		allowedHeaders := []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"}
 		c.Response().Header().Set(echo.HeaderAccessControlAllowHeaders, strings.Join(allowedHeaders, ","))
 
-		//println(c.Logger)
+		//c.Logger().Fatal()
 
 		if c.Request().Method == http.MethodOptions {
 			return c.NoContent(http.StatusNoContent)
