@@ -1,14 +1,18 @@
 package usecase
 
 import (
-	"crypto/md5"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/argon2"
 	"io"
 	"strings"
 )
+
+const PasswordSaltLength = 8
 
 type userUsecase struct {
 	userRepository     user.UserRepository
@@ -39,7 +43,7 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 		return err
 	}
 	if password != "" {
-		userToUpdate.PasswordHash = u.getPasswordHash(password)
+		userToUpdate.PasswordHash = u.GetPasswordHash(password)
 	}
 	if name != "" && userToUpdate.Name != name {
 		userToUpdate.Name = name
@@ -77,7 +81,7 @@ func (u *userUsecase) Register(email, password, name string) error {
 	if userWithSameEmail != nil {
 		return fmt.Errorf("user with email %v already registered", email)
 	}
-	passwordHash := u.getPasswordHash(password)
+	passwordHash := u.GetPasswordHash(password)
 	return u.userRepository.Create(email, passwordHash, name)
 }
 
@@ -89,7 +93,7 @@ func (u *userUsecase) Login(email, password string) (string, error) {
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
 	}
-	if u.getPasswordHash(password) != userToLogin.PasswordHash {
+	if !u.IsPasswordsEqual(password, userToLogin.PasswordHash) {
 		return "", fmt.Errorf("incorrect password")
 	}
 	sessionID := u.getNewSessionID()
@@ -105,8 +109,21 @@ func (u *userUsecase) Logout(sessionID string) error {
 	return nil
 }
 
-func (u *userUsecase) getPasswordHash(password string) string {
-	return fmt.Sprintf("%x", md5.Sum([]byte(password)))
+func (u *userUsecase) GetPasswordHash(password string) string {
+	salt := make([]byte, PasswordSaltLength)
+	rand.Read(salt)
+	return u.GetPasswordHashWithSalt(password, salt)
+}
+
+func (u *userUsecase) GetPasswordHashWithSalt(password string, salt []byte) string {
+	hash := argon2.IDKey([]byte(password), salt, 1, 64*1024, 4, 32)
+	hash = append(salt, hash...)
+	return base64.RawStdEncoding.EncodeToString(hash)
+}
+
+func (u *userUsecase) IsPasswordsEqual(password string, passwordHash string) bool {
+	decodedPasswordHash, _ := base64.RawStdEncoding.DecodeString(passwordHash)
+	return u.GetPasswordHashWithSalt(password, decodedPasswordHash[0:PasswordSaltLength]) == passwordHash
 }
 
 func (u *userUsecase) getNewSessionID() string {
