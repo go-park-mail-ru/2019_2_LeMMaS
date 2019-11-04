@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -43,8 +44,14 @@ func (s *HandlerTestSuite) NewHandlerContext() echo.Context {
 	return s.E.NewContext(s.Request, s.Response)
 }
 
-func (s HandlerTestSuite) TestResponse(expectedResponse string) {
-	s.TestResponseStatus()
+func (s HandlerTestSuite) TestOkResponse(expectedResponse string) {
+	assert.Equal(s.T, s.Response.Code, http.StatusOK)
+	s.TestResponseBody(expectedResponse)
+	s.updateCookies()
+}
+
+func (s HandlerTestSuite) TestResponse(expectedResponse string, expectedCode int) {
+	assert.Equal(s.T, s.Response.Code, expectedCode)
 	s.TestResponseBody(expectedResponse)
 	s.updateCookies()
 }
@@ -53,12 +60,6 @@ func (s HandlerTestSuite) TestResponseBody(expectedResponse string) {
 	actualBody := s.Response.Body.String()
 	if strings.TrimSpace(expectedResponse) != strings.TrimSpace(actualBody) {
 		s.T.Errorf("\nexpected response body:\n%v\ngot:\n%v", expectedResponse, actualBody)
-	}
-}
-
-func (s HandlerTestSuite) TestResponseStatus() {
-	if s.Response.Code != http.StatusOK {
-		s.T.Errorf("expected status code 200, got %v", s.Response.Code)
 	}
 }
 

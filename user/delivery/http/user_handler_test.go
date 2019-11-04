@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/test"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
@@ -26,8 +27,19 @@ func TestUserHandler_HandleUserRegister(t *testing.T) {
 	s.ExpectUsecase().Register(user1.Email, password, user1.Name).Return(nil)
 	s.ExpectUsecase().GetAllUsers().Return([]model.User{user1}, nil)
 
-	s.TestUserRegister(`{"email": "testik1@mail.ru","name": "Test The Best 1","password": "ssc-tuatara"}`, s.Ok())
+	s.TestUserRegister(
+		`{"email": "testik1@mail.ru","name": "Test The Best 1","password": "ssc-tuatara"}`,
+		s.Ok(),
+		http.StatusOK,
+	)
 	s.TestUserList(`{"status":"ok","body":{"users":[{"id":1,"email":"testik1@mail.ru","name":"Test The Best 1","avatar_path":""}]}}`)
+
+	s.ExpectUsecase().Register(user1.Email, password, user1.Name).Return(fmt.Errorf("user already registered"))
+	s.TestUserRegister(
+		`{"email": "testik1@mail.ru","name": "Test The Best 1","password": "ssc-tuatara"}`,
+		s.Error("user already registered"),
+		http.StatusBadRequest,
+	)
 }
 
 func TestUserHandler_HandleUserUpdate(t *testing.T) {
@@ -96,25 +108,25 @@ func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {
 func (s *UserHandlerTestSuite) TestUserList(expectedResponse string) {
 	s.SetupRequest(http.MethodGet, ApiV1UserListPath, "")
 	s.handler.HandleUserList(s.NewHandlerContext())
-	s.TestResponse(expectedResponse)
+	s.TestOkResponse(expectedResponse)
 }
 
-func (s *UserHandlerTestSuite) TestUserRegister(requestBody, expectedResponse string) {
+func (s *UserHandlerTestSuite) TestUserRegister(requestBody, expectedResponse string, expectedCode int) {
 	s.SetupRequest(http.MethodPost, ApiV1UserRegisterPath, requestBody)
 	s.handler.HandleUserRegister(s.NewHandlerContext())
-	s.TestResponse(expectedResponse)
+	s.TestResponse(expectedResponse, expectedCode)
 }
 
 func (s *UserHandlerTestSuite) TestUserUpdate(requestBody, expectedResponse string) {
 	s.SetupRequest(http.MethodPost, ApiV1UserUpdatePath, requestBody)
 	s.handler.HandleUserUpdate(s.NewHandlerContext())
-	s.TestResponse(expectedResponse)
+	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse string, mustHaveSessionCookie bool) {
 	s.SetupRequest(http.MethodPost, ApiV1UserLoginPath, requestBody)
 	s.handler.HandleUserLogin(s.NewHandlerContext())
-	s.TestResponse(expectedResponse)
+	s.TestOkResponse(expectedResponse)
 	if mustHaveSessionCookie {
 		s.TestCookiePresent(SessionIDCookieName)
 	}
@@ -123,6 +135,6 @@ func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse strin
 func (s *UserHandlerTestSuite) TestUserLogout(expectedResponse string) {
 	s.SetupRequest(http.MethodPost, ApiV1UserLogoutPath, "")
 	s.handler.HandleUserLogout(s.NewHandlerContext())
-	s.TestResponse(expectedResponse)
+	s.TestOkResponse(expectedResponse)
 	s.TestCookieNotPresent(SessionIDCookieName)
 }

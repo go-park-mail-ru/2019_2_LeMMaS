@@ -129,7 +129,7 @@ func TestDatabaseUserRepository_Update(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(int64(user.ID), 1))
 
 	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
-	err = repo.Update(&user)
+	err = repo.Update(user)
 	if err != nil {
 		t.Error("unexpected error:", err)
 	}
