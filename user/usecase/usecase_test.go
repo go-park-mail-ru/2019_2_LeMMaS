@@ -73,9 +73,8 @@ func TestUserUsecase_GetUserBySessionID(t *testing.T) {
 
 	userToLogin := model.User{Email: "t@mail.ru", PasswordHash: PasswordHash}
 	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
-	sessionID, _ := usecase.Login(userToLogin.Email, Password)
-
 	userRepo.EXPECT().GetByID(userToLogin.ID).Return(&userToLogin, nil)
+	sessionID, _ := usecase.Login(userToLogin.Email, Password)
 	userBySession, err := usecase.GetUserBySessionID(sessionID)
 	assert.NotNil(t, userBySession)
 	if userBySession != nil {
