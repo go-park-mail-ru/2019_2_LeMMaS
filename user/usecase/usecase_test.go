@@ -10,6 +10,9 @@ import (
 	"testing"
 )
 
+const Password = "ssc-tuatara"
+const PasswordHash = "qZxR0nf7CPVg82xpehicuDeDEAH+0Y4uQeWZr8yGZXr1MaRpGtJ+rA"
+
 func TestUserUsecase_GetAllUsers(t *testing.T) {
 	userRepo := user.NewMockUserRepository(gomock.NewController(t))
 	usecase := NewUserUsecase(userRepo, nil)
@@ -34,12 +37,11 @@ func TestUserUsecase_Register(t *testing.T) {
 	usecase := NewUserUsecase(userRepo, nil)
 
 	email := "t@mail.ru"
-	password := "ssc-tuatara"
-	passwordHash := "0897ea269d7c0ce4e1d34e253b9a1fa8"
+	password := Password
 	name := "Test"
 
 	userRepo.EXPECT().GetByEmail(email).Return(nil, nil)
-	userRepo.EXPECT().Create(email, passwordHash, name)
+	userRepo.EXPECT().Create(email, gomock.Any(), name)
 	err := usecase.Register(email, password, name)
 	assert.Nil(t, err)
 
@@ -53,24 +55,46 @@ func TestUserUsecase_Login(t *testing.T) {
 	userRepo := user.NewMockUserRepository(gomock.NewController(t))
 	usecase := NewUserUsecase(userRepo, nil)
 
-	userToLogin := model.User{Email: "t@mail.ru", PasswordHash: "0897ea269d7c0ce4e1d34e253b9a1fa8"}
+	userToLogin := model.User{Email: "t@mail.ru", PasswordHash: PasswordHash}
 	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
-	sessionID, err := usecase.Login(userToLogin.Email, "ssc-tuatara")
+	sessionID, err := usecase.Login(userToLogin.Email, Password)
 	assert.NotEmpty(t, sessionID)
 	assert.Nil(t, err)
 
 	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(nil, nil)
-	sessionID, err = usecase.Login(userToLogin.Email, "ssc-tuatara")
+	sessionID, err = usecase.Login(userToLogin.Email, Password)
 	assert.Empty(t, sessionID)
 	assert.EqualError(t, err, "incorrect email")
 }
 
 func TestUserUsecase_GetUserBySessionID(t *testing.T) {
-	// Implement after B7
+	userRepo := user.NewMockUserRepository(gomock.NewController(t))
+	usecase := NewUserUsecase(userRepo, nil)
+
+	userToLogin := model.User{Email: "t@mail.ru", PasswordHash: PasswordHash}
+	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
+	userRepo.EXPECT().GetByID(userToLogin.ID).Return(&userToLogin, nil)
+	sessionID, _ := usecase.Login(userToLogin.Email, Password)
+	userBySession, err := usecase.GetUserBySessionID(sessionID)
+	assert.NotNil(t, userBySession)
+	if userBySession != nil {
+		assert.Equal(t, *userBySession, userToLogin)
+	}
+	assert.Nil(t, err)
 }
 
 func TestUserUsecase_Logout(t *testing.T) {
-	// Implement after B7
+	userRepo := user.NewMockUserRepository(gomock.NewController(t))
+	usecase := NewUserUsecase(userRepo, nil)
+
+	userToLogin := model.User{ID: 2, Email: "t@mail.ru", PasswordHash: PasswordHash}
+	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
+	sessionID, _ := usecase.Login(userToLogin.Email, Password)
+
+	err := usecase.Logout(sessionID)
+	assert.Nil(t, err)
+	userBySession, _ := usecase.GetUserBySessionID(sessionID)
+	assert.Nil(t, userBySession)
 }
 
 func TestUserUsecase_GetAvatarUrlByName(t *testing.T) {
@@ -105,4 +129,11 @@ func TestUserUsecase_UpdateUserAvatar(t *testing.T) {
 	userRepo.EXPECT().UpdateAvatarPath(userToUpdate.ID, storageAvatarPath)
 	err := usecase.UpdateUserAvatar(&userToUpdate, &avatarFile, avatarPath)
 	assert.Nil(t, err)
+}
+
+func TestUserUsecase_GetPasswordHash(t *testing.T) {
+	usecase := NewUserUsecase(nil, nil)
+	passwordHash := usecase.getPasswordHash(Password)
+	assert.NotEmpty(t, passwordHash)
+	assert.True(t, usecase.isPasswordsEqual(Password, passwordHash))
 }
