@@ -48,8 +48,7 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 			userToUpdate.AvatarPath = avatarPath
 		}
 	}
-	u.userRepository.Update(userToUpdate)
-	return nil
+	return u.userRepository.Update(*userToUpdate)
 }
 
 func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {

@@ -23,7 +23,7 @@ func (r *databaseUserRepository) Create(email string, passwordHash string, name 
 	return err
 }
 
-func (r *databaseUserRepository) Update(user *model.User) error {
+func (r *databaseUserRepository) Update(user model.User) error {
 	_, err := r.db.Exec(
 		`update "`+UserTable+`" set email=$1, password_hash=$2, name=$3, avatar_path=$4 where id=$5`,
 		user.Email, user.PasswordHash, user.Name, user.AvatarPath, user.ID,
