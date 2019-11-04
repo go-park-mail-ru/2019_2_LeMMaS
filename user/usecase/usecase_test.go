@@ -68,11 +68,34 @@ func TestUserUsecase_Login(t *testing.T) {
 }
 
 func TestUserUsecase_GetUserBySessionID(t *testing.T) {
-	// Implement after B7
+	userRepo := user.NewMockUserRepository(gomock.NewController(t))
+	usecase := NewUserUsecase(userRepo, nil)
+
+	userToLogin := model.User{Email: "t@mail.ru", PasswordHash: PasswordHash}
+	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
+	sessionID, _ := usecase.Login(userToLogin.Email, Password)
+
+	userRepo.EXPECT().GetByID(userToLogin.ID).Return(&userToLogin, nil)
+	userBySession, err := usecase.GetUserBySessionID(sessionID)
+	assert.NotNil(t, userBySession)
+	if userBySession != nil {
+		assert.Equal(t, *userBySession, userToLogin)
+	}
+	assert.Nil(t, err)
 }
 
 func TestUserUsecase_Logout(t *testing.T) {
-	// Implement after B7
+	userRepo := user.NewMockUserRepository(gomock.NewController(t))
+	usecase := NewUserUsecase(userRepo, nil)
+
+	userToLogin := model.User{ID: 2, Email: "t@mail.ru", PasswordHash: PasswordHash}
+	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
+	sessionID, _ := usecase.Login(userToLogin.Email, Password)
+
+	err := usecase.Logout(sessionID)
+	assert.Nil(t, err)
+	userBySession, _ := usecase.GetUserBySessionID(sessionID)
+	assert.Nil(t, userBySession)
 }
 
 func TestUserUsecase_GetAvatarUrlByName(t *testing.T) {
