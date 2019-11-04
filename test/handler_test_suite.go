@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"fmt"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
@@ -58,35 +59,17 @@ func (s HandlerTestSuite) TestResponse(expectedResponse string, expectedCode int
 
 func (s HandlerTestSuite) TestResponseBody(expectedResponse string) {
 	actualBody := s.Response.Body.String()
-	if strings.TrimSpace(expectedResponse) != strings.TrimSpace(actualBody) {
-		s.T.Errorf("\nexpected response body:\n%v\ngot:\n%v", expectedResponse, actualBody)
-	}
+	assert.Equal(s.T, strings.TrimSpace(expectedResponse), strings.TrimSpace(actualBody), "unexpected response body")
 }
 
 func (s HandlerTestSuite) TestCookiePresent(cookieName string) {
-	if _, present := s.CookiesByName[cookieName]; !present {
-		s.T.Errorf("cookie %v not found in response", cookieName)
-	}
+	_, present := s.CookiesByName[cookieName]
+	assert.True(s.T, present, fmt.Sprintf("cookie %v not found in response", cookieName))
 }
 
 func (s HandlerTestSuite) TestCookieNotPresent(cookieName string) {
-	if _, present := s.CookiesByName[cookieName]; present {
-		s.T.Errorf("cookie %v must not be present in response", cookieName)
-	}
-}
-
-func (s HandlerTestSuite) GetResponseBody() (map[string]*json.RawMessage, error) {
-	var response map[string]*json.RawMessage
-	err := json.NewDecoder(s.Response.Body).Decode(&response)
-	if err != nil {
-		return nil, err
-	}
-	var responseBody map[string]*json.RawMessage
-	err = json.Unmarshal(*response["body"], &responseBody)
-	if err != nil {
-		return nil, err
-	}
-	return responseBody, nil
+	_, present := s.CookiesByName[cookieName]
+	assert.False(s.T, present, fmt.Sprintf("cookie %v must not be present in response", cookieName))
 }
 
 func (s *HandlerTestSuite) Ok() string {
