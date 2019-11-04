@@ -46,7 +46,7 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 		return err
 	}
 	if password != "" {
-		userToUpdate.PasswordHash = u.GetPasswordHash(password)
+		userToUpdate.PasswordHash = u.getPasswordHash(password)
 	}
 	if name != "" && userToUpdate.Name != name {
 		userToUpdate.Name = name
@@ -84,7 +84,7 @@ func (u *userUsecase) Register(email, password, name string) error {
 	if userWithSameEmail != nil {
 		return fmt.Errorf("user with email %v already registered", email)
 	}
-	passwordHash := u.GetPasswordHash(password)
+	passwordHash := u.getPasswordHash(password)
 	return u.userRepository.Create(email, passwordHash, name)
 }
 
@@ -96,7 +96,7 @@ func (u *userUsecase) Login(email, password string) (string, error) {
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
 	}
-	if !u.IsPasswordsEqual(password, userToLogin.PasswordHash) {
+	if !u.isPasswordsEqual(password, userToLogin.PasswordHash) {
 		return "", fmt.Errorf("incorrect password")
 	}
 	sessionID := u.getNewSessionID()
@@ -112,21 +112,21 @@ func (u *userUsecase) Logout(sessionID string) error {
 	return nil
 }
 
-func (u *userUsecase) GetPasswordHash(password string) string {
+func (u *userUsecase) getPasswordHash(password string) string {
 	salt := make([]byte, PasswordSaltLength)
 	rand.Read(salt)
-	return u.GetPasswordHashWithSalt(password, salt)
+	return u.getPasswordHashWithSalt(password, salt)
 }
 
-func (u *userUsecase) GetPasswordHashWithSalt(password string, salt []byte) string {
+func (u *userUsecase) isPasswordsEqual(password string, passwordHash string) bool {
+	decodedPasswordHash, _ := base64.RawStdEncoding.DecodeString(passwordHash)
+	return u.getPasswordHashWithSalt(password, decodedPasswordHash[0:PasswordSaltLength]) == passwordHash
+}
+
+func (u *userUsecase) getPasswordHashWithSalt(password string, salt []byte) string {
 	hash := argon2.IDKey([]byte(password), salt, 1, 64*1024, 4, 32)
 	hash = append(salt, hash...)
 	return base64.RawStdEncoding.EncodeToString(hash)
-}
-
-func (u *userUsecase) IsPasswordsEqual(password string, passwordHash string) bool {
-	decodedPasswordHash, _ := base64.RawStdEncoding.DecodeString(passwordHash)
-	return u.GetPasswordHashWithSalt(password, decodedPasswordHash[0:PasswordSaltLength]) == passwordHash
 }
 
 func (u *userUsecase) getNewSessionID() string {
