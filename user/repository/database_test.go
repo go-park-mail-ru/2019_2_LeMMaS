@@ -4,6 +4,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -23,21 +24,9 @@ func TestDatabaseUserRepository_GetAll(t *testing.T) {
 
 	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
 	users, err := repo.GetAll()
-	if err != nil {
-		t.Error("unexpected error:", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
-	if len(expectedUsers) != len(users) {
-		t.Error("unexpected number of users")
-		return
-	}
-	for i := range expectedUsers {
-		if expectedUsers[i] != users[i] {
-			t.Errorf("expected %v, got %v", expectedUsers[i], users[i])
-		}
-	}
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+	assert.Equal(t, users, expectedUsers)
 }
 
 func TestDatabaseUserRepository_GetByID(t *testing.T) {
@@ -53,18 +42,10 @@ func TestDatabaseUserRepository_GetByID(t *testing.T) {
 
 	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
 	user, err := repo.GetByID(expectedUser.ID)
-	if err != nil {
-		t.Error("unexpected error:", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
-	if user == nil {
-		t.Error("got nil result")
-		return
-	}
-	if *user != expectedUser {
-		t.Errorf("expected %v, got %v", user, expectedUser)
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+	if assert.NotNil(t, user) {
+		assert.Equal(t, *user, expectedUser)
 	}
 }
 
@@ -81,18 +62,10 @@ func TestDatabaseUserRepository_GetByEmail(t *testing.T) {
 
 	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
 	user, err := repo.GetByEmail(expectedUser.Email)
-	if err != nil {
-		t.Error("unexpected error:", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
-	if user == nil {
-		t.Error("got nil result")
-		return
-	}
-	if *user != expectedUser {
-		t.Errorf("expected %v, got %v", user, expectedUser)
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+	if assert.NotNil(t, user) {
+		assert.Equal(t, *user, expectedUser)
 	}
 }
 
@@ -108,12 +81,8 @@ func TestDatabaseUserRepository_Create(t *testing.T) {
 
 	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
 	err = repo.Create(user.Email, user.PasswordHash, user.Name)
-	if err != nil {
-		t.Error("unexpected error:", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestDatabaseUserRepository_Update(t *testing.T) {
@@ -130,12 +99,8 @@ func TestDatabaseUserRepository_Update(t *testing.T) {
 
 	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
 	err = repo.Update(user)
-	if err != nil {
-		t.Error("unexpected error:", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestDatabaseUserRepository_UpdateAvatarPath(t *testing.T) {
@@ -152,10 +117,6 @@ func TestDatabaseUserRepository_UpdateAvatarPath(t *testing.T) {
 
 	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
 	err = repo.UpdateAvatarPath(user.ID, user.AvatarPath)
-	if err != nil {
-		t.Error("unexpected error:", err)
-	}
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
