@@ -20,7 +20,7 @@ require (
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/stretchr/testify v1.4.0
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
 	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456 // indirect
 	google.golang.org/appengine v1.6.5 // indirect

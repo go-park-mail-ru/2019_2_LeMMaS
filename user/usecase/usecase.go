@@ -1,14 +1,18 @@
 package usecase
 
 import (
-	"crypto/md5"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/argon2"
 	"io"
 	"strings"
 )
+
+const PasswordSaltLength = 8
 
 type userUsecase struct {
 	userRepository     user.UserRepository
@@ -29,7 +33,10 @@ func (u *userUsecase) GetAllUsers() ([]model.User, error) {
 }
 
 func (u *userUsecase) GetUserBySessionID(sessionID string) (*model.User, error) {
-	userID := u.sessions[sessionID]
+	userID, ok := u.sessions[sessionID]
+	if !ok {
+		return nil, nil
+	}
 	return u.userRepository.GetByID(userID)
 }
 
@@ -89,7 +96,7 @@ func (u *userUsecase) Login(email, password string) (string, error) {
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
 	}
-	if u.getPasswordHash(password) != userToLogin.PasswordHash {
+	if !u.isPasswordsEqual(password, userToLogin.PasswordHash) {
 		return "", fmt.Errorf("incorrect password")
 	}
 	sessionID := u.getNewSessionID()
@@ -106,7 +113,20 @@ func (u *userUsecase) Logout(sessionID string) error {
 }
 
 func (u *userUsecase) getPasswordHash(password string) string {
-	return fmt.Sprintf("%x", md5.Sum([]byte(password)))
+	salt := make([]byte, PasswordSaltLength)
+	rand.Read(salt)
+	return u.getPasswordHashWithSalt(password, salt)
+}
+
+func (u *userUsecase) isPasswordsEqual(password string, passwordHash string) bool {
+	decodedPasswordHash, _ := base64.RawStdEncoding.DecodeString(passwordHash)
+	return u.getPasswordHashWithSalt(password, decodedPasswordHash[0:PasswordSaltLength]) == passwordHash
+}
+
+func (u *userUsecase) getPasswordHashWithSalt(password string, salt []byte) string {
+	hash := argon2.IDKey([]byte(password), salt, 1, 64*1024, 4, 32)
+	hash = append(salt, hash...)
+	return base64.RawStdEncoding.EncodeToString(hash)
 }
 
 func (u *userUsecase) getNewSessionID() string {
