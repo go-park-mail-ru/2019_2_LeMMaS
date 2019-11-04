@@ -1,14 +1,17 @@
-# 2019_2_LeMMaS
+# LeMMaS
 
-Project "Agario"
+Игра про голодные шарики, вдохновленная [Agar.io](http://agar.io/). Поиграть можно [тут](https://20192lemmasnew-h0ivhao1a.now.sh/).
 
-### Test
+API доступно по адресу https://quiet-depths-50475.herokuapp.com.
 
-https://quiet-depths-50475.herokuapp.com/api/v1/user/list
+## Авторы
 
-### Developers
-<a name="developers"></a>
+- [Сударев Максим](https://github.com/smi97)
+- [Можевикина Леонарда](https://github.com/ledka17)
+- [Кобзев Антон](https://github.com/kzon)
 
-- [Sudarev Maxim](https://github.com/smi97)
-- [Mozhevikina Leonarda](https://github.com/ledka17)
-- [Kobzev Anton](https://github.com/kzon)
+## Запуск
+
+```sh
+docker-compose up -d --build
+```
