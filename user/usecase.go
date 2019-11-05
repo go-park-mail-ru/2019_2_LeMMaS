@@ -12,6 +12,6 @@ type Usecase interface {
 	UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error
 	GetAvatarUrlByName(name string) string
 	Register(email, password, name string) error
-	Login(email, password string) (string, error)
+	Login(email, password string) (sessionID string, err error)
 	Logout(sessionID string) error
 }
