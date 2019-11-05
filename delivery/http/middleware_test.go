@@ -6,9 +6,9 @@ import (
 )
 
 func TestIsOriginAllowed(t *testing.T) {
-	assert.False(t, IsOriginAllowed(""))
-	assert.True(t, IsOriginAllowed("https://20192lemmasnew-h0ivhao1a.now.sh"))
-	assert.False(t, IsOriginAllowed("https://yandex.ru"))
-	assert.False(t, IsOriginAllowed("https://random324.now.sh"))
-	assert.True(t, IsOriginAllowed("http://localhost:3000"))
+	assert.False(t, isOriginAllowed(""))
+	assert.True(t, isOriginAllowed("https://20192lemmasnew-h0ivhao1a.now.sh"))
+	assert.False(t, isOriginAllowed("https://yandex.ru"))
+	assert.False(t, isOriginAllowed("https://random324.now.sh"))
+	assert.True(t, isOriginAllowed("http://localhost:3000"))
 }
