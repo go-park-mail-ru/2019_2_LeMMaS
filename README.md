@@ -1,4 +1,4 @@
-# LeMMaS Backend
+# LeMMaS Backend [![Build Status](https://travis-ci.org/go-park-mail-ru/2019_2_LeMMaS.svg?branch=master)](https://travis-ci.org/go-park-mail-ru/2019_2_LeMMaS)
 
 Игра про голодные шарики, вдохновленная [Agar.io](http://agar.io/). Поиграть можно [тут](http://95.163.212.121).
 
