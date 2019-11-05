@@ -1,11 +1,10 @@
 package http
 
 import (
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	"github.com/labstack/echo"
-	middleware "github.com/labstack/echo/middleware"
-	"log"
+	"github.com/labstack/echo/middleware"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -13,29 +12,7 @@ import (
 func InitMiddlewares(e *echo.Echo) {
 	e.Use(corsMiddleware)
 	e.Use(panicMiddleware)
-	e.Use(middleware.LoggerWithConfig(setLoggerConfig()))
-}
-
-func Logger() echo.MiddlewareFunc {
-	return middleware.LoggerWithConfig(setLoggerConfig())
-}
-
-func setLoggerConfig() middleware.LoggerConfig {
-	f, err := os.OpenFile("agario.log",
-		os.O_RDWR | os.O_CREATE | os.O_APPEND,
-		0666)
-	if err != nil {
-		log.Fatalf("error opening log file: %v", err)
-	}
-	defer f.Close()
-
-	return middleware.LoggerConfig{
-		Format: `{"time":"${time_rfc3339}","id":"${id}","remote_ip":"${remote_ip}",` +
-			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
-			`"status":${status},"error":"${error}","file":"${long_file}"` + "\n",
-		CustomTimeFormat: "2000-01-01 15:01:02",
-		Output: f,
-	}
+	e.Use(middleware.LoggerWithConfig(logger.SetLoggerConfig()))
 }
 
 func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -56,7 +33,7 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		allowedHeaders := []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"}
 		c.Response().Header().Set(echo.HeaderAccessControlAllowHeaders, strings.Join(allowedHeaders, ","))
 
-		//c.Logger().Fatal()
+		c.Echo().Logger.Error("Error creating user")
 
 		if c.Request().Method == http.MethodOptions {
 			return c.NoContent(http.StatusNoContent)
@@ -75,7 +52,7 @@ func panicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Printf("panic during request to %s: %s", c.Request().URL.Path, err)
+				c.Echo().Logger.Printf("panic during request to %s: %s", c.Request().URL.Path, err)
 				c.JSON(http.StatusInternalServerError, "internal error")
 			}
 		}()
