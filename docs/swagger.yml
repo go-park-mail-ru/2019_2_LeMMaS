@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: LeMMaS API
   version: '1'
-host: quiet-depths-50475.herokuapp.com
+host: 95.163.212.121
 basePath: /api/v1
 consumes:
   - application/json
@@ -10,7 +10,6 @@ produces:
   - application/json
 schemes:
   - http
-  - https
 
 
 paths:
