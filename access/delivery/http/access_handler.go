@@ -2,8 +2,10 @@ package http
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/access"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -41,7 +43,7 @@ func (h *AccessHandler) HandleGetCSRFToken(c echo.Context) error {
 	}
 	if err != nil {
 		c.Logger().Error(err)
-		return h.Error(c, errors.New("error generating token"))
+		return h.Error(c, "error generating token")
 	}
 	return h.OkWithBody(c, map[string]string{
 		"token": token,
@@ -67,10 +69,11 @@ func (h *AccessHandler) CsrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			ok, err = h.csrfUsecase.CheckTokenBySession(csrfToken, sessionID.Value)
 		}
 		if !ok {
-			c.Echo().Logger.Errorf("recieved incorrect CSRF token %v, session id %v", csrfToken, sessionID.Value)
+			message := fmt.Sprintf("recieved incorrect CSRF token %v, session id %v", csrfToken, sessionID.Value)
 			if err != nil {
-				c.Echo().Logger.Error(err)
+				message += "\n" + err.Error()
 			}
+			logger.Warn(errors.New(message))
 			return c.JSON(http.StatusForbidden, "incorrect CSRF token")
 		}
 		return next(c)
