@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
 	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
 	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
@@ -18,16 +20,19 @@ func main() {
 	}
 
 	e := echo.New()
-	e.Static("static", "static")
+	logger.Init(e)
 	http.InitMiddlewares(e)
+	logger.Error(errors.New("fsdfsdfds"))
 	db, err := getDB()
-
 	if err != nil {
-		e.Logger.Fatal(err)
+		logger.Error(err)
 		return
 	}
 	initUserHandler(e, db)
-	e.Logger.Fatal(e.Start(":" + port))
+	err = e.Start(":" + port)
+	if err != nil {
+		logger.Error(err)
+	}
 }
 
 func getDB() (*sqlx.DB, error) {
