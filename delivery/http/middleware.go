@@ -33,8 +33,6 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		allowedHeaders := []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"}
 		c.Response().Header().Set(echo.HeaderAccessControlAllowHeaders, strings.Join(allowedHeaders, ","))
 
-		c.Echo().Logger.Error("Error creating user")
-
 		if c.Request().Method == http.MethodOptions {
 			return c.NoContent(http.StatusNoContent)
 		}
