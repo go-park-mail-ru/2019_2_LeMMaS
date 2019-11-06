@@ -1,6 +1,8 @@
 package main
 
 import (
+	accessHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/access/delivery/http"
+	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/access/usecase"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
 	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
@@ -22,13 +24,12 @@ func main() {
 	httpDelivery.InitMiddlewares(e)
 
 	db, err := getDB()
-
 	if err != nil {
 		e.Logger.Fatal(err)
 		return
 	}
 
-	initCSRFHandler(e)
+	initAccessHandler(e)
 	initUserHandler(e, db)
 
 	e.Logger.Fatal(e.Start(":" + port))
@@ -46,8 +47,9 @@ func getDB() (*sqlx.DB, error) {
 	return db, nil
 }
 
-func initCSRFHandler(e *echo.Echo) {
-	httpDelivery.NewCSRFHandler(e)
+func initAccessHandler(e *echo.Echo) {
+	csrfUsecase := accessUsecase.NewCSRFUsecase()
+	accessHttpDelivery.NewAccessHandler(e, csrfUsecase)
 }
 
 func initUserHandler(e *echo.Echo, db *sqlx.DB) {

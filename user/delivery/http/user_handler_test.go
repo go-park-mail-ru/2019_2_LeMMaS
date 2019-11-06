@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/test"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
@@ -128,7 +129,7 @@ func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse strin
 	s.handler.HandleUserLogin(s.NewHandlerContext())
 	s.TestOkResponse(expectedResponse)
 	if mustHaveSessionCookie {
-		s.TestCookiePresent(SessionIDCookieName)
+		s.TestCookiePresent(httpDelivery.SessionIDCookieName)
 	}
 }
 
@@ -136,5 +137,5 @@ func (s *UserHandlerTestSuite) TestUserLogout(expectedResponse string) {
 	s.SetupRequest(http.MethodPost, ApiV1UserLogoutPath, "")
 	s.handler.HandleUserLogout(s.NewHandlerContext())
 	s.TestOkResponse(expectedResponse)
-	s.TestCookieNotPresent(SessionIDCookieName)
+	s.TestCookieNotPresent(httpDelivery.SessionIDCookieName)
 }

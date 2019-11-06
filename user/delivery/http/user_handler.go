@@ -20,11 +20,6 @@ const (
 	ApiV1UserGetAvatarByNamePath = httpDelivery.ApiV1PathPrefix + "/user/avatar/getByName"
 )
 
-const (
-	SessionIDCookieName   = "session_id"
-	SessionIDCookieExpire = 10 * time.Hour
-)
-
 type UserHandler struct {
 	userUsecase user.Usecase
 	httpDelivery.Handler
@@ -178,16 +173,16 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 	if err != nil {
 		return h.Error(c, err)
 	}
-	h.SetCookie(c, SessionIDCookieName, sessionID, time.Now().Add(SessionIDCookieExpire))
+	h.SetCookie(c, httpDelivery.SessionIDCookieName, sessionID, time.Now().Add(httpDelivery.SessionIDCookieExpire))
 	return h.Ok(c)
 }
 
 func (h *UserHandler) HandleUserLogout(c echo.Context) error {
-	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
+	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
 	if err != nil {
 		return h.Error(c, fmt.Errorf("no session cookie"))
 	}
-	h.DeleteCookie(c, SessionIDCookieName)
+	h.DeleteCookie(c, httpDelivery.SessionIDCookieName)
 	err = h.userUsecase.Logout(sessionIDCookie.Value)
 	if err != nil {
 		return h.Error(c, err)
@@ -196,7 +191,7 @@ func (h *UserHandler) HandleUserLogout(c echo.Context) error {
 }
 
 func (h *UserHandler) getCurrentUser(c echo.Context) (*model.User, error) {
-	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
+	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
 	if err != nil {
 		return nil, fmt.Errorf("no session cookie")
 	}
