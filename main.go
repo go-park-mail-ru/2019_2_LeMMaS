@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
@@ -22,7 +21,6 @@ func main() {
 	e := echo.New()
 	logger.Init(e)
 	http.InitMiddlewares(e)
-	logger.Error(errors.New("fsdfsdfds"))
 	db, err := getDB()
 	if err != nil {
 		logger.Error(err)

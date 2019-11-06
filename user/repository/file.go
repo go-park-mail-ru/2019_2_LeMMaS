@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/google/uuid"
 	"io"
@@ -24,14 +25,17 @@ func NewUserFileRepository() *userFileRepository {
 
 func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
 	if err := os.MkdirAll(UserAvatarDirectory, DirectoryPerm); err != nil {
+		logger.Error(err)
 		return "", err
 	}
 	if err := r.deleteFileIfExists(user.AvatarPath); err != nil {
+		logger.Error(err)
 		return "", err
 	}
 	storageAvatarPath := UserAvatarDirectory + "/" + uuid.New().String() + filepath.Ext(avatarPath)
 	storageAvatarFile, err := os.OpenFile(storageAvatarPath, os.O_WRONLY|os.O_CREATE, FilePerm)
 	if err != nil {
+		logger.Error(err)
 		return "", err
 	}
 	defer storageAvatarFile.Close()
