@@ -9,22 +9,29 @@ import (
 	"path/filepath"
 )
 
-const UserAvatarDirectory = "static/user/avatar"
-
 const (
+	UserAvatarDirectory = "user/avatar"
+
 	FilePerm      = 0666
 	DirectoryPerm = 0777
 )
 
 type userFileRepository struct {
+	staticPath string
 }
 
 func NewUserFileRepository() *userFileRepository {
-	return &userFileRepository{}
+	staticPath := os.Getenv("STATIC_PATH")
+	if staticPath == "" {
+		staticPath = "static"
+	}
+	return &userFileRepository{
+		staticPath: staticPath,
+	}
 }
 
 func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
-	if err := os.MkdirAll(UserAvatarDirectory, DirectoryPerm); err != nil {
+	if err := os.MkdirAll(r.getPath(UserAvatarDirectory), DirectoryPerm); err != nil {
 		logger.Error(err)
 		return "", err
 	}
@@ -32,7 +39,7 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 		logger.Error(err)
 		return "", err
 	}
-	storageAvatarPath := UserAvatarDirectory + "/" + uuid.New().String() + filepath.Ext(avatarPath)
+	storageAvatarPath := r.getPath(UserAvatarDirectory) + "/" + uuid.New().String() + filepath.Ext(avatarPath)
 	storageAvatarFile, err := os.OpenFile(storageAvatarPath, os.O_WRONLY|os.O_CREATE, FilePerm)
 	if err != nil {
 		logger.Error(err)
@@ -41,6 +48,10 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 	defer storageAvatarFile.Close()
 	io.Copy(storageAvatarFile, avatarFile)
 	return storageAvatarPath, nil
+}
+
+func (r *userFileRepository) getPath(directory string) string {
+	return r.staticPath + "/" + directory
 }
 
 func (r *userFileRepository) deleteFileIfExists(fileName string) error {
