@@ -1,8 +1,9 @@
 package http
 
 import (
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	"github.com/labstack/echo"
-	"log"
+	"github.com/labstack/echo/middleware"
 	"net/http"
 	"regexp"
 	"strings"
@@ -11,6 +12,7 @@ import (
 func InitMiddlewares(e *echo.Echo) {
 	e.Use(corsMiddleware)
 	e.Use(panicMiddleware)
+	e.Use(middleware.LoggerWithConfig(logger.SetLoggerConfig()))
 }
 
 func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -48,7 +50,7 @@ func panicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Printf("panic during request to %s: %s", c.Request().URL.Path, err)
+				c.Echo().Logger.Printf("panic during request to %s: %s", c.Request().URL.Path, err)
 				c.JSON(http.StatusInternalServerError, "internal error")
 			}
 		}()

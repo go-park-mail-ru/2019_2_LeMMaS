@@ -1,12 +1,12 @@
 module github.com/go-park-mail-ru/2019_2_LeMMaS
 
-go 1.12
+go 1.13
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/cockroachdb/apd v1.1.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/mock v1.3.1
 	github.com/google/uuid v1.1.1

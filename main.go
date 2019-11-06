@@ -8,7 +8,6 @@ import (
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
-	"log"
 	"os"
 )
 
@@ -22,12 +21,13 @@ func main() {
 	e.Static("static", "static")
 	http.InitMiddlewares(e)
 	db, err := getDB()
+
 	if err != nil {
-		log.Fatal(err)
+		e.Logger.Fatal(err)
 		return
 	}
 	initUserHandler(e, db)
-	log.Fatal(e.Start(":" + port))
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func getDB() (*sqlx.DB, error) {
