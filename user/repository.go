@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-type UserRepository interface {
+type Repository interface {
 	Create(email string, passwordHash string, name string) error
 	Update(user model.User) error
 	UpdateAvatarPath(id int, avatarPath string) error
@@ -14,6 +14,12 @@ type UserRepository interface {
 	GetByEmail(email string) (*model.User, error)
 }
 
-type UserFileRepository interface {
+type FileRepository interface {
 	StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error)
+}
+
+type SessionRepository interface {
+	AddSession(sessionID string, userID int) error
+	GetUserBySession(sessionID string) (int, bool)
+	DeleteSession(sessionID string) error
 }

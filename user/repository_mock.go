@@ -11,7 +11,7 @@ import (
 	reflect "reflect"
 )
 
-// MockUserRepository is a mock of UserRepository interface
+// MockUserRepository is a mock of Repository interface
 type MockUserRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockUserRepositoryMockRecorder
@@ -121,7 +121,7 @@ func (mr *MockUserRepositoryMockRecorder) GetByEmail(email interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockUserRepository)(nil).GetByEmail), email)
 }
 
-// MockUserFileRepository is a mock of UserFileRepository interface
+// MockUserFileRepository is a mock of FileRepository interface
 type MockUserFileRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockUserFileRepositoryMockRecorder

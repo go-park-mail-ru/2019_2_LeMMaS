@@ -20,7 +20,7 @@ type userFileRepository struct {
 	staticPath string
 }
 
-func NewUserFileRepository() *userFileRepository {
+func NewFileRepository() *userFileRepository {
 	staticPath := os.Getenv("STATIC_PATH")
 	if staticPath == "" {
 		staticPath = "static"

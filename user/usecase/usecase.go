@@ -16,33 +16,36 @@ import (
 const PasswordSaltLength = 8
 
 type userUsecase struct {
-	userRepository     user.UserRepository
-	userFileRepository user.UserFileRepository
-	sessions           map[string]int
+	repository        user.Repository
+	fileRepository    user.FileRepository
+	sessionRepository user.SessionRepository
 }
 
-func NewUserUsecase(userRepository user.UserRepository, userFileRepository user.UserFileRepository) *userUsecase {
+func NewUserUsecase(
+	repository user.Repository,
+	fileRepository user.FileRepository,
+	sessionRepository user.SessionRepository) *userUsecase {
 	return &userUsecase{
-		userRepository:     userRepository,
-		userFileRepository: userFileRepository,
-		sessions:           map[string]int{},
+		repository:        repository,
+		fileRepository:    fileRepository,
+		sessionRepository: sessionRepository,
 	}
 }
 
 func (u *userUsecase) GetAllUsers() ([]model.User, error) {
-	return u.userRepository.GetAll()
+	return u.repository.GetAll()
 }
 
 func (u *userUsecase) GetUserBySessionID(sessionID string) (*model.User, error) {
-	userID, ok := u.sessions[sessionID]
+	userID, ok := u.sessionRepository.GetUserBySession(sessionID)
 	if !ok {
 		return nil, nil
 	}
-	return u.userRepository.GetByID(userID)
+	return u.repository.GetByID(userID)
 }
 
 func (u *userUsecase) UpdateUser(id int, password, name string) error {
-	userToUpdate, err := u.userRepository.GetByID(id)
+	userToUpdate, err := u.repository.GetByID(id)
 	if err != nil {
 		return err
 	}
@@ -56,15 +59,15 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 			userToUpdate.AvatarPath = avatarPath
 		}
 	}
-	return u.userRepository.Update(*userToUpdate)
+	return u.repository.Update(*userToUpdate)
 }
 
 func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {
-	newAvatarPath, err := u.userFileRepository.StoreAvatar(user, avatarFile, avatarPath)
+	newAvatarPath, err := u.fileRepository.StoreAvatar(user, avatarFile, avatarPath)
 	if err != nil {
 		return err
 	}
-	return u.userRepository.UpdateAvatarPath(user.ID, newAvatarPath)
+	return u.repository.UpdateAvatarPath(user.ID, newAvatarPath)
 }
 
 func (u *userUsecase) GetAvatarUrlByName(name string) string {
@@ -78,7 +81,7 @@ func (u *userUsecase) GetAvatarUrlByName(name string) string {
 }
 
 func (u *userUsecase) Register(email, password, name string) error {
-	userWithSameEmail, err := u.userRepository.GetByEmail(email)
+	userWithSameEmail, err := u.repository.GetByEmail(email)
 	if err != nil {
 		return errors.New("unknown error")
 	}
@@ -86,11 +89,11 @@ func (u *userUsecase) Register(email, password, name string) error {
 		return fmt.Errorf("user with email %v already registered", email)
 	}
 	passwordHash := u.getPasswordHash(password)
-	return u.userRepository.Create(email, passwordHash, name)
+	return u.repository.Create(email, passwordHash, name)
 }
 
 func (u *userUsecase) Login(email, password string) (string, error) {
-	userToLogin, err := u.userRepository.GetByEmail(email)
+	userToLogin, err := u.repository.GetByEmail(email)
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
 	}
@@ -101,15 +104,18 @@ func (u *userUsecase) Login(email, password string) (string, error) {
 		return "", fmt.Errorf("incorrect password")
 	}
 	sessionID := u.getNewSessionID()
-	u.sessions[sessionID] = userToLogin.ID
+	err = u.sessionRepository.AddSession(sessionID, userToLogin.ID)
+	if err != nil {
+		return "", err
+	}
 	return sessionID, nil
 }
 
 func (u *userUsecase) Logout(sessionID string) error {
-	if _, ok := u.sessions[sessionID]; !ok {
-		return fmt.Errorf("session id not found")
+	err := u.sessionRepository.DeleteSession(sessionID)
+	if err != nil {
+		return fmt.Errorf("error deleting session")
 	}
-	delete(u.sessions, sessionID)
 	return nil
 }
 
