@@ -3,6 +3,7 @@ package usecase
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
@@ -79,7 +80,7 @@ func (u *userUsecase) GetAvatarUrlByName(name string) string {
 func (u *userUsecase) Register(email, password, name string) error {
 	userWithSameEmail, err := u.userRepository.GetByEmail(email)
 	if err != nil {
-		return err
+		return errors.New("unknown error")
 	}
 	if userWithSameEmail != nil {
 		return fmt.Errorf("user with email %v already registered", email)
@@ -90,11 +91,11 @@ func (u *userUsecase) Register(email, password, name string) error {
 
 func (u *userUsecase) Login(email, password string) (sessionID string, err error) {
 	userToLogin, err := u.userRepository.GetByEmail(email)
-	if err != nil {
-		return "", err
-	}
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
+	}
+	if err != nil {
+		return "", fmt.Errorf("unknown error")
 	}
 	if !u.isPasswordsEqual(password, userToLogin.PasswordHash) {
 		return "", fmt.Errorf("incorrect password")

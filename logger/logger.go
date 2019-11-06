@@ -1,25 +1,40 @@
 package logger
 
 import (
-	"github.com/labstack/echo/middleware"
-	"log"
+	"fmt"
+	"github.com/getsentry/sentry-go"
+	"github.com/labstack/echo"
 	"os"
 )
 
-func SetLoggerConfig() middleware.LoggerConfig {
-	f, err := os.OpenFile("agario.log",
-		os.O_RDWR|os.O_CREATE|os.O_APPEND,
-		0666)
-	if err != nil {
-		log.Fatalf("error opening log file: %v", err)
-	}
-	defer f.Close()
+var e *echo.Echo
 
-	return middleware.LoggerConfig{
-		Format: `{"time":"${time_rfc3339}", "id":"${id}","remote_ip":"${remote_ip}",` +
-			`"host":"${host}","method":"${method}","uri":"${uri}","user_agent":"${user_agent}",` +
-			`"status":${status},"error":"${error}","file":"${long_file}"` + "\n",
-		CustomTimeFormat: "2000-01-01 15:01:02",
-		Output:           f,
+func Init(echoInstance *echo.Echo) {
+	e = echoInstance
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn: os.Getenv("SENTRY_DSN"),
+	})
+	if err != nil {
+		e.Logger.Error("error connecting to Sentry", err)
 	}
+}
+
+func Error(err error) {
+	e.Logger.Error(err)
+	sentry.CaptureException(err)
+}
+
+func Errorf(format string, args ...interface{}) {
+	e.Logger.Errorf(format, args...)
+	sentry.CaptureException(fmt.Errorf(format, args...))
+}
+
+func Warn(err error) {
+	e.Logger.Warn(err)
+	sentry.CaptureMessage(err.Error())
+}
+
+func Warnf(format string, args ...interface{}) {
+	e.Logger.Errorf(format, args...)
+	sentry.CaptureMessage(fmt.Sprintf(format, args...))
 }

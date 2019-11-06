@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	valid "github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 	"net/http"
@@ -37,10 +36,10 @@ type errorResponseBody struct {
 	Message string `json:"message"`
 }
 
-func (h *Handler) Error(c echo.Context, err error) error {
+func (h *Handler) Error(c echo.Context, message string) error {
 	response := Response{
 		Status: "error",
-		Body:   errorResponseBody{Message: err.Error()},
+		Body:   errorResponseBody{Message: message},
 	}
 	return c.JSON(http.StatusBadRequest, response)
 }
@@ -50,7 +49,7 @@ func (h *Handler) Errors(c echo.Context, errors []error) error {
 	for _, err := range errors {
 		message += err.Error() + "   "
 	}
-	return h.Error(c, fmt.Errorf(message))
+	return h.Error(c, message)
 }
 
 func (h *Handler) Validate(data interface{}) (bool, []error) {

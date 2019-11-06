@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
 	"github.com/labstack/echo"
@@ -48,7 +49,7 @@ type userToOutput struct {
 func (h *UserHandler) HandleUserList(c echo.Context) error {
 	users, err := h.userUsecase.GetAllUsers()
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, "error loading users")
 	}
 	usersToOutput := h.convertUsersForOutput(users)
 	return h.OkWithBody(c, map[string]interface{}{
@@ -81,15 +82,15 @@ type userToUpdate struct {
 func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
 	currentUser, err := h.getCurrentUser(c)
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, err.Error())
 	}
 	userToUpdate := &userToUpdate{}
 	if err := c.Bind(userToUpdate); err != nil {
-		return h.Error(c, err)
+		return h.Error(c, "unknown error")
 	}
 	err = h.userUsecase.UpdateUser(currentUser.ID, userToUpdate.Password, userToUpdate.Name)
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, "error updating user")
 	}
 	return h.Ok(c)
 }
@@ -97,20 +98,22 @@ func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
 func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
 	currentUser, err := h.getCurrentUser(c)
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, err.Error())
 	}
 	err = c.Request().ParseMultipartForm(32 << 20)
 	if err != nil {
-		return h.Error(c, err)
+		logger.Error(err)
+		return h.Error(c, "bad request")
 	}
 	avatarFile, avatarFileHeader, err := c.Request().FormFile("avatar")
 	if err != nil {
-		return h.Error(c, err)
+		logger.Error(err)
+		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()
 	err = h.userUsecase.UpdateUserAvatar(currentUser, avatarFile, avatarFileHeader.Filename)
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, "error updating avatar")
 	}
 	return h.Ok(c)
 }
@@ -144,14 +147,14 @@ type userToRegister struct {
 func (h *UserHandler) HandleUserRegister(c echo.Context) error {
 	userToRegister := &userToRegister{}
 	if err := c.Bind(userToRegister); err != nil {
-		return err
+		return h.Error(c, err.Error())
 	}
-	if ok, errors := h.Validate(userToRegister); !ok {
-		return h.Errors(c, errors)
+	if ok, errs := h.Validate(userToRegister); !ok {
+		return h.Errors(c, errs)
 	}
 	err := h.userUsecase.Register(userToRegister.Email, userToRegister.Password, userToRegister.Name)
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, err.Error())
 	}
 	return h.Ok(c)
 }
@@ -166,12 +169,12 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 	if err := c.Bind(userToLogin); err != nil {
 		return err
 	}
-	if ok, errors := h.Validate(userToLogin); !ok {
-		return h.Errors(c, errors)
+	if ok, errs := h.Validate(userToLogin); !ok {
+		return h.Errors(c, errs)
 	}
 	sessionID, err := h.userUsecase.Login(userToLogin.Email, userToLogin.Password)
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, err.Error())
 	}
 	h.SetCookie(c, httpDelivery.SessionIDCookieName, sessionID, time.Now().Add(httpDelivery.SessionIDCookieExpire))
 	return h.Ok(c)
@@ -180,12 +183,12 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 func (h *UserHandler) HandleUserLogout(c echo.Context) error {
 	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
 	if err != nil {
-		return h.Error(c, fmt.Errorf("no session cookie"))
+		return h.Error(c, "no session cookie")
 	}
 	h.DeleteCookie(c, httpDelivery.SessionIDCookieName)
 	err = h.userUsecase.Logout(sessionIDCookie.Value)
 	if err != nil {
-		return h.Error(c, err)
+		return h.Error(c, err.Error())
 	}
 	return h.Ok(c)
 }
