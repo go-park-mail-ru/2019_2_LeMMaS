@@ -17,3 +17,8 @@ services:
       POSTGRES_PASSWORD: temppassword
     ports:
       - 5432:5432
+
+  redis:
+    image: redis:5
+    expose:
+    - 6379

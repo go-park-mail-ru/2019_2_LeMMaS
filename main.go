@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
@@ -26,13 +25,11 @@ func main() {
 
 	db, err := getDB()
 	if err != nil {
-		logger.Error(err)
 		return
 	}
 
 	redisConn, err := getRedis()
 	if err != nil {
-		logger.Error(err)
 		return
 	}
 
@@ -44,36 +41,34 @@ func main() {
 }
 
 func getDB() (*sqlx.DB, error) {
-	db, err := sqlx.Connect("pgx", os.Getenv("DATABASE_URL"))
+	db, err := sqlx.Connect("pgx", os.Getenv("POSTGRES_DSN"))
 	if err != nil {
-		logger.Error(errors.New("cannot connect to PostgreSQL"))
+		logger.Errorf("cannot connect to postgres", err)
 		return nil, err
 	}
 	err = db.Ping()
 	if err != nil {
-		logger.Error(errors.New("error pinging PostgreSQL"))
+		logger.Errorf("cannot connect to postgres", err)
 		return nil, err
 	}
 	return db, nil
 }
 
-func getRedis() (redis.Conn, error) {
-	connection, err := redis.DialURL(os.Getenv("REDIS_DATABASE_URL"))
+func getRedis() (*redis.Conn, error) {
+	connection, err := redis.DialURL(os.Getenv("REDIS_DSN"))
 	if err != nil {
 		logger.Errorf("cannot connect to redis", err)
 		return nil, err
 	}
-	defer connection.Close()
-
 	_, err = connection.Do("PING")
 	if err != nil {
 		logger.Errorf("cannot connect to redis", err)
 		return nil, err
 	}
-	return connection, nil
+	return &connection, nil
 }
 
-func initUserHandler(e *echo.Echo, db *sqlx.DB, redisConn redis.Conn) {
+func initUserHandler(e *echo.Echo, db *sqlx.DB, redisConn *redis.Conn) {
 	repo := userRepository.NewDatabaseUserRepository(db)
 	fileRepo := userRepository.NewFileRepository()
 	sessionRepo := userRepository.NewSessionRepository(redisConn)
