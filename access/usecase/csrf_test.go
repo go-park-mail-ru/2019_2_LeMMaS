@@ -5,18 +5,6 @@ import (
 	"testing"
 )
 
-func TestCsrfUsecase_SimpleToken(t *testing.T) {
-	usecase := NewCSRFUsecase()
-
-	token, err := usecase.CreateSimpleToken()
-	assert.NotEmpty(t, token)
-	assert.NoError(t, err)
-
-	ok, err := usecase.CheckSimpleToken(token)
-	assert.True(t, ok)
-	assert.NoError(t, err)
-}
-
 func TestCsrfUsecase_TokenBySession(t *testing.T) {
 	usecase := NewCSRFUsecase()
 

@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-const ApiV1PathPrefix = "/api/v1"
-
 type Handler struct {
 }
 

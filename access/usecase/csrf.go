@@ -12,10 +12,8 @@ import (
 )
 
 const (
-	SimpleCSRFTokenExpire  = time.Minute
-	SimpleCSRFTokenPayload = "jka1!dsa3??ko=2>@1anv-=pP?T(D]21v-03nJ/k/ka))f3D3v4-edm2;-="
-	CSRFTokenExpire        = time.Minute * 30
-	CSRFTokenSecret        = "09dJ2e4hcM5Tot984E9WQ5ur8Nty7RT2"
+	CSRFTokenExpire = time.Minute * 30
+	CSRFTokenSecret = "09dJ2e4hcM5Tot984E9WQ5ur8Nty7RT2"
 )
 
 type csrfUsecase struct {
@@ -28,14 +26,6 @@ func NewCSRFUsecase() *csrfUsecase {
 type TokenData struct {
 	Payload string
 	Expires int64
-}
-
-func (u *csrfUsecase) CreateSimpleToken() (string, error) {
-	return u.createToken(SimpleCSRFTokenPayload, SimpleCSRFTokenExpire)
-}
-
-func (u *csrfUsecase) CheckSimpleToken(token string) (bool, error) {
-	return u.checkToken(token, SimpleCSRFTokenPayload)
 }
 
 func (u *csrfUsecase) CreateTokenBySession(sessionID string) (string, error) {
