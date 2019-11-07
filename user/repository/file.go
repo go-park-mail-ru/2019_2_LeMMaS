@@ -10,24 +10,17 @@ import (
 )
 
 const (
-	UserAvatarDirectory = "user/avatar"
+	UserAvatarDirectory = "static/user/avatar"
 
 	FilePerm      = 0666
 	DirectoryPerm = 0777
 )
 
 type userFileRepository struct {
-	staticPath string
 }
 
 func NewFileRepository() *userFileRepository {
-	staticPath := os.Getenv("STATIC_PATH")
-	if staticPath == "" {
-		staticPath = "static"
-	}
-	return &userFileRepository{
-		staticPath: staticPath,
-	}
+	return &userFileRepository{}
 }
 
 func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
@@ -39,8 +32,9 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 		logger.Error(err)
 		return "", err
 	}
-	storageAvatarPath := r.getPath(UserAvatarDirectory) + "/" + uuid.New().String() + filepath.Ext(avatarPath)
-	storageAvatarFile, err := os.OpenFile(storageAvatarPath, os.O_WRONLY|os.O_CREATE, FilePerm)
+	storageAvatarPath := uuid.New().String() + filepath.Ext(avatarPath)
+	fullStorageAvatarPath := r.getPath(UserAvatarDirectory) + "/" + storageAvatarPath
+	storageAvatarFile, err := os.OpenFile(fullStorageAvatarPath, os.O_WRONLY|os.O_CREATE, FilePerm)
 	if err != nil {
 		logger.Error(err)
 		return "", err
@@ -51,7 +45,11 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 }
 
 func (r *userFileRepository) getPath(directory string) string {
-	return r.staticPath + "/" + directory
+	serverRoot := os.Getenv("SERVER_ROOT")
+	if serverRoot == "" {
+		return directory
+	}
+	return serverRoot + "/" + directory
 }
 
 func (r *userFileRepository) deleteFileIfExists(fileName string) error {
