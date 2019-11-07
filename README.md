@@ -13,5 +13,5 @@
 ## Запуск
 
 ```sh
-docker-compose up -d --build
+./docker/bin/start
 ```

@@ -16,14 +16,14 @@ const (
 	DirectoryPerm = 0777
 )
 
-type userFileRepository struct {
+type fileRepository struct {
 }
 
-func NewUserFileRepository() *userFileRepository {
-	return &userFileRepository{}
+func NewFileRepository() *fileRepository {
+	return &fileRepository{}
 }
 
-func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
+func (r *fileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
 	if err := os.MkdirAll(r.getPath(UserAvatarDirectory), DirectoryPerm); err != nil {
 		logger.Error(err)
 		return "", err
@@ -44,7 +44,7 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 	return storageAvatarPath, nil
 }
 
-func (r *userFileRepository) getPath(directory string) string {
+func (r *fileRepository) getPath(directory string) string {
 	serverRoot := os.Getenv("SERVER_ROOT")
 	if serverRoot == "" {
 		return directory
@@ -52,14 +52,14 @@ func (r *userFileRepository) getPath(directory string) string {
 	return serverRoot + "/" + directory
 }
 
-func (r *userFileRepository) deleteFileIfExists(fileName string) error {
+func (r *fileRepository) deleteFileIfExists(fileName string) error {
 	if r.fileExists(fileName) {
 		return os.Remove(fileName)
 	}
 	return nil
 }
 
-func (r *userFileRepository) fileExists(file string) bool {
+func (r *fileRepository) fileExists(file string) bool {
 	info, err := os.Stat(file)
 	if os.IsNotExist(err) {
 		return false
