@@ -20,7 +20,7 @@ func main() {
 	}
 
 	e := echo.New()
-	logger.Init(e)
+	logger.Init(*e)
 	http.InitMiddlewares(e)
 
 	db, err := getDB()
@@ -54,7 +54,7 @@ func getDB() (*sqlx.DB, error) {
 	return db, nil
 }
 
-func getRedis() (*redis.Conn, error) {
+func getRedis() (redis.Conn, error) {
 	connection, err := redis.DialURL(os.Getenv("REDIS_DSN"))
 	if err != nil {
 		logger.Errorf("cannot connect to redis: %s", err)
@@ -65,10 +65,10 @@ func getRedis() (*redis.Conn, error) {
 		logger.Errorf("cannot connect to redis: %s", err)
 		return nil, err
 	}
-	return &connection, nil
+	return connection, nil
 }
 
-func initUserHandler(e *echo.Echo, db *sqlx.DB, redisConn *redis.Conn) {
+func initUserHandler(e *echo.Echo, db *sqlx.DB, redisConn redis.Conn) {
 	dbRepo := userRepository.NewDatabaseRepository(db)
 	fileRepo := userRepository.NewFileRepository()
 	sessionRepo := userRepository.NewSessionRepository(redisConn)

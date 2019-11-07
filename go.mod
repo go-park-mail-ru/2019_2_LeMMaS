@@ -17,6 +17,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/lib/pq v1.2.0 // indirect
+	github.com/rafaeljusto/redigomock v0.0.0-20191016070255-2f957ca2c86c
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
