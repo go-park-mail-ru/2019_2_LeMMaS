@@ -1,10 +1,11 @@
 version: '2.4'
 services:
   web:
-    build: .
-    env_file: .env
+    build: images/web
+    env_file: ../.env
+    working_dir: /home/app
     volumes:
-      - .:/home/app
+      - ../.:/home/app
     ports:
       - 8080:8080
 
@@ -19,6 +20,6 @@ services:
       - 5432:5432
 
   redis:
-    image: redis:5
+    build: images/redis
     expose:
     - 6379

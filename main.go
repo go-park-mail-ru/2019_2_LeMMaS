@@ -43,12 +43,12 @@ func main() {
 func getDB() (*sqlx.DB, error) {
 	db, err := sqlx.Connect("pgx", os.Getenv("POSTGRES_DSN"))
 	if err != nil {
-		logger.Errorf("cannot connect to postgres", err)
+		logger.Errorf("cannot connect to postgres: %s", err)
 		return nil, err
 	}
 	err = db.Ping()
 	if err != nil {
-		logger.Errorf("cannot connect to postgres", err)
+		logger.Errorf("cannot connect to postgres: %s", err)
 		return nil, err
 	}
 	return db, nil
@@ -57,21 +57,21 @@ func getDB() (*sqlx.DB, error) {
 func getRedis() (*redis.Conn, error) {
 	connection, err := redis.DialURL(os.Getenv("REDIS_DSN"))
 	if err != nil {
-		logger.Errorf("cannot connect to redis", err)
+		logger.Errorf("cannot connect to redis: %s", err)
 		return nil, err
 	}
 	_, err = connection.Do("PING")
 	if err != nil {
-		logger.Errorf("cannot connect to redis", err)
+		logger.Errorf("cannot connect to redis: %s", err)
 		return nil, err
 	}
 	return &connection, nil
 }
 
 func initUserHandler(e *echo.Echo, db *sqlx.DB, redisConn *redis.Conn) {
-	repo := userRepository.NewDatabaseUserRepository(db)
+	dbRepo := userRepository.NewDatabaseRepository(db)
 	fileRepo := userRepository.NewFileRepository()
 	sessionRepo := userRepository.NewSessionRepository(redisConn)
-	usecase := userUsecase.NewUserUsecase(repo, fileRepo, sessionRepo)
+	usecase := userUsecase.NewUserUsecase(dbRepo, fileRepo, sessionRepo)
 	userHttpDelivery.NewUserHandler(e, usecase)
 }

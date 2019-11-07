@@ -22,7 +22,7 @@ func TestDatabaseUserRepository_GetAll(t *testing.T) {
 	}
 	mock.ExpectQuery(`select (.+) from "` + UserTable + `"`).WillReturnRows(expectedRows)
 
-	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
+	repo := NewDatabaseRepository(sqlx.NewDb(db, ""))
 	users, err := repo.GetAll()
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -40,7 +40,7 @@ func TestDatabaseUserRepository_GetByID(t *testing.T) {
 	expectedRows := sqlmock.NewRows([]string{"id", "email"}).AddRow(expectedUser.ID, expectedUser.Email)
 	mock.ExpectQuery(`select (.+) from "` + UserTable + `"`).WithArgs(expectedUser.ID).WillReturnRows(expectedRows)
 
-	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
+	repo := NewDatabaseRepository(sqlx.NewDb(db, ""))
 	user, err := repo.GetByID(expectedUser.ID)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -60,7 +60,7 @@ func TestDatabaseUserRepository_GetByEmail(t *testing.T) {
 	expectedRows := sqlmock.NewRows([]string{"id", "email"}).AddRow(expectedUser.ID, expectedUser.Email)
 	mock.ExpectQuery(`select (.+) from "` + UserTable + `"`).WithArgs(expectedUser.Email).WillReturnRows(expectedRows)
 
-	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
+	repo := NewDatabaseRepository(sqlx.NewDb(db, ""))
 	user, err := repo.GetByEmail(expectedUser.Email)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -79,7 +79,7 @@ func TestDatabaseUserRepository_Create(t *testing.T) {
 	user := model.User{Email: "test@m.ru", PasswordHash: "123456", Name: "Testik"}
 	mock.ExpectExec(`insert into "` + UserTable + `"`).WillReturnResult(sqlmock.NewResult(1, 1))
 
-	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
+	repo := NewDatabaseRepository(sqlx.NewDb(db, ""))
 	err = repo.Create(user.Email, user.PasswordHash, user.Name)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -97,7 +97,7 @@ func TestDatabaseUserRepository_Update(t *testing.T) {
 		WithArgs(user.Email, user.PasswordHash, user.Name, user.AvatarPath, user.ID).
 		WillReturnResult(sqlmock.NewResult(int64(user.ID), 1))
 
-	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
+	repo := NewDatabaseRepository(sqlx.NewDb(db, ""))
 	err = repo.Update(user)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -115,7 +115,7 @@ func TestDatabaseUserRepository_UpdateAvatarPath(t *testing.T) {
 		WithArgs(user.AvatarPath, user.ID).
 		WillReturnResult(sqlmock.NewResult(int64(user.ID), 1))
 
-	repo := NewDatabaseUserRepository(sqlx.NewDb(db, ""))
+	repo := NewDatabaseRepository(sqlx.NewDb(db, ""))
 	err = repo.UpdateAvatarPath(user.ID, user.AvatarPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
