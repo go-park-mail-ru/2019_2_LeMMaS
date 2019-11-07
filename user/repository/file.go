@@ -9,22 +9,22 @@ import (
 	"path/filepath"
 )
 
-const UserAvatarDirectory = "static/user/avatar"
-
 const (
+	UserAvatarDirectory = "static/user/avatar"
+
 	FilePerm      = 0666
 	DirectoryPerm = 0777
 )
 
-type userFileRepository struct {
+type fileRepository struct {
 }
 
-func NewUserFileRepository() *userFileRepository {
-	return &userFileRepository{}
+func NewFileRepository() *fileRepository {
+	return &fileRepository{}
 }
 
-func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
-	if err := os.MkdirAll(UserAvatarDirectory, DirectoryPerm); err != nil {
+func (r *fileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
+	if err := os.MkdirAll(r.getPath(UserAvatarDirectory), DirectoryPerm); err != nil {
 		logger.Error(err)
 		return "", err
 	}
@@ -32,8 +32,9 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 		logger.Error(err)
 		return "", err
 	}
-	storageAvatarPath := UserAvatarDirectory + "/" + uuid.New().String() + filepath.Ext(avatarPath)
-	storageAvatarFile, err := os.OpenFile(storageAvatarPath, os.O_WRONLY|os.O_CREATE, FilePerm)
+	storageAvatarPath := uuid.New().String() + filepath.Ext(avatarPath)
+	fullStorageAvatarPath := r.getPath(UserAvatarDirectory) + "/" + storageAvatarPath
+	storageAvatarFile, err := os.OpenFile(fullStorageAvatarPath, os.O_WRONLY|os.O_CREATE, FilePerm)
 	if err != nil {
 		logger.Error(err)
 		return "", err
@@ -43,14 +44,22 @@ func (r *userFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader,
 	return storageAvatarPath, nil
 }
 
-func (r *userFileRepository) deleteFileIfExists(fileName string) error {
+func (r *fileRepository) getPath(directory string) string {
+	serverRoot := os.Getenv("SERVER_ROOT")
+	if serverRoot == "" {
+		return directory
+	}
+	return serverRoot + "/" + directory
+}
+
+func (r *fileRepository) deleteFileIfExists(fileName string) error {
 	if r.fileExists(fileName) {
 		return os.Remove(fileName)
 	}
 	return nil
 }
 
-func (r *userFileRepository) fileExists(file string) bool {
+func (r *fileRepository) fileExists(file string) bool {
 	info, err := os.Stat(file)
 	if os.IsNotExist(err) {
 		return false
