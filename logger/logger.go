@@ -7,9 +7,9 @@ import (
 	"os"
 )
 
-var e echo.Echo
+var e *echo.Echo
 
-func Init(echoInstance echo.Echo) {
+func Init(echoInstance *echo.Echo) {
 	e = echoInstance
 	err := sentry.Init(sentry.ClientOptions{
 		Dsn: os.Getenv("SENTRY_DSN"),

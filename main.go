@@ -1,6 +1,8 @@
 package main
 
 import (
+	accessHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/access/delivery/http"
+	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/access/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
 	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
@@ -20,20 +22,21 @@ func main() {
 	}
 
 	e := echo.New()
-	logger.Init(*e)
+	logger.Init(e)
 	http.InitMiddlewares(e)
 
 	db, err := getDB()
 	if err != nil {
 		return
 	}
-
 	redisConn, err := getRedis()
 	if err != nil {
 		return
 	}
 
+	initAccessHandler(e)
 	initUserHandler(e, db, redisConn)
+
 	err = e.Start(":" + port)
 	if err != nil {
 		logger.Error(err)
@@ -52,6 +55,11 @@ func getDB() (*sqlx.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func initAccessHandler(e *echo.Echo) {
+	csrfUsecase := accessUsecase.NewCSRFUsecase()
+	accessHttpDelivery.NewAccessHandler(e, csrfUsecase)
 }
 
 func getRedis() (redis.Conn, error) {

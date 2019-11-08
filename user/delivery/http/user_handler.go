@@ -10,22 +10,6 @@ import (
 	"time"
 )
 
-const (
-	ApiV1UserListPath            = httpDelivery.ApiV1PathPrefix + "/user/list"
-	ApiV1UserRegisterPath        = httpDelivery.ApiV1PathPrefix + "/user/register"
-	ApiV1UserLoginPath           = httpDelivery.ApiV1PathPrefix + "/user/login"
-	ApiV1UserLogoutPath          = httpDelivery.ApiV1PathPrefix + "/user/logout"
-	ApiV1UserProfilePath         = httpDelivery.ApiV1PathPrefix + "/user/me"
-	ApiV1UserUpdatePath          = httpDelivery.ApiV1PathPrefix + "/user/update"
-	ApiV1UserAvatarUploadPath    = httpDelivery.ApiV1PathPrefix + "/user/avatar/upload"
-	ApiV1UserGetAvatarByNamePath = httpDelivery.ApiV1PathPrefix + "/user/avatar/getByName"
-)
-
-const (
-	SessionIDCookieName   = "session_id"
-	SessionIDCookieExpire = 10 * time.Hour
-)
-
 type UserHandler struct {
 	userUsecase user.Usecase
 	httpDelivery.Handler
@@ -33,14 +17,14 @@ type UserHandler struct {
 
 func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) *UserHandler {
 	handler := UserHandler{userUsecase: userUsecase}
-	e.GET(ApiV1UserListPath, handler.HandleUserList)
-	e.POST(ApiV1UserRegisterPath, handler.HandleUserRegister)
-	e.POST(ApiV1UserLoginPath, handler.HandleUserLogin)
-	e.POST(ApiV1UserLogoutPath, handler.HandleUserLogout)
-	e.GET(ApiV1UserProfilePath, handler.HandleUserProfile)
-	e.POST(ApiV1UserUpdatePath, handler.HandleUserUpdate)
-	e.POST(ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
-	e.GET(ApiV1UserGetAvatarByNamePath, handler.HandleGetAvatarByName)
+	e.GET(httpDelivery.ApiV1UserListPath, handler.HandleUserList)
+	e.POST(httpDelivery.ApiV1UserRegisterPath, handler.HandleUserRegister)
+	e.POST(httpDelivery.ApiV1UserLoginPath, handler.HandleUserLogin)
+	e.POST(httpDelivery.ApiV1UserLogoutPath, handler.HandleUserLogout)
+	e.GET(httpDelivery.ApiV1UserProfilePath, handler.HandleUserProfile)
+	e.POST(httpDelivery.ApiV1UserUpdatePath, handler.HandleUserUpdate)
+	e.POST(httpDelivery.ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
+	e.GET(httpDelivery.ApiV1UserGetAvatarByNamePath, handler.HandleGetAvatarByName)
 	return &handler
 }
 
@@ -181,16 +165,16 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
-	h.SetCookie(c, SessionIDCookieName, sessionID, time.Now().Add(SessionIDCookieExpire))
+	h.SetCookie(c, httpDelivery.SessionIDCookieName, sessionID, time.Now().Add(httpDelivery.SessionIDCookieExpire))
 	return h.Ok(c)
 }
 
 func (h *UserHandler) HandleUserLogout(c echo.Context) error {
-	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
+	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
 	if err != nil {
 		return h.Error(c, "no session cookie")
 	}
-	h.DeleteCookie(c, SessionIDCookieName)
+	h.DeleteCookie(c, httpDelivery.SessionIDCookieName)
 	err = h.userUsecase.Logout(sessionIDCookie.Value)
 	if err != nil {
 		return h.Error(c, err.Error())
@@ -199,7 +183,7 @@ func (h *UserHandler) HandleUserLogout(c echo.Context) error {
 }
 
 func (h *UserHandler) getCurrentUser(c echo.Context) (*model.User, error) {
-	sessionIDCookie, err := c.Cookie(SessionIDCookieName)
+	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
 	if err != nil {
 		return nil, fmt.Errorf("no session cookie")
 	}

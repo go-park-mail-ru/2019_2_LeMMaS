@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/test"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
@@ -104,35 +105,35 @@ func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {
 }
 
 func (s *UserHandlerTestSuite) TestUserList(expectedResponse string) {
-	s.SetupRequest(http.MethodGet, ApiV1UserListPath, "")
+	s.SetupRequest(http.MethodGet, httpDelivery.ApiV1UserListPath, "")
 	s.handler.HandleUserList(s.NewHandlerContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserRegister(requestBody, expectedResponse string, expectedCode int) {
-	s.SetupRequest(http.MethodPost, ApiV1UserRegisterPath, requestBody)
+	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserRegisterPath, requestBody)
 	s.handler.HandleUserRegister(s.NewHandlerContext())
 	s.TestResponse(expectedResponse, expectedCode)
 }
 
 func (s *UserHandlerTestSuite) TestUserUpdate(requestBody, expectedResponse string) {
-	s.SetupRequest(http.MethodPost, ApiV1UserUpdatePath, requestBody)
+	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserUpdatePath, requestBody)
 	s.handler.HandleUserUpdate(s.NewHandlerContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse string, mustHaveSessionCookie bool) {
-	s.SetupRequest(http.MethodPost, ApiV1UserLoginPath, requestBody)
+	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserLoginPath, requestBody)
 	s.handler.HandleUserLogin(s.NewHandlerContext())
 	s.TestOkResponse(expectedResponse)
 	if mustHaveSessionCookie {
-		s.TestCookiePresent(SessionIDCookieName)
+		s.TestCookiePresent(httpDelivery.SessionIDCookieName)
 	}
 }
 
 func (s *UserHandlerTestSuite) TestUserLogout(expectedResponse string) {
-	s.SetupRequest(http.MethodPost, ApiV1UserLogoutPath, "")
+	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserLogoutPath, "")
 	s.handler.HandleUserLogout(s.NewHandlerContext())
 	s.TestOkResponse(expectedResponse)
-	s.TestCookieNotPresent(SessionIDCookieName)
+	s.TestCookieNotPresent(httpDelivery.SessionIDCookieName)
 }

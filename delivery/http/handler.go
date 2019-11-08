@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-const ApiV1PathPrefix = "/api/v1"
-
 type Handler struct {
 }
 
@@ -67,6 +65,7 @@ func (h *Handler) SetCookie(c echo.Context, name, value string, expires time.Tim
 		Name:    name,
 		Value:   value,
 		Expires: expires,
+		Path:    "/",
 	}
 	c.SetCookie(cookie)
 }

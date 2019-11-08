@@ -92,7 +92,7 @@ func (u *userUsecase) Register(email, password, name string) error {
 	return u.repository.Create(email, passwordHash, name)
 }
 
-func (u *userUsecase) Login(email, password string) (string, error) {
+func (u *userUsecase) Login(email, password string) (sessionID string, err error) {
 	userToLogin, err := u.repository.GetByEmail(email)
 	if userToLogin == nil {
 		return "", fmt.Errorf("incorrect email")
@@ -103,7 +103,7 @@ func (u *userUsecase) Login(email, password string) (string, error) {
 	if !u.isPasswordsEqual(password, userToLogin.PasswordHash) {
 		return "", fmt.Errorf("incorrect password")
 	}
-	sessionID := u.getNewSessionID()
+	sessionID = u.getNewSessionID()
 	err = u.sessionRepository.AddSession(sessionID, userToLogin.ID)
 	if err != nil {
 		return "", err
