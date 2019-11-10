@@ -2,7 +2,7 @@ package http
 
 import (
 	"fmt"
-	user2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/test"
@@ -84,7 +84,7 @@ func TestUserHandler_HandleUserLogout(t *testing.T) {
 
 type UserHandlerTestSuite struct {
 	test.HandlerTestSuite
-	usecase *user2.MockUsecase
+	usecase *user.MockUsecase
 	handler *UserHandler
 }
 
@@ -96,11 +96,11 @@ func NewUserHandlerTestSuite() *UserHandlerTestSuite {
 
 func (s *UserHandlerTestSuite) SetTesting(t *testing.T) {
 	s.HandlerTestSuite.SetTesting(t)
-	s.usecase = user2.NewMockUsecase(gomock.NewController(t))
+	s.usecase = user.NewMockUsecase(gomock.NewController(t))
 	s.handler = NewUserHandler(s.E, s.usecase)
 }
 
-func (s *UserHandlerTestSuite) ExpectUsecase() *user2.MockUsecaseMockRecorder {
+func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {
 	return s.usecase.EXPECT()
 }
 
