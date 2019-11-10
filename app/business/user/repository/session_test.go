@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/test"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/test"
 	"github.com/rafaeljusto/redigomock"
 	"github.com/stretchr/testify/assert"
 	"testing"

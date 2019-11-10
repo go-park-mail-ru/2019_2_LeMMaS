@@ -2,10 +2,10 @@ package http
 
 import (
 	"fmt"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
+	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"github.com/labstack/echo"
 	"time"
 )

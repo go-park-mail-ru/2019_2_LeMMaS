@@ -5,10 +5,10 @@
 package user
 
 import (
-	model "github.com/go-park-mail-ru/2019_2_LeMMaS/model"
-	gomock "github.com/golang/mock/gomock"
-	io "io"
-	reflect "reflect"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
+	"github.com/golang/mock/gomock"
+	"io"
+	"reflect"
 )
 
 // MockUsecase is a mock of Usecase interface

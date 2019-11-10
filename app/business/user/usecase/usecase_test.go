@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/test"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
+	user2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/test"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestUserUsecase_GetAllUsers(t *testing.T) {
-	userRepo := user.NewMockRepository(gomock.NewController(t))
+	userRepo := user2.NewMockRepository(gomock.NewController(t))
 	usecase := NewUserUsecase(userRepo, nil, nil)
 
 	expectedUsers := []model.User{
@@ -31,7 +31,7 @@ func TestUserUsecase_GetAllUsers(t *testing.T) {
 }
 
 func TestUserUsecase_Register(t *testing.T) {
-	userRepo := user.NewMockRepository(gomock.NewController(t))
+	userRepo := user2.NewMockRepository(gomock.NewController(t))
 	usecase := NewUserUsecase(userRepo, nil, nil)
 
 	email := "t@mail.ru"
@@ -51,8 +51,8 @@ func TestUserUsecase_Register(t *testing.T) {
 
 func TestUserUsecase_Login(t *testing.T) {
 	mockController := gomock.NewController(t)
-	userRepo := user.NewMockRepository(mockController)
-	sessionRepo := user.NewMockSessionRepository(mockController)
+	userRepo := user2.NewMockRepository(mockController)
+	sessionRepo := user2.NewMockSessionRepository(mockController)
 	usecase := NewUserUsecase(userRepo, nil, sessionRepo)
 
 	userToLogin := model.User{ID: 2, Email: "t@mail.ru", PasswordHash: test.PasswordHash}
@@ -71,8 +71,8 @@ func TestUserUsecase_Login(t *testing.T) {
 
 func TestUserUsecase_GetUserBySessionID(t *testing.T) {
 	mockController := gomock.NewController(t)
-	userRepo := user.NewMockRepository(mockController)
-	sessionRepo := user.NewMockSessionRepository(mockController)
+	userRepo := user2.NewMockRepository(mockController)
+	sessionRepo := user2.NewMockSessionRepository(mockController)
 	usecase := NewUserUsecase(userRepo, nil, sessionRepo)
 
 	userToLogin := model.User{Email: "t@mail.ru", PasswordHash: test.PasswordHash}
@@ -91,7 +91,7 @@ func TestUserUsecase_GetUserBySessionID(t *testing.T) {
 }
 
 func TestUserUsecase_Logout(t *testing.T) {
-	sessionRepo := user.NewMockSessionRepository(gomock.NewController(t))
+	sessionRepo := user2.NewMockSessionRepository(gomock.NewController(t))
 	usecase := NewUserUsecase(nil, nil, sessionRepo)
 	sessionRepo.EXPECT().DeleteSession(test.SessionID).Return(nil)
 	err := usecase.Logout(test.SessionID)
@@ -105,7 +105,7 @@ func TestUserUsecase_GetAvatarUrlByName(t *testing.T) {
 }
 
 func TestUserUsecase_UpdateUser(t *testing.T) {
-	userRepo := user.NewMockRepository(gomock.NewController(t))
+	userRepo := user2.NewMockRepository(gomock.NewController(t))
 	usecase := NewUserUsecase(userRepo, nil, nil)
 
 	oldUser := model.User{ID: 4, Name: "Old Name"}
@@ -118,8 +118,8 @@ func TestUserUsecase_UpdateUser(t *testing.T) {
 
 func TestUserUsecase_UpdateUserAvatar(t *testing.T) {
 	mockController := gomock.NewController(t)
-	userRepo := user.NewMockRepository(mockController)
-	userFileRepo := user.NewMockFileRepository(mockController)
+	userRepo := user2.NewMockRepository(mockController)
+	userFileRepo := user2.NewMockFileRepository(mockController)
 	usecase := NewUserUsecase(userRepo, userFileRepo, nil)
 
 	userToUpdate := model.User{ID: 2}

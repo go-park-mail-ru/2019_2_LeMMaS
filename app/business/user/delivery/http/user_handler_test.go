@@ -2,10 +2,10 @@ package http
 
 import (
 	"fmt"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/test"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
+	user2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
+	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/test"
 	"github.com/golang/mock/gomock"
 	"net/http"
 	"testing"
@@ -84,7 +84,7 @@ func TestUserHandler_HandleUserLogout(t *testing.T) {
 
 type UserHandlerTestSuite struct {
 	test.HandlerTestSuite
-	usecase *user.MockUsecase
+	usecase *user2.MockUsecase
 	handler *UserHandler
 }
 
@@ -96,11 +96,11 @@ func NewUserHandlerTestSuite() *UserHandlerTestSuite {
 
 func (s *UserHandlerTestSuite) SetTesting(t *testing.T) {
 	s.HandlerTestSuite.SetTesting(t)
-	s.usecase = user.NewMockUsecase(gomock.NewController(t))
+	s.usecase = user2.NewMockUsecase(gomock.NewController(t))
 	s.handler = NewUserHandler(s.E, s.usecase)
 }
 
-func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {
+func (s *UserHandlerTestSuite) ExpectUsecase() *user2.MockUsecaseMockRecorder {
 	return s.usecase.EXPECT()
 }
 

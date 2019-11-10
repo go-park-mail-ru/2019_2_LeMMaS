@@ -1,13 +1,13 @@
 package main
 
 import (
-	accessHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/access/delivery/http"
-	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/access/usecase"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/logger"
-	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/user/delivery/http"
-	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/user/repository"
-	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/user/usecase"
+	accessHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access/delivery/http"
+	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access/usecase"
+	userHttpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/delivery/http"
+	userRepository "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/repository"
+	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/usecase"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
 	"github.com/gomodule/redigo/redis"
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"

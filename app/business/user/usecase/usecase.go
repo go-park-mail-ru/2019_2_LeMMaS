@@ -5,8 +5,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/user"
+	user2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/argon2"
 	"io"
@@ -16,15 +16,15 @@ import (
 const PasswordSaltLength = 8
 
 type userUsecase struct {
-	repository        user.Repository
-	fileRepository    user.FileRepository
-	sessionRepository user.SessionRepository
+	repository        user2.Repository
+	fileRepository    user2.FileRepository
+	sessionRepository user2.SessionRepository
 }
 
 func NewUserUsecase(
-	repository user.Repository,
-	fileRepository user.FileRepository,
-	sessionRepository user.SessionRepository) *userUsecase {
+	repository user2.Repository,
+	fileRepository user2.FileRepository,
+	sessionRepository user2.SessionRepository) *userUsecase {
 	return &userUsecase{
 		repository:        repository,
 		fileRepository:    fileRepository,

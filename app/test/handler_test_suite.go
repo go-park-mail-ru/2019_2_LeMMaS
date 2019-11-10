@@ -3,7 +3,7 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/delivery/http"
+	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"net/http"

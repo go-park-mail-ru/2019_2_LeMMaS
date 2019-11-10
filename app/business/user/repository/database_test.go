@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"testing"

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"io"
 )
 
