@@ -2,7 +2,7 @@ package http
 
 import (
 	"fmt"
-	access2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
 	"github.com/labstack/echo"
@@ -15,11 +15,11 @@ const (
 )
 
 type AccessHandler struct {
-	csrfUsecase access2.CsrfUsecase
+	csrfUsecase access.CsrfUsecase
 	httpDelivery.Handler
 }
 
-func NewAccessHandler(e *echo.Echo, csrfUsecase access2.CsrfUsecase) *AccessHandler {
+func NewAccessHandler(e *echo.Echo, csrfUsecase access.CsrfUsecase) *AccessHandler {
 	handler := AccessHandler{csrfUsecase: csrfUsecase}
 	e.Use(handler.CsrfMiddleware)
 	e.GET(httpDelivery.ApiV1AccessCSRFPath, handler.HandleGetCSRFToken)
