@@ -133,7 +133,7 @@ func TestUserUsecase_UpdateUserAvatar(t *testing.T) {
 }
 
 func TestUserUsecase_GetPasswordHash(t *testing.T) {
-	usecase := NewUserUsecase(nil, nil, nil)
+	usecase := userUsecase{}
 	passwordHash := usecase.getPasswordHash(test.Password)
 	assert.NotEmpty(t, passwordHash)
 	assert.True(t, usecase.isPasswordsEqual(test.Password, passwordHash))

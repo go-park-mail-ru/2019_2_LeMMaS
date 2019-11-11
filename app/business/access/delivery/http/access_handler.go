@@ -15,12 +15,13 @@ const (
 )
 
 type AccessHandler struct {
-	csrfUsecase access.CsrfUsecase
 	httpDelivery.Handler
+	csrfUsecase access.CsrfUsecase
+	logger      logger.Logger
 }
 
-func NewAccessHandler(e *echo.Echo, csrfUsecase access.CsrfUsecase) *AccessHandler {
-	handler := AccessHandler{csrfUsecase: csrfUsecase}
+func NewAccessHandler(e *echo.Echo, csrfUsecase access.CsrfUsecase, logger logger.Logger) *AccessHandler {
+	handler := AccessHandler{csrfUsecase: csrfUsecase, logger: logger}
 	e.Use(handler.CsrfMiddleware)
 	e.GET(httpDelivery.ApiV1AccessCSRFPath, handler.HandleGetCSRFToken)
 	return &handler
@@ -34,7 +35,7 @@ func (h *AccessHandler) HandleGetCSRFToken(c echo.Context) error {
 	}
 	token, err = h.csrfUsecase.CreateTokenBySession(sessionID.Value)
 	if err != nil {
-		logger.Error(err)
+		h.logger.Error(err)
 		return h.Error(c, "error generating token")
 	}
 	return h.OkWithBody(c, map[string]string{
@@ -64,7 +65,7 @@ func (h *AccessHandler) CsrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			if err != nil {
 				message += "\n" + err.Error()
 			}
-			logger.Warnf(message)
+			h.logger.Warnf(message)
 			return c.JSON(http.StatusForbidden, "incorrect CSRF token")
 		}
 		return next(c)

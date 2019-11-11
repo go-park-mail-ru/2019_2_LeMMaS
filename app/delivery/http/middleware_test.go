@@ -1,14 +1,23 @@
 package http
 
 import (
+	testMock "github.com/go-park-mail-ru/2019_2_LeMMaS/app/test/mock"
+	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestIsOriginAllowed(t *testing.T) {
-	assert.False(t, isOriginAllowed(""))
-	assert.True(t, isOriginAllowed("https://20192lemmasnew-h0ivhao1a.now.sh"))
-	assert.False(t, isOriginAllowed("https://yandex.ru"))
-	assert.False(t, isOriginAllowed("https://random324.now.sh"))
-	assert.True(t, isOriginAllowed("http://localhost:3000"))
+	m := newTestMiddleware(t)
+	assert.False(t, m.isOriginAllowed(""))
+	assert.True(t, m.isOriginAllowed("https://20192lemmasnew-h0ivhao1a.now.sh"))
+	assert.False(t, m.isOriginAllowed("https://yandex.ru"))
+	assert.False(t, m.isOriginAllowed("https://random324.now.sh"))
+	assert.True(t, m.isOriginAllowed("http://localhost:3000"))
+}
+
+func newTestMiddleware(t *testing.T) Middleware {
+	e := echo.New()
+	logger := testMock.NewMockLogger(t)
+	return NewMiddleware(e, logger)
 }

@@ -8,16 +8,23 @@ import (
 	"strings"
 )
 
-func InitMiddlewares(e *echo.Echo) {
-	e.Use(corsMiddleware)
-	e.Use(panicMiddleware)
+type Middleware struct {
+	e      *echo.Echo
+	logger logger.Logger
 }
 
-func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func NewMiddleware(e *echo.Echo, logger logger.Logger) Middleware {
+	middleware := Middleware{e, logger}
+	e.Use(middleware.corsMiddleware)
+	e.Use(middleware.panicMiddleware)
+	return middleware
+}
+
+func (m Middleware) corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		origin := c.Request().Header.Get(echo.HeaderOrigin)
 		var allowOrigin string
-		if isOriginAllowed(origin) {
+		if m.isOriginAllowed(origin) {
 			allowOrigin = origin
 		} else {
 			allowOrigin = ""
@@ -38,17 +45,17 @@ func corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func isOriginAllowed(origin string) bool {
+func (m Middleware) isOriginAllowed(origin string) bool {
 	isNowSh, _ := regexp.MatchString(`^https:\/\/20192lemmas.*\.now\.sh$`, origin)
 	isLocalhost, _ := regexp.MatchString(`^http:\/\/localhost:\d*$`, origin)
 	return isNowSh || isLocalhost
 }
 
-func panicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (m Middleware) panicMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		defer func() {
 			if err := recover(); err != nil {
-				logger.Errorf("panic during request to %v: %v", c.Request().URL.Path, err)
+				m.logger.Errorf("panic during request to %v: %v", c.Request().URL.Path, err)
 				c.JSON(http.StatusInternalServerError, "internal error")
 			}
 		}()

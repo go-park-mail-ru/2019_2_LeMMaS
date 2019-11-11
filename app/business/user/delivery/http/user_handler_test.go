@@ -6,6 +6,7 @@ import (
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/test"
+	testMock "github.com/go-park-mail-ru/2019_2_LeMMaS/app/test/mock"
 	"github.com/golang/mock/gomock"
 	"net/http"
 	"testing"
@@ -97,7 +98,8 @@ func NewUserHandlerTestSuite() *UserHandlerTestSuite {
 func (s *UserHandlerTestSuite) SetTesting(t *testing.T) {
 	s.HandlerTestSuite.SetTesting(t)
 	s.usecase = user.NewMockUsecase(gomock.NewController(t))
-	s.handler = NewUserHandler(s.E, s.usecase)
+	logger := testMock.NewMockLogger(t)
+	s.handler = NewUserHandler(s.E, s.usecase, logger)
 }
 
 func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {

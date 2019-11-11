@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access"
 	"io"
 	"time"
 )
@@ -19,8 +20,8 @@ const (
 type csrfUsecase struct {
 }
 
-func NewCSRFUsecase() *csrfUsecase {
-	return &csrfUsecase{}
+func NewCSRFUsecase() access.CsrfUsecase {
+	return csrfUsecase{}
 }
 
 type TokenData struct {
@@ -28,15 +29,15 @@ type TokenData struct {
 	Expires int64
 }
 
-func (u *csrfUsecase) CreateTokenBySession(sessionID string) (string, error) {
+func (u csrfUsecase) CreateTokenBySession(sessionID string) (string, error) {
 	return u.createToken(sessionID, CSRFTokenExpire)
 }
 
-func (u *csrfUsecase) CheckTokenBySession(token string, sessionID string) (bool, error) {
+func (u csrfUsecase) CheckTokenBySession(token string, sessionID string) (bool, error) {
 	return u.checkToken(token, sessionID)
 }
 
-func (u *csrfUsecase) createToken(payload string, expire time.Duration) (string, error) {
+func (u csrfUsecase) createToken(payload string, expire time.Duration) (string, error) {
 	block, err := aes.NewCipher([]byte(CSRFTokenSecret))
 	if err != nil {
 		return "", err
@@ -64,7 +65,7 @@ func (u *csrfUsecase) createToken(payload string, expire time.Duration) (string,
 	return token, nil
 }
 
-func (u *csrfUsecase) checkToken(token string, payload string) (bool, error) {
+func (u csrfUsecase) checkToken(token string, payload string) (bool, error) {
 	block, err := aes.NewCipher([]byte(CSRFTokenSecret))
 	if err != nil {
 		return false, err

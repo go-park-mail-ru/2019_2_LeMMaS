@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
 	"github.com/gomodule/redigo/redis"
 	"strconv"
@@ -13,19 +14,21 @@ const (
 )
 
 type sessionRepository struct {
-	redis redis.Conn
+	redis  redis.Conn
+	logger logger.Logger
 }
 
-func NewSessionRepository(redis redis.Conn) *sessionRepository {
+func NewSessionRepository(redis redis.Conn, logger logger.Logger) user.SessionRepository {
 	return &sessionRepository{
 		redis,
+		logger,
 	}
 }
 
 func (r *sessionRepository) AddSession(sessionID string, userID int) error {
 	_, err := r.redis.Do(RedisCommandSet, sessionID, userID)
 	if err != nil {
-		logger.Error(err)
+		r.logger.Error(err)
 	}
 	return err
 }
@@ -33,14 +36,14 @@ func (r *sessionRepository) AddSession(sessionID string, userID int) error {
 func (r *sessionRepository) GetUserBySession(sessionID string) (int, bool) {
 	externalUserID, err := r.redis.Do(RedisCommandGet, sessionID)
 	if err != nil {
-		logger.Error(err)
+		r.logger.Error(err)
 		return 0, false
 	}
 	switch externalUserID.(type) {
 	case []byte:
 		userID, err := strconv.Atoi(string(externalUserID.([]byte)))
 		if err != nil {
-			logger.Error(err)
+			r.logger.Error(err)
 			return 0, false
 		}
 		return userID, true
@@ -51,7 +54,7 @@ func (r *sessionRepository) GetUserBySession(sessionID string) (int, bool) {
 func (r *sessionRepository) DeleteSession(sessionID string) error {
 	_, err := r.redis.Do(RedisCommandDel, sessionID)
 	if err != nil {
-		logger.Error(err)
+		r.logger.Error(err)
 	}
 	return err
 }

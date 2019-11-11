@@ -11,12 +11,13 @@ import (
 )
 
 type UserHandler struct {
-	userUsecase user.Usecase
 	httpDelivery.Handler
+	userUsecase user.Usecase
+	logger      logger.Logger
 }
 
-func NewUserHandler(e *echo.Echo, userUsecase user.Usecase) *UserHandler {
-	handler := UserHandler{userUsecase: userUsecase}
+func NewUserHandler(e *echo.Echo, userUsecase user.Usecase, logger logger.Logger) *UserHandler {
+	handler := UserHandler{userUsecase: userUsecase, logger: logger}
 	e.GET(httpDelivery.ApiV1UserListPath, handler.HandleUserList)
 	e.POST(httpDelivery.ApiV1UserRegisterPath, handler.HandleUserRegister)
 	e.POST(httpDelivery.ApiV1UserLoginPath, handler.HandleUserLogin)
@@ -91,12 +92,12 @@ func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
 	}
 	err = c.Request().ParseMultipartForm(32 << 20)
 	if err != nil {
-		logger.Error(err)
+		h.logger.Error(err)
 		return h.Error(c, "bad request")
 	}
 	avatarFile, avatarFileHeader, err := c.Request().FormFile("avatar")
 	if err != nil {
-		logger.Error(err)
+		h.logger.Error(err)
 		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()

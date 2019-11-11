@@ -24,7 +24,7 @@ type userUsecase struct {
 func NewUserUsecase(
 	repository user.Repository,
 	fileRepository user.FileRepository,
-	sessionRepository user.SessionRepository) *userUsecase {
+	sessionRepository user.SessionRepository) user.Usecase {
 	return &userUsecase{
 		repository:        repository,
 		fileRepository:    fileRepository,
