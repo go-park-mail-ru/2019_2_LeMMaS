@@ -3,7 +3,7 @@ services:
   web:
     build: images/web
     env_file: ../.env
-    working_dir: /home/app
+    working_dir: /home/app/cmd/web
     volumes:
       - ../.:/home/app
     ports:
