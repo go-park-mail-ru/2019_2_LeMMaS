@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/test"
 	"github.com/golang/mock/gomock"

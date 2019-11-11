@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/access"
 	"io"
 	"time"
 )

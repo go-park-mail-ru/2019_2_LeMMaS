@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/model"
 	"github.com/jmoiron/sqlx"

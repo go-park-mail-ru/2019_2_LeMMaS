@@ -6,11 +6,11 @@
 package main
 
 import (
-	http2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access/delivery/http"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access/usecase"
-	http3 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/delivery/http"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/repository"
-	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/usecase"
+	http2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/access/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/access/usecase"
+	http3 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user/repository"
+	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
 	"github.com/gomodule/redigo/redis"

@@ -3,11 +3,11 @@
 package main
 
 import (
-	accessHttp "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access/delivery/http"
-	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access/usecase"
-	userHttp "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/delivery/http"
-	userRepo "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/repository"
-	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/user/usecase"
+	accessHttp "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/access/delivery/http"
+	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/access/usecase"
+	userHttp "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user/delivery/http"
+	userRepo "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user/repository"
+	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/user/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
 	"github.com/gomodule/redigo/redis"

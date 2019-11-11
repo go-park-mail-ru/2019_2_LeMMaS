@@ -2,7 +2,7 @@ package http
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/business/access"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/components/access"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/app/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/app/logger"
 	"github.com/labstack/echo"
