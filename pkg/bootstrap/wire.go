@@ -19,7 +19,7 @@ import (
 	"os"
 )
 
-func InitMiddleware() (http.Middleware, error) {
+func NewMiddleware() (http.Middleware, error) {
 	wire.Build(
 		http.NewMiddleware,
 		NewEcho,
@@ -28,7 +28,7 @@ func InitMiddleware() (http.Middleware, error) {
 	return http.Middleware{}, nil
 }
 
-func InitAccessHandler() (*accessHttp.AccessHandler, error) {
+func NewAccessHandler() (*accessHttp.AccessHandler, error) {
 	wire.Build(
 		accessHttp.NewAccessHandler,
 		accessUsecase.NewCSRFUsecase,
@@ -38,7 +38,7 @@ func InitAccessHandler() (*accessHttp.AccessHandler, error) {
 	return &accessHttp.AccessHandler{}, nil
 }
 
-func InitUserHandler() (*userHttp.UserHandler, error) {
+func NewUserHandler() (*userHttp.UserHandler, error) {
 	wire.Build(
 		userHttp.NewUserHandler,
 		userUsecase.NewUserUsecase,

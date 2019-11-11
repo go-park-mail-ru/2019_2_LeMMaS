@@ -13,15 +13,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = bootstrap.InitMiddleware()
+	_, err = bootstrap.NewMiddleware()
 	if err != nil {
 		fatal(l, err)
 	}
-	_, err = bootstrap.InitAccessHandler()
+	_, err = bootstrap.NewAccessHandler()
 	if err != nil {
 		fatal(l, err)
 	}
-	_, err = bootstrap.InitUserHandler()
+	_, err = bootstrap.NewUserHandler()
 	if err != nil {
 		fatal(l, err)
 	}

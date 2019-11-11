@@ -22,7 +22,7 @@ import (
 
 // Injectors from wire.go:
 
-func InitMiddleware() (http.Middleware, error) {
+func NewMiddleware() (http.Middleware, error) {
 	echo := NewEcho()
 	logger, err := NewLogger()
 	if err != nil {
@@ -32,7 +32,7 @@ func InitMiddleware() (http.Middleware, error) {
 	return middleware, nil
 }
 
-func InitAccessHandler() (*http2.AccessHandler, error) {
+func NewAccessHandler() (*http2.AccessHandler, error) {
 	echo := NewEcho()
 	csrfUsecase := usecase.NewCSRFUsecase()
 	logger, err := NewLogger()
@@ -43,7 +43,7 @@ func InitAccessHandler() (*http2.AccessHandler, error) {
 	return accessHandler, nil
 }
 
-func InitUserHandler() (*http3.UserHandler, error) {
+func NewUserHandler() (*http3.UserHandler, error) {
 	echo := NewEcho()
 	db, err := NewDB()
 	if err != nil {
