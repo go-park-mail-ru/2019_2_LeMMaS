@@ -54,7 +54,7 @@ func NewUserHandler() (*http3.UserHandler, error) {
 		return nil, err
 	}
 	userRepository := repository.NewDatabaseRepository(db, logger)
-	fileRepository := repository.NewFileRepository(logger)
+	fileRepository := repository.NewS3Repository(logger)
 	conn, err := NewRedis()
 	if err != nil {
 		return nil, err

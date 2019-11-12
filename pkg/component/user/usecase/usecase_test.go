@@ -124,11 +124,10 @@ func TestUserUsecase_UpdateUserAvatar(t *testing.T) {
 
 	userToUpdate := model.User{ID: 2}
 	avatarFile := io.LimitedReader{}
-	avatarPath := "1.jpg"
-	storageAvatarPath := "2ad2.jpg"
-	userFileRepo.EXPECT().StoreAvatar(&userToUpdate, &avatarFile, avatarPath).Return(storageAvatarPath, nil)
-	userRepo.EXPECT().UpdateAvatarPath(userToUpdate.ID, storageAvatarPath)
-	err := usecase.UpdateUserAvatar(&userToUpdate, &avatarFile, avatarPath)
+	avatarFileLocation := "2ad2.jpg"
+	userFileRepo.EXPECT().Store(&avatarFile).Return(avatarFileLocation, nil)
+	userRepo.EXPECT().UpdateAvatarPath(userToUpdate.ID, avatarFileLocation)
+	err := usecase.UpdateUserAvatar(&userToUpdate, &avatarFile)
 	assert.Nil(t, err)
 }
 

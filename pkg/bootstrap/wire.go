@@ -43,7 +43,7 @@ func NewUserHandler() (*userHttp.UserHandler, error) {
 		userHttp.NewUserHandler,
 		userUsecase.NewUserUsecase,
 		userRepo.NewDatabaseRepository,
-		userRepo.NewFileRepository,
+		userRepo.NewS3Repository,
 		userRepo.NewSessionRepository,
 		NewEcho,
 		NewLogger,

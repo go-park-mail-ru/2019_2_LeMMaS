@@ -95,13 +95,13 @@ func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
 		h.logger.Error(err)
 		return h.Error(c, "bad request")
 	}
-	avatarFile, avatarFileHeader, err := c.Request().FormFile("avatar")
+	avatarFile, _, err := c.Request().FormFile("avatar")
 	if err != nil {
 		h.logger.Error(err)
 		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()
-	err = h.userUsecase.UpdateUserAvatar(currentUser, avatarFile, avatarFileHeader.Filename)
+	err = h.userUsecase.UpdateUserAvatar(currentUser, avatarFile)
 	if err != nil {
 		return h.Error(c, "error updating avatar")
 	}
