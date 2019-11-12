@@ -62,8 +62,8 @@ func (u *userUsecase) UpdateUser(id int, password, name string) error {
 	return u.repository.Update(*userToUpdate)
 }
 
-func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {
-	newAvatarPath, err := u.fileRepository.StoreAvatar(user, avatarFile, avatarPath)
+func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader) error {
+	newAvatarPath, err := u.fileRepository.Store(avatarFile)
 	if err != nil {
 		return err
 	}

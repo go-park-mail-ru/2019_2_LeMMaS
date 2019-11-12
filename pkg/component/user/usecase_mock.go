@@ -79,17 +79,17 @@ func (mr *MockUsecaseMockRecorder) UpdateUser(id, password, name interface{}) *g
 }
 
 // UpdateUserAvatar mocks base method
-func (m *MockUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader, avatarPath string) error {
+func (m *MockUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUserAvatar", user, avatarFile, avatarPath)
+	ret := m.ctrl.Call(m, "UpdateUserAvatar", user, avatarFile)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateUserAvatar indicates an expected call of UpdateUserAvatar
-func (mr *MockUsecaseMockRecorder) UpdateUserAvatar(user, avatarFile, avatarPath interface{}) *gomock.Call {
+func (mr *MockUsecaseMockRecorder) UpdateUserAvatar(user, avatarFile interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserAvatar", reflect.TypeOf((*MockUsecase)(nil).UpdateUserAvatar), user, avatarFile, avatarPath)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserAvatar", reflect.TypeOf((*MockUsecase)(nil).UpdateUserAvatar), user, avatarFile)
 }
 
 // GetAvatarUrlByName mocks base method

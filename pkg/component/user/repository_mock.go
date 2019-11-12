@@ -144,19 +144,19 @@ func (m *MockFileRepository) EXPECT() *MockFileRepositoryMockRecorder {
 	return m.recorder
 }
 
-// StoreAvatar mocks base method
-func (m *MockFileRepository) StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error) {
+// Store mocks base method
+func (m *MockFileRepository) Store(file io.Reader) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StoreAvatar", user, avatarFile, avatarPath)
+	ret := m.ctrl.Call(m, "Store", file)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// StoreAvatar indicates an expected call of StoreAvatar
-func (mr *MockFileRepositoryMockRecorder) StoreAvatar(user, avatarFile, avatarPath interface{}) *gomock.Call {
+// Store indicates an expected call of Store
+func (mr *MockFileRepositoryMockRecorder) Store(file interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StoreAvatar", reflect.TypeOf((*MockFileRepository)(nil).StoreAvatar), user, avatarFile, avatarPath)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Store", reflect.TypeOf((*MockFileRepository)(nil).Store), file)
 }
 
 // MockSessionRepository is a mock of SessionRepository interface

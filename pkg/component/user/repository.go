@@ -17,7 +17,7 @@ type Repository interface {
 }
 
 type FileRepository interface {
-	StoreAvatar(user *model.User, avatarFile io.Reader, avatarPath string) (string, error)
+	Store(file io.Reader) (location string, err error)
 }
 
 type SessionRepository interface {
