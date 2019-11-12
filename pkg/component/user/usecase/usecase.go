@@ -86,7 +86,7 @@ func (u *userUsecase) Register(email, password, name string) error {
 		return errors.New("unknown error")
 	}
 	if userWithSameEmail != nil {
-		return fmt.Errorf("user with email %v already registered", email)
+		return errors.New("user with this email already registered")
 	}
 	passwordHash := u.getPasswordHash(password)
 	return u.repository.Create(email, passwordHash, name)
