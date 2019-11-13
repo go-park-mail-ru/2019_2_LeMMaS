@@ -10,12 +10,28 @@ import (
 )
 
 type gameUsecase struct {
-	logger      logger.Logger
-	playersByID map[int]model.User
+	logger            logger.Logger
+	positionsByUserID map[int]model.Position
 }
 
 func NewGameUsecase(logger logger.Logger) game.Usecase {
-	return gameUsecase{logger: logger}
+	return gameUsecase{
+		logger:            logger,
+		positionsByUserID: map[int]model.Position{},
+	}
+}
+
+func (u gameUsecase) StartGame(user *model.User) error {
+	u.positionsByUserID[user.ID] = model.Position{rand.Int(), rand.Int()}
+	return nil
+}
+
+func (u gameUsecase) GetPlayerPosition(user *model.User) model.Position {
+	return u.positionsByUserID[user.ID]
+}
+
+func (u gameUsecase) GetFoodsPositions(user *model.User) []model.Position {
+	return []model.Position{{rand.Int(), rand.Int()}, {rand.Int(), rand.Int()}}
 }
 
 func (u gameUsecase) SetDirection(user *model.User, direction int) error {
@@ -29,9 +45,9 @@ func (u gameUsecase) SetSpeed(user *model.User, speed int) error {
 func (u gameUsecase) GetUpdatesStream(user *model.User) chan model.Position {
 	updates := make(chan model.Position)
 	go func() {
-		tick := time.Tick(300 * time.Millisecond)
+		tick := time.Tick(4000 * time.Millisecond)
 		for range tick {
-			updates <- model.Position{rand.Int(), rand.Int()}
+			updates <- u.GetPlayerPosition(user)
 		}
 	}()
 	return updates

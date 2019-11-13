@@ -46,12 +46,13 @@ func (h GameHandler) HandleGame(c echo.Context) error {
 		h.Error(conn, err.Error())
 		return nil
 	}
-	//go func() {
-	//	updates := h.gameUsecase.GetUpdatesStream(user)
-	//	for update := range updates {
-	//		h.OkWithBody(conn, update)
-	//	}
-	//}()
+
+	go func() {
+		updates := h.gameUsecase.GetUpdatesStream(user)
+		for update := range updates {
+			h.OkWithBody(conn, update)
+		}
+	}()
 
 	for {
 		err := h.processRequest(user, conn)
@@ -85,9 +86,10 @@ type gameStartResponse struct {
 }
 
 func (h GameHandler) processGameStart(user *model.User, c *websocket.Conn) error {
+	h.gameUsecase.StartGame(user)
 	return h.OkWithBody(c, gameStartResponse{
-		PlayerPosition: model.Position{10, 20},
-		Foods:          []model.Position{{2, 1}, {432, 1}},
+		PlayerPosition: h.gameUsecase.GetPlayerPosition(user),
+		Foods:          h.gameUsecase.GetFoodsPositions(user),
 	})
 }
 
