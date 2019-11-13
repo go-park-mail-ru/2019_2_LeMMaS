@@ -4,9 +4,11 @@
 package bootstrap
 
 import (
-	accessHttp "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
+	accessHTTP "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
 	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
-	userHttp "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
+	gameWS "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
+	gameUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
+	userHTTP "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	userRepo "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
@@ -28,19 +30,29 @@ func NewMiddleware() (http.Middleware, error) {
 	return http.Middleware{}, nil
 }
 
-func NewAccessHandler() (*accessHttp.AccessHandler, error) {
+func NewAccessHandler() (*accessHTTP.AccessHandler, error) {
 	wire.Build(
-		accessHttp.NewAccessHandler,
+		accessHTTP.NewAccessHandler,
 		accessUsecase.NewCSRFUsecase,
 		NewEcho,
 		NewLogger,
 	)
-	return &accessHttp.AccessHandler{}, nil
+	return &accessHTTP.AccessHandler{}, nil
 }
 
-func NewUserHandler() (*userHttp.UserHandler, error) {
+func NewGameHandler() (*gameWS.GameHandler, error) {
 	wire.Build(
-		userHttp.NewUserHandler,
+		gameWS.NewGameHandler,
+		gameUsecase.NewGameUsecase,
+		NewEcho,
+		NewLogger,
+	)
+	return &gameWS.GameHandler{}, nil
+}
+
+func NewUserHandler() (*userHTTP.UserHandler, error) {
+	wire.Build(
+		userHTTP.NewUserHandler,
 		userUsecase.NewUserUsecase,
 		userRepo.NewDatabaseRepository,
 		userRepo.NewS3Repository,
@@ -50,7 +62,7 @@ func NewUserHandler() (*userHttp.UserHandler, error) {
 		NewDB,
 		NewRedis,
 	)
-	return &userHttp.UserHandler{}, nil
+	return &userHTTP.UserHandler{}, nil
 }
 
 var echoInstance *echo.Echo = nil

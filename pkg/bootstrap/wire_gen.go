@@ -8,9 +8,11 @@ package bootstrap
 import (
 	http2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
+	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
 	http3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
-	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
+	usecase3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/gomodule/redigo/redis"
@@ -43,6 +45,17 @@ func NewAccessHandler() (*http2.AccessHandler, error) {
 	return accessHandler, nil
 }
 
+func NewGameHandler() (*ws.GameHandler, error) {
+	echo := NewEcho()
+	logger, err := NewLogger()
+	if err != nil {
+		return nil, err
+	}
+	gameUsecase := usecase2.NewGameUsecase(logger)
+	gameHandler := ws.NewGameHandler(echo, gameUsecase, logger)
+	return gameHandler, nil
+}
+
 func NewUserHandler() (*http3.UserHandler, error) {
 	echo := NewEcho()
 	db, err := NewDB()
@@ -60,7 +73,7 @@ func NewUserHandler() (*http3.UserHandler, error) {
 		return nil, err
 	}
 	sessionRepository := repository.NewSessionRepository(conn, logger)
-	userUsecase := usecase2.NewUserUsecase(userRepository, fileRepository, sessionRepository)
+	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository)
 	userHandler := http3.NewUserHandler(echo, userUsecase, logger)
 	return userHandler, nil
 }

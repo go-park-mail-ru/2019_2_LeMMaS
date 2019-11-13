@@ -6,6 +6,10 @@ const (
 	ApiV1Public  = "/api/v1/public"
 	ApiV1Private = "/api/v1/private"
 
+	ApiV1AccessCSRFPath = ApiV1Public + "/access/csrf"
+
+	ApiV1GamePath = ApiV1Private + "/game"
+
 	ApiV1UserListPath            = ApiV1Public + "/user/list"
 	ApiV1UserRegisterPath        = ApiV1Public + "/user/register"
 	ApiV1UserLoginPath           = ApiV1Public + "/user/login"
@@ -14,8 +18,6 @@ const (
 	ApiV1UserUpdatePath          = ApiV1Private + "/user/update"
 	ApiV1UserAvatarUploadPath    = ApiV1Private + "/user/avatar/upload"
 	ApiV1UserGetAvatarByNamePath = ApiV1Private + "/user/avatar/getByName"
-
-	ApiV1AccessCSRFPath = ApiV1Public + "/access/csrf"
 )
 
 const (

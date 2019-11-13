@@ -13,18 +13,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	_, err = bootstrap.NewMiddleware()
 	if err != nil {
 		fatal(l, err)
 	}
+
 	_, err = bootstrap.NewAccessHandler()
 	if err != nil {
 		fatal(l, err)
 	}
-	_, err = bootstrap.NewUserHandler()
+
+	_, err = bootstrap.NewGameHandler()
 	if err != nil {
 		fatal(l, err)
 	}
+
+	//_, err = bootstrap.NewUserHandler()
+	//if err != nil {
+	//	fatal(l, err)
+	//}
+
 	err = bootstrap.NewEcho().Start(":" + getPort())
 	if err != nil {
 		fatal(l, err)
