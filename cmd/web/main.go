@@ -29,10 +29,10 @@ func main() {
 		fatal(l, err)
 	}
 
-	//_, err = bootstrap.NewUserHandler()
-	//if err != nil {
-	//	fatal(l, err)
-	//}
+	_, err = bootstrap.NewUserHandler()
+	if err != nil {
+		fatal(l, err)
+	}
 
 	err = bootstrap.NewEcho().Start(":" + getPort())
 	if err != nil {

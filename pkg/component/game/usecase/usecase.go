@@ -18,15 +18,15 @@ func NewGameUsecase(logger logger.Logger) game.Usecase {
 	return gameUsecase{logger: logger}
 }
 
-func (u gameUsecase) SetDirection(direction int) error {
+func (u gameUsecase) SetDirection(user *model.User, direction int) error {
 	return nil
 }
 
-func (u gameUsecase) SetSpeed(speed int) error {
+func (u gameUsecase) SetSpeed(user *model.User, speed int) error {
 	return nil
 }
 
-func (u gameUsecase) GetUpdatesStream() chan model.Position {
+func (u gameUsecase) GetUpdatesStream(user *model.User) chan model.Position {
 	updates := make(chan model.Position)
 	go func() {
 		tick := time.Tick(300 * time.Millisecond)

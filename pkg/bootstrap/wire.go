@@ -44,8 +44,14 @@ func NewGameHandler() (*gameWS.GameHandler, error) {
 	wire.Build(
 		gameWS.NewGameHandler,
 		gameUsecase.NewGameUsecase,
+		userUsecase.NewUserUsecase,
+		userRepo.NewDatabaseRepository,
+		userRepo.NewS3Repository,
+		userRepo.NewSessionRepository,
 		NewEcho,
 		NewLogger,
+		NewDB,
+		NewRedis,
 	)
 	return &gameWS.GameHandler{}, nil
 }

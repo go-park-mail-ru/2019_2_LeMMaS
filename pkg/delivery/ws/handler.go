@@ -16,26 +16,26 @@ type Response struct {
 	Body   interface{} `json:"body"`
 }
 
-func (h *Handler) Ok(c *websocket.Conn) {
-	c.WriteJSON(Response{Status: "ok"})
+func (h *Handler) Ok(c *websocket.Conn) error {
+	return c.WriteJSON(Response{Status: "ok"})
 }
 
-func (h *Handler) OkWithBody(c *websocket.Conn, body interface{}) {
+func (h *Handler) OkWithBody(c *websocket.Conn, body interface{}) error {
 	response := Response{
 		Status: "ok",
 		Body:   body,
 	}
-	c.WriteJSON(response)
+	return c.WriteJSON(response)
 }
 
 type errorResponseBody struct {
 	Message string `json:"message"`
 }
 
-func (h Handler) Error(c *websocket.Conn, message string) {
+func (h Handler) Error(c *websocket.Conn, message string) error {
 	response := Response{
 		Status: "error",
 		Body:   errorResponseBody{Message: message},
 	}
-	c.WriteJSON(response)
+	return c.WriteJSON(response)
 }

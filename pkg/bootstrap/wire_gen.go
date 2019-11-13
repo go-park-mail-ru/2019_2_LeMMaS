@@ -52,7 +52,19 @@ func NewGameHandler() (*ws.GameHandler, error) {
 		return nil, err
 	}
 	gameUsecase := usecase2.NewGameUsecase(logger)
-	gameHandler := ws.NewGameHandler(echo, gameUsecase, logger)
+	db, err := NewDB()
+	if err != nil {
+		return nil, err
+	}
+	userRepository := repository.NewDatabaseRepository(db, logger)
+	fileRepository := repository.NewS3Repository(logger)
+	conn, err := NewRedis()
+	if err != nil {
+		return nil, err
+	}
+	sessionRepository := repository.NewSessionRepository(conn, logger)
+	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository)
+	gameHandler := ws.NewGameHandler(echo, gameUsecase, userUsecase, logger)
 	return gameHandler, nil
 }
 
