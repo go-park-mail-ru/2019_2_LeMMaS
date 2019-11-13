@@ -41,28 +41,28 @@ func (h GameHandler) HandleGame(c echo.Context) error {
 	}
 	defer conn.Close()
 
-	user, err := h.getCurrentUser(c)
+	currUser, err := h.getCurrentUser(c)
 	if err != nil {
 		h.Error(conn, err.Error())
 		return nil
 	}
 
 	go func() {
-		updates := h.gameUsecase.GetUpdatesStream(user)
+		updates := h.gameUsecase.GetEventStream(*currUser)
 		for update := range updates {
 			h.OkWithBody(conn, update)
 		}
 	}()
 
 	for {
-		err := h.processRequest(user, conn)
+		err := h.processRequest(*currUser, conn)
 		if err != nil {
 			return nil
 		}
 	}
 }
 
-func (h GameHandler) processRequest(user *model.User, conn *websocket.Conn) error {
+func (h GameHandler) processRequest(user model.User, conn *websocket.Conn) error {
 	request := wsDelivery.Request{}
 	err := conn.ReadJSON(&request)
 	if err != nil {
@@ -85,7 +85,7 @@ type gameStartResponse struct {
 	Foods          []model.Position `json:"foods"`
 }
 
-func (h GameHandler) processGameStart(user *model.User, c *websocket.Conn) error {
+func (h GameHandler) processGameStart(user model.User, c *websocket.Conn) error {
 	h.gameUsecase.StartGame(user)
 	return h.OkWithBody(c, gameStartResponse{
 		PlayerPosition: h.gameUsecase.GetPlayerPosition(user),
@@ -94,10 +94,10 @@ func (h GameHandler) processGameStart(user *model.User, c *websocket.Conn) error
 }
 
 type directionRequest struct {
-	Direction int `json:"direction"`
+	Direction float64 `json:"direction"`
 }
 
-func (h GameHandler) processSetDirection(user *model.User, conn *websocket.Conn) error {
+func (h GameHandler) processSetDirection(user model.User, conn *websocket.Conn) error {
 	request := directionRequest{}
 	if err := conn.ReadJSON(&request); err != nil {
 		return h.Error(conn, "invalid json")
@@ -110,10 +110,10 @@ func (h GameHandler) processSetDirection(user *model.User, conn *websocket.Conn)
 }
 
 type speedRequest struct {
-	Speed int `json:"speed"`
+	Speed float64 `json:"speed"`
 }
 
-func (h GameHandler) processSetSpeed(user *model.User, c *websocket.Conn) error {
+func (h GameHandler) processSetSpeed(user model.User, c *websocket.Conn) error {
 	request := speedRequest{}
 	if err := c.ReadJSON(&request); err != nil {
 		return h.Error(c, "invalid json")
