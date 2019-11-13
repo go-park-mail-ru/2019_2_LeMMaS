@@ -42,15 +42,18 @@ func (h GameHandler) HandleGame(c echo.Context) error {
 	}()
 
 	for {
-		h.processRequest(conn)
+		err := h.processRequest(conn)
+		if err != nil {
+			return nil
+		}
 	}
 }
 
-func (h GameHandler) processRequest(c *websocket.Conn) {
+func (h GameHandler) processRequest(c *websocket.Conn) error {
 	request := wsDelivery.Request{}
-	if err := c.ReadJSON(&request); err != nil {
-		h.Error(c, "invalid json")
-		return
+	err := c.ReadJSON(&request)
+	if err != nil {
+		return err
 	}
 	switch request.Type {
 	case "start":
@@ -62,6 +65,7 @@ func (h GameHandler) processRequest(c *websocket.Conn) {
 	default:
 		h.Error(c, "unknown request type")
 	}
+	return nil
 }
 
 type gameStartResponse struct {
