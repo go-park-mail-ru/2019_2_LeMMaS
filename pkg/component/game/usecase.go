@@ -15,5 +15,5 @@ type Usecase interface {
 	SetSpeed(user model.User, speed float64) error
 	GetPlayerPosition(user model.User) model.Position
 	GetFoodsPositions(user model.User) []model.Position
-	GetEventStream(user model.User) chan Event
+	GetEventsStream(user model.User) chan Event
 }

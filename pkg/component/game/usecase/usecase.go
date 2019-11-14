@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -12,10 +11,15 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 )
 
-const EventStreamRate = 2000 * time.Millisecond
+const (
+	MaxSpeed = 100
+	MinSpeed = 0
 
-const MaxSpeed = 100
-const MinSpeed = 0
+	MaxDirection = 359
+	MinDirection = 0
+
+	EventStreamRate = 2000 * time.Millisecond
+)
 
 type gameUsecase struct {
 	logger      logger.Logger
@@ -50,8 +54,8 @@ func (u gameUsecase) StartGame(user model.User) error {
 }
 
 func (u *gameUsecase) SetDirection(user model.User, direction float64) error {
-	if direction < 0 || direction > 359 {
-		return errors.New("directions must be in range (0, 359)")
+	if direction < MinDirection || direction > MaxDirection {
+		return fmt.Errorf("directions must be in range (%v, %v)", MinDirection, MaxDirection)
 	}
 	u.infoByUser[user.ID].Direction = direction
 	return nil
@@ -73,15 +77,15 @@ func (u gameUsecase) GetFoodsPositions(user model.User) []model.Position {
 	return u.infoByUser[user.ID].Food
 }
 
-func (u *gameUsecase) GetEventStream(user model.User) chan game.Event {
-	updates := make(chan game.Event)
+func (u *gameUsecase) GetEventsStream(user model.User) chan game.Event {
+	events := make(chan game.Event)
 	go func() {
 		<-u.gameStarted
 		tick := time.Tick(EventStreamRate)
 		for range tick {
 			u.updatePlayerPosition(user)
 			info := u.infoByUser[user.ID]
-			updates <- game.Event{
+			events <- game.Event{
 				Type: game.EventTypeMove,
 				Body: map[string]interface{}{
 					"x": info.Position.X,
@@ -90,7 +94,7 @@ func (u *gameUsecase) GetEventStream(user model.User) chan game.Event {
 			}
 		}
 	}()
-	return updates
+	return events
 }
 
 func (u *gameUsecase) updatePlayerPosition(user model.User) {

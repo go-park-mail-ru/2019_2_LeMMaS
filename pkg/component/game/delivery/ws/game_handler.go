@@ -48,7 +48,7 @@ func (h GameHandler) HandleGame(c echo.Context) error {
 	}
 
 	go func() {
-		updates := h.gameUsecase.GetEventStream(*currUser)
+		updates := h.gameUsecase.GetEventsStream(*currUser)
 		for update := range updates {
 			h.OkWithBody(conn, update)
 		}
