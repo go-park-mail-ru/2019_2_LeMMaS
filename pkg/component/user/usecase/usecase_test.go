@@ -46,7 +46,7 @@ func TestUserUsecase_Register(t *testing.T) {
 	userWithSameEmail := model.User{}
 	userRepo.EXPECT().GetByEmail(email).Return(&userWithSameEmail, nil)
 	err = usecase.Register(email, password, name)
-	assert.EqualError(t, err, fmt.Sprintf("user with email %v already registered", email))
+	assert.EqualError(t, err, "user with this email already registered")
 }
 
 func TestUserUsecase_Login(t *testing.T) {
