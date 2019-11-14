@@ -64,8 +64,7 @@ func (h GameHandler) HandleGame(c echo.Context) error {
 
 func (h GameHandler) processRequest(user model.User, conn *websocket.Conn) error {
 	request := wsDelivery.Request{}
-	err := conn.ReadJSON(&request)
-	if err != nil {
+	if err := conn.ReadJSON(&request); err != nil {
 		return err
 	}
 	switch request.Type {
