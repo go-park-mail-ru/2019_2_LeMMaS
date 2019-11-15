@@ -73,7 +73,7 @@ func (u *userUsecase) UpdateUserAvatar(user *model.User, avatarFile io.Reader) e
 func (u *userUsecase) GetAvatarUrlByName(name string) string {
 	avatarsByName := map[string]string{
 		"eath":   "http://www.i2clipart.com/cliparts/3/d/1/e/clipart-earth-3d1e.png",
-		"trump":  "https://www.jing.fm/clipimg/full/21-213906_trump-clipart-overload-trump-thinking-transparent.png",
+		"trump":  "https://lemmas.s3.eu-west-3.amazonaws.com/trump.png",
 		"heroku": "https://railsware.com/blog/wp-content/uploads/2017/12/How-to-set-up-the-Heroku.png",
 		"cat":    "https://i.pinimg.com/originals/90/a8/56/90a856d434dd9df24d8d5fdf4bf3ce72.png",
 	}
