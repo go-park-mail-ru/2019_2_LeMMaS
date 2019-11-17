@@ -53,11 +53,11 @@ func (h *AccessHandler) CsrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		csrfToken := c.Request().Header.Get(CSRFTokenHeader)
 		if csrfToken == "" {
-			return c.JSON(http.StatusForbidden, "csrf token required")
+			return h.Error(c, "csrf token required")
 		}
 		sessionID, err := c.Cookie(httpDelivery.SessionIDCookieName)
 		if err != nil {
-			return c.JSON(http.StatusForbidden, "no session cookie")
+			return h.Error(c, "no session cookie")
 		}
 		ok, err := h.csrfUsecase.CheckTokenBySession(csrfToken, sessionID.Value)
 		if !ok {
@@ -66,7 +66,7 @@ func (h *AccessHandler) CsrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 				message += "\n" + err.Error()
 			}
 			h.logger.Warnf(message)
-			return c.JSON(http.StatusForbidden, "incorrect CSRF token")
+			return h.Error(c, "incorrect CSRF token")
 		}
 		return next(c)
 	}
