@@ -18,7 +18,6 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
-	"github.com/pkg/errors"
 	"os"
 )
 
@@ -104,11 +103,11 @@ func NewEcho() *echo.Echo {
 func NewDB() (*sqlx.DB, error) {
 	db, err := sqlx.Connect("pgx", os.Getenv("POSTGRES_DSN"))
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot connect to postgres")
+		return nil, err
 	}
 	err = db.Ping()
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot connect to postgres")
+		return nil, err
 	}
 	return db, nil
 }
@@ -116,11 +115,11 @@ func NewDB() (*sqlx.DB, error) {
 func NewRedis() (redis.Conn, error) {
 	connection, err := redis.DialURL(os.Getenv("REDIS_DSN"))
 	if err != nil {
-		return connection, errors.Wrap(err, "cannot connect to redis")
+		return nil, err
 	}
 	_, err = connection.Do("PING")
 	if err != nil {
-		return connection, errors.Wrap(err, "cannot connect to redis")
+		return nil, err
 	}
 	return connection, nil
 }
