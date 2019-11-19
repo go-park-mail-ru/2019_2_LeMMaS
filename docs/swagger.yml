@@ -14,181 +14,219 @@ schemes:
 
 paths:
 
-  /user/list:
+  /public/access/csrf:
     get:
       tags:
-        - "user"
-      summary: "List all registered users"
+        - access
+      summary: Get CSRF token
+      description: Get CSRF token, required by **/private** requests. Needs session cookie. Must be send back in X-CSRF-Token header.
       responses:
         200:
           description: ""
           schema:
-            type: "array"
+            type: object
+            properties:
+              token:
+                type: string
+                example: wYxO84cBo7GfUTLvdjyNcSK2OA
+
+  /public/user/list:
+    get:
+      tags:
+        - user
+      summary: List all registered users
+      responses:
+        200:
+          description: ""
+          schema:
+            type: array
             items:
               $ref: "#/definitions/UserToOutput"
 
 
-  /user/register:
+  /public/user/register:
     post:
       tags:
-        - "user"
-      summary: "Register new user"
+        - user
+      summary: Register new user
       parameters:
-        - in: "body"
-          name: "body"
+        - in: body
+          name: body
           required: true
           schema:
             $ref: "#/definitions/UserToRegister"
       responses:
         200:
-          description: "User registered"
+          description: User registered
         400:
-          description: "Error"
+          description: Error
           schema:
-            type: "string"
-            example: "user with email ... already registered"
+            type: string
+            example: user with this email already registered
 
 
-  /user/login:
+  /public/user/login:
     post:
       tags:
-        - "user"
-      summary: "Login user"
-      description: "Login user and set session cookie"
+        - user
+      summary: Login user
+      description: Login user and set session cookie
       parameters:
-        - in: "body"
-          name: "body"
+        - in: body
+          name: body
           required: true
           schema:
             $ref: "#/definitions/UserToLogin"
       responses:
         200:
-          description: "User logged in"
+          description: User logged in
         400:
-          description: "Error"
+          description: Error
           schema:
-            type: "string"
-            example: "invalid password"
+            type: string
+            example: incorrect password
 
 
-  /user/logout:
+  /private/user/logout:
     post:
       tags:
-        - "user"
-      summary: "Logout user"
-      description: "Logout user and remove session cookie"
+        - user
+      summary: Logout user
+      description: Logout user and remove session cookie
       responses:
         200:
-          description: "User logged out"
+          description: User logged out
         400:
-          description: "Error"
+          description: Error
           schema:
-            type: "string"
-            example: "no session cookie"
+            type: string
+            example: no session cookie
 
 
-  /user/me:
+  /private/user/me:
     get:
       tags:
-        - "user"
-      summary: "Get current logged in user"
+        - user
+      summary: Get current logged in user
       description: ""
       responses:
         200:
-          description: "Current user or null if no session cookie"
+          description: Current user or null if no session cookie
           schema:
             $ref: "#/definitions/UserToOutput"
 
 
-  /user/update:
+  /private/user/update:
     post:
       tags:
-        - "user"
-      summary: "Update current logged in user"
+        - user
+      summary: Update current logged in user
       description: ""
       parameters:
-        - in: "body"
-          name: "body"
+        - in: body
+          name: body
           required: true
           schema:
             $ref: "#/definitions/UserToUpdate"
       responses:
         200:
-          description: "User updated"
+          description: User updated
         400:
-          description: "Error"
+          description: Error
           schema:
-            type: "string"
-            example: "no session cookie"
+            type: string
+            example: no session cookie
 
 
-  /user/avatar/upload:
+  /private/user/avatar/upload:
     post:
       tags:
-        - "user"
-      summary: "Upload current logged in user avatar"
+        - user
+      summary: Upload current logged in user avatar
       description: ""
       consumes:
-        - "multipart/form-data"
+        - multipart/form-data
       parameters:
-        - in: "formData"
-          name: "avatar"
-          description: "Avatar to upload"
+        - in: formData
+          name: avatar
+          description: Avatar to upload
           required: true
-          type: "file"
+          type: file
       responses:
         200:
-          description: "Avatar updated"
+          description: Avatar updated
         400:
-          description: "Error"
+          description: Error
           schema:
-            type: "string"
-            example: "no session cookie"
+            type: string
+            example: no session cookie
+
+
+  /private/user/avatar/getByName:
+    get:
+      tags:
+        - user
+      summary: Get avatar by username
+      description: Get special avatar by username. For example try, 'trump' and 'lebedev' names.
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+      responses:
+        200:
+          description: Avatar url for given name
+          schema:
+            type: object
+            properties:
+              avatar_url:
+                type: string
+                example: https://s3.com/avatar.jpg
 
 
 
 definitions:
 
   UserToOutput:
-    type: "object"
+    type: object
     properties:
       id:
-        type: "integer"
-        example: "21"
+        type: integer
+        example: 21
       email:
-        type: "string"
-        format: "email"
+        type: string
+        format: email
       name:
-        type: "string"
-        example: "Mark Pip"
+        type: string
+        example: Mark Pip
       avatar_path:
-        type: "string"
-        example: "static/user/avatar/21.jpg"
+        type: string
+        example: static/user/avatar/21.jpg
 
   UserToRegister:
-    type: "object"
+    type: object
     properties:
       email:
-        type: "string"
-        format: "email"
+        type: string
+        format: email
       password:
-        type: "string"
+        type: string
       name:
-        type: "string"
+        type: string
 
   UserToLogin:
-    type: "object"
+    type: object
     properties:
       email:
-        type: "string"
-        format: "email"
+        type: string
+        format: email
       password:
-        type: "string"
+        type: string
 
   UserToUpdate:
-    type: "object"
+    type: object
     properties:
       password:
-        type: "string"
+        type: string
       name:
-        type: "string"
+        type: string
