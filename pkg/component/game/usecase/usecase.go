@@ -12,13 +12,16 @@ import (
 )
 
 const (
+	MaxPositionX = 4000
+	MaxPositionY = 2000
+
 	MaxSpeed = 100
 	MinSpeed = 0
 
 	MaxDirection = 359
 	MinDirection = 0
 
-	EventStreamRate = 2000 * time.Millisecond
+	EventStreamRate = 1000 * time.Millisecond
 )
 
 type gameUsecase struct {
@@ -39,13 +42,16 @@ func NewGameUsecase(logger logger.Logger) game.Usecase {
 }
 
 func (u *gameUsecase) StartGame(user model.User) error {
-	u.playersByID[user.ID] = &model.Player{}
+	u.playersByID[user.ID] = &model.Player{Position: model.Position{
+		X: MaxPositionX / 2,
+		Y: MaxPositionY / 2,
+	}}
 	u.foodByID = u.generateFood()
 	u.gameStarted <- true
 	return nil
 }
 
-func (u *gameUsecase) SetDirection(user model.User, direction float64) error {
+func (u *gameUsecase) SetDirection(user model.User, direction int) error {
 	if direction < MinDirection || direction > MaxDirection {
 		return fmt.Errorf("direction must be in range (%v, %v)", MinDirection, MaxDirection)
 	}
@@ -53,7 +59,7 @@ func (u *gameUsecase) SetDirection(user model.User, direction float64) error {
 	return nil
 }
 
-func (u *gameUsecase) SetSpeed(user model.User, speed float64) error {
+func (u *gameUsecase) SetSpeed(user model.User, speed int) error {
 	if speed < MinSpeed || speed > MaxSpeed {
 		return fmt.Errorf("speed must be in range (%v, %v)", MinSpeed, MaxSpeed)
 	}
@@ -75,41 +81,57 @@ func (u *gameUsecase) GetEventsStream(user model.User) chan model.GameEvent {
 		<-u.gameStarted
 		tick := time.Tick(EventStreamRate)
 		for range tick {
-			u.updatePlayerPosition(user)
 			player := u.playersByID[user.ID]
-			events <- model.GameEvent{
-				"type": model.GameEventMove,
-				"players": map[string]interface{}{
-					"id": user.ID,
-					"x":  player.Position.X,
-					"y":  player.Position.Y,
-				},
+			newPosition := u.GetNextPlayerPosition(*player)
+			if newPosition != player.Position {
+				player.Position = newPosition
+				events <- model.GameEvent{
+					"type": model.GameEventMove,
+					"players": map[string]interface{}{
+						"id": user.ID,
+						"x":  player.Position.X,
+						"y":  player.Position.Y,
+					},
+				}
 			}
 		}
 	}()
 	return events
 }
 
-func (u gameUsecase) generateFood() map[int]*model.Position {
-	food := map[int]*model.Position{}
-	for i := 0; i < 10; i++ {
-		food[i] = &model.Position{X: rand.Float64(), Y: rand.Float64()}
-	}
-	return food
-}
-
-func (u *gameUsecase) updatePlayerPosition(user model.User) {
-	player := u.playersByID[user.ID]
-	directionRadians := player.Direction * math.Pi / 180
-	distance := player.Speed * float64(EventStreamRate/time.Millisecond)
+func (u gameUsecase) GetNextPlayerPosition(player model.Player) model.Position {
+	directionRadians := float64(player.Direction) * math.Pi / 180
+	distance := float64(player.Speed) * float64(EventStreamRate/time.Millisecond) / 200
 	deltaX := distance * math.Sin(directionRadians)
 	deltaY := distance * math.Cos(directionRadians)
 	oldPosition := player.Position
 	newPosition := model.Position{
-		X: oldPosition.X + deltaX,
-		Y: oldPosition.Y + deltaY,
+		X: int(math.Round(float64(oldPosition.X) + deltaX)),
+		Y: int(math.Round(float64(oldPosition.Y) + deltaY)),
 	}
-	newPosition.X = math.Round(newPosition.X*100) / 100
-	newPosition.Y = math.Round(newPosition.Y*100) / 100
-	player.Position = newPosition
+	if newPosition.X > MaxPositionX {
+		newPosition.X = MaxPositionX
+	}
+	if newPosition.Y > MaxPositionY {
+		newPosition.Y = MaxPositionY
+	}
+	if newPosition.X < 0 {
+		newPosition.X = 0
+	}
+	if newPosition.Y < 0 {
+		newPosition.Y = 0
+	}
+	return newPosition
+}
+
+func (u gameUsecase) isValidPosition(position model.Position) bool {
+	return position.X < MaxPositionX && position.Y < MaxPositionY
+}
+
+func (u gameUsecase) generateFood() map[int]*model.Position {
+	food := map[int]*model.Position{}
+	for i := 0; i < 10; i++ {
+		food[i] = &model.Position{X: rand.Intn(MaxPositionX), Y: rand.Intn(MaxPositionY)}
+	}
+	return food
 }

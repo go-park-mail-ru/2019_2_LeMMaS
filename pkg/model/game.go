@@ -1,8 +1,8 @@
 package model
 
 type Position struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
 const (
@@ -15,6 +15,6 @@ type GameEvent = map[string]interface{}
 
 type Player struct {
 	Position  Position
-	Direction float64
-	Speed     float64
+	Direction int
+	Speed     int
 }

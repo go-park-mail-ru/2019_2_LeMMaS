@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user"
@@ -9,6 +10,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -76,20 +78,25 @@ type Request struct {
 	Type string `json:"type"`
 }
 
-func (h GameHandler) processRequest(user model.User, conn *websocket.Conn) error {
-	request := Request{}
-	if err := conn.ReadJSON(&request); err != nil {
+func (h GameHandler) processRequest(user model.User, c *websocket.Conn) error {
+	_, requestReader, _ := c.NextReader()
+	requestBytes, err := ioutil.ReadAll(requestReader)
+	if err != nil {
 		return err
+	}
+	request := Request{}
+	if err := json.Unmarshal(requestBytes, &request); err != nil {
+		return h.sendError(c, "invalid json")
 	}
 	switch request.Type {
 	case "start":
-		return h.processGameStart(user, conn)
+		return h.processGameStart(user, c)
 	case "direction":
-		return h.processSetDirection(user, conn)
+		return h.processSetDirection(user, c, requestBytes)
 	case "speed":
-		return h.processSetSpeed(user, conn)
+		return h.processSetSpeed(user, c, requestBytes)
 	default:
-		return h.sendError(conn, "unknown request type")
+		return h.sendError(c, "unknown request type")
 	}
 }
 
@@ -127,28 +134,28 @@ func (h GameHandler) convertFoodToOutput(foodByID map[int]*model.Position) []map
 }
 
 type directionRequest struct {
-	Direction float64 `json:"direction"`
+	Direction int `json:"direction"`
 }
 
-func (h GameHandler) processSetDirection(user model.User, conn *websocket.Conn) error {
+func (h GameHandler) processSetDirection(user model.User, c *websocket.Conn, data []byte) error {
 	request := directionRequest{}
-	if err := conn.ReadJSON(&request); err != nil {
-		return h.sendError(conn, "invalid json")
+	if err := json.Unmarshal(data, &request); err != nil {
+		return h.sendError(c, "invalid json")
 	}
 	err := h.gameUsecase.SetDirection(user, request.Direction)
 	if err != nil {
-		return h.sendError(conn, err.Error())
+		return h.sendError(c, err.Error())
 	}
 	return nil
 }
 
 type speedRequest struct {
-	Speed float64 `json:"speed"`
+	Speed int `json:"speed"`
 }
 
-func (h GameHandler) processSetSpeed(user model.User, c *websocket.Conn) error {
+func (h GameHandler) processSetSpeed(user model.User, c *websocket.Conn, data []byte) error {
 	request := speedRequest{}
-	if err := c.ReadJSON(&request); err != nil {
+	if err := json.Unmarshal(data, &request); err != nil {
 		return h.sendError(c, "invalid json")
 	}
 	err := h.gameUsecase.SetSpeed(user, request.Speed)
