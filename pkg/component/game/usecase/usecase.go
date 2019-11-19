@@ -124,10 +124,6 @@ func (u gameUsecase) GetNextPlayerPosition(player model.Player) model.Position {
 	return newPosition
 }
 
-func (u gameUsecase) isValidPosition(position model.Position) bool {
-	return position.X < MaxPositionX && position.Y < MaxPositionY
-}
-
 func (u gameUsecase) generateFood() map[int]*model.Position {
 	food := map[int]*model.Position{}
 	for i := 0; i < 10; i++ {
