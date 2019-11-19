@@ -20,13 +20,13 @@ import (
 	"os"
 )
 
-func NewMiddleware() (http.Middleware, error) {
+func NewMiddleware() (http.CommonMiddlewaresHandler, error) {
 	wire.Build(
-		http.NewMiddleware,
+		http.NewCommonMiddlewaresHandler,
 		NewEcho,
 		NewLogger,
 	)
-	return http.Middleware{}, nil
+	return http.CommonMiddlewaresHandler{}, nil
 }
 
 func NewAccessHandler() (*accessHTTP.AccessHandler, error) {

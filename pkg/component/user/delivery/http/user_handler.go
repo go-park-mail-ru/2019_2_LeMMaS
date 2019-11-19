@@ -3,7 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
+	delivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/labstack/echo"
@@ -11,21 +11,21 @@ import (
 )
 
 type UserHandler struct {
-	httpDelivery.Handler
+	delivery.Handler
 	userUsecase user.Usecase
 	logger      logger.Logger
 }
 
 func NewUserHandler(e *echo.Echo, userUsecase user.Usecase, logger logger.Logger) *UserHandler {
 	handler := UserHandler{userUsecase: userUsecase, logger: logger}
-	e.GET(httpDelivery.ApiV1UserListPath, handler.HandleUserList)
-	e.POST(httpDelivery.ApiV1UserRegisterPath, handler.HandleUserRegister)
-	e.POST(httpDelivery.ApiV1UserLoginPath, handler.HandleUserLogin)
-	e.POST(httpDelivery.ApiV1UserLogoutPath, handler.HandleUserLogout)
-	e.GET(httpDelivery.ApiV1UserProfilePath, handler.HandleUserProfile)
-	e.POST(httpDelivery.ApiV1UserUpdatePath, handler.HandleUserUpdate)
-	e.POST(httpDelivery.ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
-	e.GET(httpDelivery.ApiV1UserGetAvatarByNamePath, handler.HandleGetAvatarByName)
+	e.GET(delivery.ApiV1UserListPath, handler.HandleUserList)
+	e.POST(delivery.ApiV1UserRegisterPath, handler.HandleUserRegister)
+	e.POST(delivery.ApiV1UserLoginPath, handler.HandleUserLogin)
+	e.POST(delivery.ApiV1UserLogoutPath, handler.HandleUserLogout)
+	e.GET(delivery.ApiV1UserProfilePath, handler.HandleUserProfile)
+	e.POST(delivery.ApiV1UserUpdatePath, handler.HandleUserUpdate)
+	e.POST(delivery.ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
+	e.GET(delivery.ApiV1UserGetAvatarByNamePath, handler.HandleGetAvatarByName)
 	return &handler
 }
 
@@ -166,16 +166,16 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
-	h.SetCookie(c, httpDelivery.SessionIDCookieName, sessionID, time.Now().Add(httpDelivery.SessionIDCookieExpire))
+	h.SetCookie(c, delivery.SessionIDCookieName, sessionID, time.Now().Add(delivery.SessionIDCookieExpire))
 	return h.Ok(c)
 }
 
 func (h *UserHandler) HandleUserLogout(c echo.Context) error {
-	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
+	sessionIDCookie, err := c.Cookie(delivery.SessionIDCookieName)
 	if err != nil {
 		return h.Error(c, "no session cookie")
 	}
-	h.DeleteCookie(c, httpDelivery.SessionIDCookieName)
+	h.DeleteCookie(c, delivery.SessionIDCookieName)
 	err = h.userUsecase.Logout(sessionIDCookie.Value)
 	if err != nil {
 		return h.Error(c, err.Error())
@@ -184,7 +184,7 @@ func (h *UserHandler) HandleUserLogout(c echo.Context) error {
 }
 
 func (h *UserHandler) getCurrentUser(c echo.Context) (*model.User, error) {
-	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
+	sessionIDCookie, err := c.Cookie(delivery.SessionIDCookieName)
 	if err != nil {
 		return nil, fmt.Errorf("no session cookie")
 	}

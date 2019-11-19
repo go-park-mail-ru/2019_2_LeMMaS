@@ -3,10 +3,11 @@ package http
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
+	delivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/labstack/echo"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -15,37 +16,22 @@ const (
 )
 
 type AccessHandler struct {
-	httpDelivery.Handler
+	delivery.Handler
 	csrfUsecase access.CsrfUsecase
 	logger      logger.Logger
 }
 
 func NewAccessHandler(e *echo.Echo, csrfUsecase access.CsrfUsecase, logger logger.Logger) *AccessHandler {
 	handler := AccessHandler{csrfUsecase: csrfUsecase, logger: logger}
-	e.Use(handler.CsrfMiddleware)
-	e.GET(httpDelivery.ApiV1AccessCSRFPath, handler.HandleGetCSRFToken)
+	e.Use(handler.csrfMiddleware)
+	e.Use(handler.corsMiddleware)
+	e.GET(delivery.ApiV1AccessCSRFPath, handler.handleGetCSRFToken)
 	return &handler
 }
 
-func (h *AccessHandler) HandleGetCSRFToken(c echo.Context) error {
-	token := ""
-	sessionID, err := c.Cookie(httpDelivery.SessionIDCookieName)
-	if err != nil {
-		return h.Error(c, "no session cookie")
-	}
-	token, err = h.csrfUsecase.CreateTokenBySession(sessionID.Value)
-	if err != nil {
-		h.logger.Error(err)
-		return h.Error(c, "error generating token")
-	}
-	return h.OkWithBody(c, map[string]string{
-		"token": token,
-	})
-}
-
-func (h *AccessHandler) CsrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (h *AccessHandler) csrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		isPrivate := strings.HasPrefix(c.Request().URL.Path, httpDelivery.ApiV1Private)
+		isPrivate := strings.HasPrefix(c.Request().URL.Path, delivery.ApiV1Private)
 		method := c.Request().Method
 		if !isPrivate || method == http.MethodGet || method == http.MethodHead || method == http.MethodOptions {
 			return next(c)
@@ -55,7 +41,7 @@ func (h *AccessHandler) CsrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if csrfToken == "" {
 			return h.Error(c, "csrf token required")
 		}
-		sessionID, err := c.Cookie(httpDelivery.SessionIDCookieName)
+		sessionID, err := c.Cookie(delivery.SessionIDCookieName)
 		if err != nil {
 			return h.Error(c, "no session cookie")
 		}
@@ -70,4 +56,51 @@ func (h *AccessHandler) CsrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		return next(c)
 	}
+}
+
+func (h AccessHandler) corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		origin := c.Request().Header.Get(echo.HeaderOrigin)
+		var allowOrigin string
+		if h.isOriginAllowed(origin) {
+			allowOrigin = origin
+		} else {
+			allowOrigin = ""
+		}
+		c.Response().Header().Set(echo.HeaderAccessControlAllowOrigin, allowOrigin)
+
+		allowedMethods := []string{http.MethodGet, http.MethodHead, http.MethodPost, http.MethodPut, http.MethodOptions, http.MethodDelete}
+		c.Response().Header().Set(echo.HeaderAccessControlAllowMethods, strings.Join(allowedMethods, ","))
+		c.Response().Header().Set(echo.HeaderAccessControlAllowCredentials, "true")
+
+		allowedHeaders := []string{"X-Requested-With", "Accept", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"}
+		c.Response().Header().Set(echo.HeaderAccessControlAllowHeaders, strings.Join(allowedHeaders, ","))
+
+		if c.Request().Method == http.MethodOptions {
+			return c.NoContent(http.StatusNoContent)
+		}
+		return next(c)
+	}
+}
+
+func (h AccessHandler) isOriginAllowed(origin string) bool {
+	isNowSh, _ := regexp.MatchString(`^https:\/\/20192lemmas.*\.now\.sh$`, origin)
+	isLocalhost, _ := regexp.MatchString(`^http:\/\/localhost:\d*$`, origin)
+	return isNowSh || isLocalhost
+}
+
+func (h *AccessHandler) handleGetCSRFToken(c echo.Context) error {
+	token := ""
+	sessionID, err := c.Cookie(delivery.SessionIDCookieName)
+	if err != nil {
+		return h.Error(c, "no session cookie")
+	}
+	token, err = h.csrfUsecase.CreateTokenBySession(sessionID.Value)
+	if err != nil {
+		h.logger.Error(err)
+		return h.Error(c, "error generating token")
+	}
+	return h.OkWithBody(c, map[string]string{
+		"token": token,
+	})
 }

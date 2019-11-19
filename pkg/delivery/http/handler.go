@@ -4,6 +4,7 @@ import (
 	valid "github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -35,19 +36,23 @@ type errorResponseBody struct {
 }
 
 func (h *Handler) Error(c echo.Context, message string) error {
+	return h.ErrorWithStatus(c, message, http.StatusBadRequest)
+}
+
+func (h *Handler) ErrorWithStatus(c echo.Context, message string, httpStatus int) error {
 	response := Response{
 		Status: "error",
 		Body:   errorResponseBody{Message: message},
 	}
-	return c.JSON(http.StatusBadRequest, response)
+	return c.JSON(httpStatus, response)
 }
 
 func (h *Handler) Errors(c echo.Context, errors []error) error {
-	message := ""
+	messages := make([]string, 0, len(errors))
 	for _, err := range errors {
-		message += err.Error() + "   "
+		messages = append(messages, err.Error())
 	}
-	return h.Error(c, message)
+	return h.Error(c, strings.Join(messages, "; "))
 }
 
 func (h *Handler) Validate(data interface{}) (bool, []error) {

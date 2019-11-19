@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+const CookieExpiration = time.Hour * 10
+
 type HandlerTestSuite struct {
 	T             *testing.T
 	E             *echo.Echo
@@ -32,7 +34,12 @@ func (s *HandlerTestSuite) SetTesting(t *testing.T) {
 	s.E = echo.New()
 }
 
-func (s *HandlerTestSuite) SetupRequest(method, path string, requestBody string) {
+func (s *HandlerTestSuite) SetupRequestWithBody(requestBody string) {
+	// The methods and path does not matter, if handler is called directly (as in test suite)
+	s.SetupRequest(http.MethodGet, "/", requestBody)
+}
+
+func (s *HandlerTestSuite) SetupRequest(method, path, requestBody string) {
 	s.Response = httptest.NewRecorder()
 	s.Request = httptest.NewRequest(method, path, strings.NewReader(requestBody))
 	s.Request.Header.Add("Content-Type", "application/json")
@@ -41,18 +48,22 @@ func (s *HandlerTestSuite) SetupRequest(method, path string, requestBody string)
 	}
 }
 
-func (s *HandlerTestSuite) NewHandlerContext() echo.Context {
+func (s HandlerTestSuite) AddCookie(name, value string) {
+	s.CookiesByName[name] = &http.Cookie{Name: name, Value: value, Expires: time.Now().Add(CookieExpiration)}
+}
+
+func (s *HandlerTestSuite) NewContext() echo.Context {
 	return s.E.NewContext(s.Request, s.Response)
 }
 
 func (s HandlerTestSuite) TestOkResponse(expectedResponse string) {
-	assert.Equal(s.T, s.Response.Code, http.StatusOK)
+	assert.Equal(s.T, http.StatusOK, s.Response.Code, "unexpected response status")
 	s.TestResponseBody(expectedResponse)
 	s.updateCookies()
 }
 
 func (s HandlerTestSuite) TestResponse(expectedResponse string, expectedCode int) {
-	assert.Equal(s.T, s.Response.Code, expectedCode)
+	assert.Equal(s.T, expectedCode, s.Response.Code, "unexpected response status")
 	s.TestResponseBody(expectedResponse)
 	s.updateCookies()
 }

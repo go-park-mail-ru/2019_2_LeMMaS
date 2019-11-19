@@ -3,7 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
+	delivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/test"
 	testMock "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/test/mock"
@@ -34,6 +34,12 @@ func TestUserHandler_HandleUserRegister(t *testing.T) {
 		http.StatusOK,
 	)
 	s.TestUserList(`{"status":"ok","body":{"users":[{"id":1,"email":"testik1@mail.ru","name":"Test The Best 1","avatar_path":""}]}}`)
+
+	s.TestUserRegister(
+		`{"email": "invalid-email","name": "Test The Best 1","password": "ssc-tuatara"}`,
+		s.Error("email: invalid-email does not validate as email"),
+		http.StatusBadRequest,
+	)
 
 	s.ExpectUsecase().Register(user1.Email, test.Password, user1.Name).Return(fmt.Errorf("user already registered"))
 	s.TestUserRegister(
@@ -98,7 +104,7 @@ func NewUserHandlerTestSuite() *UserHandlerTestSuite {
 func (s *UserHandlerTestSuite) SetTesting(t *testing.T) {
 	s.HandlerTestSuite.SetTesting(t)
 	s.usecase = user.NewMockUsecase(gomock.NewController(t))
-	logger := testMock.NewMockLogger(t)
+	logger := testMock.NewMockLogger()
 	s.handler = NewUserHandler(s.E, s.usecase, logger)
 }
 
@@ -107,35 +113,35 @@ func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {
 }
 
 func (s *UserHandlerTestSuite) TestUserList(expectedResponse string) {
-	s.SetupRequest(http.MethodGet, httpDelivery.ApiV1UserListPath, "")
-	s.handler.HandleUserList(s.NewHandlerContext())
+	s.SetupRequestWithBody("")
+	s.handler.HandleUserList(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserRegister(requestBody, expectedResponse string, expectedCode int) {
-	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserRegisterPath, requestBody)
-	s.handler.HandleUserRegister(s.NewHandlerContext())
+	s.SetupRequestWithBody(requestBody)
+	s.handler.HandleUserRegister(s.NewContext())
 	s.TestResponse(expectedResponse, expectedCode)
 }
 
 func (s *UserHandlerTestSuite) TestUserUpdate(requestBody, expectedResponse string) {
-	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserUpdatePath, requestBody)
-	s.handler.HandleUserUpdate(s.NewHandlerContext())
+	s.SetupRequestWithBody(requestBody)
+	s.handler.HandleUserUpdate(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse string, mustHaveSessionCookie bool) {
-	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserLoginPath, requestBody)
-	s.handler.HandleUserLogin(s.NewHandlerContext())
+	s.SetupRequestWithBody(requestBody)
+	s.handler.HandleUserLogin(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 	if mustHaveSessionCookie {
-		s.TestCookiePresent(httpDelivery.SessionIDCookieName)
+		s.TestCookiePresent(delivery.SessionIDCookieName)
 	}
 }
 
 func (s *UserHandlerTestSuite) TestUserLogout(expectedResponse string) {
-	s.SetupRequest(http.MethodPost, httpDelivery.ApiV1UserLogoutPath, "")
-	s.handler.HandleUserLogout(s.NewHandlerContext())
+	s.SetupRequestWithBody("")
+	s.handler.HandleUserLogout(s.NewContext())
 	s.TestOkResponse(expectedResponse)
-	s.TestCookieNotPresent(httpDelivery.SessionIDCookieName)
+	s.TestCookieNotPresent(delivery.SessionIDCookieName)
 }

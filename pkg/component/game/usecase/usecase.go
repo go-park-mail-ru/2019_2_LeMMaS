@@ -2,13 +2,12 @@ package usecase
 
 import (
 	"fmt"
-	"math"
-	"math/rand"
-	"time"
-
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
+	"math"
+	"math/rand"
+	"time"
 )
 
 const (

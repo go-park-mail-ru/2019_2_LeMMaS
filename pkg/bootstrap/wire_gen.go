@@ -23,14 +23,14 @@ import (
 
 // Injectors from wire.go:
 
-func NewMiddleware() (http.Middleware, error) {
+func NewMiddleware() (http.CommonMiddlewaresHandler, error) {
 	echo := NewEcho()
 	logger, err := NewLogger()
 	if err != nil {
-		return http.Middleware{}, err
+		return http.CommonMiddlewaresHandler{}, err
 	}
-	middleware := http.NewMiddleware(echo, logger)
-	return middleware, nil
+	commonMiddlewaresHandler := http.NewCommonMiddlewaresHandler(echo, logger)
+	return commonMiddlewaresHandler, nil
 }
 
 func NewAccessHandler() (*http2.AccessHandler, error) {
