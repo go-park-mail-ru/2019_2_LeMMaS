@@ -22,42 +22,34 @@ const (
 )
 
 type gameUsecase struct {
-	logger      logger.Logger
-	infoByUser  map[int]*userInfo
-	gameStarted chan bool
-}
+	logger logger.Logger
 
-type userInfo struct {
-	Position  model.Position
-	Food      []model.Position
-	Direction float64
-	Speed     float64
+	playersByID map[int]*model.Player
+	foodByID    map[int]*model.Position
+	gameStarted chan bool
 }
 
 func NewGameUsecase(logger logger.Logger) game.Usecase {
 	return &gameUsecase{
 		logger:      logger,
-		infoByUser:  map[int]*userInfo{},
+		playersByID: map[int]*model.Player{},
+		foodByID:    map[int]*model.Position{},
 		gameStarted: make(chan bool),
 	}
 }
 
-func (u gameUsecase) StartGame(user model.User) error {
-	u.infoByUser[user.ID] = &userInfo{
-		Position:  model.Position{X: 0, Y: 0},
-		Food:      []model.Position{{rand.Float64(), rand.Float64()}, {rand.Float64(), rand.Float64()}},
-		Direction: 0,
-		Speed:     0,
-	}
+func (u *gameUsecase) StartGame(user model.User) error {
+	u.playersByID[user.ID] = &model.Player{}
+	u.foodByID = u.generateFood()
 	u.gameStarted <- true
 	return nil
 }
 
 func (u *gameUsecase) SetDirection(user model.User, direction float64) error {
 	if direction < MinDirection || direction > MaxDirection {
-		return fmt.Errorf("directions must be in range (%v, %v)", MinDirection, MaxDirection)
+		return fmt.Errorf("direction must be in range (%v, %v)", MinDirection, MaxDirection)
 	}
-	u.infoByUser[user.ID].Direction = direction
+	u.playersByID[user.ID].Direction = direction
 	return nil
 }
 
@@ -65,31 +57,32 @@ func (u *gameUsecase) SetSpeed(user model.User, speed float64) error {
 	if speed < MinSpeed || speed > MaxSpeed {
 		return fmt.Errorf("speed must be in range (%v, %v)", MinSpeed, MaxSpeed)
 	}
-	u.infoByUser[user.ID].Speed = speed
+	u.playersByID[user.ID].Speed = speed
 	return nil
 }
 
-func (u gameUsecase) GetPlayerPosition(user model.User) model.Position {
-	return u.infoByUser[user.ID].Position
+func (u gameUsecase) GetPlayers(user model.User) map[int]*model.Player {
+	return u.playersByID
 }
 
-func (u gameUsecase) GetFoodsPositions(user model.User) []model.Position {
-	return u.infoByUser[user.ID].Food
+func (u gameUsecase) GetFood(user model.User) map[int]*model.Position {
+	return u.foodByID
 }
 
-func (u *gameUsecase) GetEventsStream(user model.User) chan game.Event {
-	events := make(chan game.Event)
+func (u *gameUsecase) GetEventsStream(user model.User) chan model.GameEvent {
+	events := make(chan model.GameEvent)
 	go func() {
 		<-u.gameStarted
 		tick := time.Tick(EventStreamRate)
 		for range tick {
 			u.updatePlayerPosition(user)
-			info := u.infoByUser[user.ID]
-			events <- game.Event{
-				Type: game.EventTypeMove,
-				Body: map[string]interface{}{
-					"x": info.Position.X,
-					"y": info.Position.Y,
+			player := u.playersByID[user.ID]
+			events <- model.GameEvent{
+				"type": model.GameEventMove,
+				"players": map[string]interface{}{
+					"id": user.ID,
+					"x":  player.Position.X,
+					"y":  player.Position.Y,
 				},
 			}
 		}
@@ -97,18 +90,26 @@ func (u *gameUsecase) GetEventsStream(user model.User) chan game.Event {
 	return events
 }
 
+func (u gameUsecase) generateFood() map[int]*model.Position {
+	food := map[int]*model.Position{}
+	for i := 0; i < 10; i++ {
+		food[i] = &model.Position{X: rand.Float64(), Y: rand.Float64()}
+	}
+	return food
+}
+
 func (u *gameUsecase) updatePlayerPosition(user model.User) {
-	info := u.infoByUser[user.ID]
-	directionRadians := info.Direction * math.Pi / 180
-	distance := info.Speed * float64(EventStreamRate/time.Millisecond)
+	player := u.playersByID[user.ID]
+	directionRadians := player.Direction * math.Pi / 180
+	distance := player.Speed * float64(EventStreamRate/time.Millisecond)
 	deltaX := distance * math.Sin(directionRadians)
 	deltaY := distance * math.Cos(directionRadians)
-	oldPosition := info.Position
+	oldPosition := player.Position
 	newPosition := model.Position{
 		X: oldPosition.X + deltaX,
 		Y: oldPosition.Y + deltaY,
 	}
 	newPosition.X = math.Round(newPosition.X*100) / 100
 	newPosition.Y = math.Round(newPosition.Y*100) / 100
-	info.Position = newPosition
+	player.Position = newPosition
 }
