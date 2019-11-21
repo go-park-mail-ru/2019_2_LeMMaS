@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/paulmach/orb"
@@ -49,7 +50,11 @@ func (r *repository) CreateRoom(userID int) *model.Room {
 }
 
 func (r repository) GetRoomByID(id int) *model.Room {
-	return r.roomsByID[id]
+	room, ok := r.roomsByID[id]
+	if !ok {
+		return nil
+	}
+	return room
 }
 
 func (r repository) GetAllRooms() []*model.Room {
@@ -93,20 +98,29 @@ func (r *repository) GetFoodInRange(room *model.Room, topLeftPoint, bottomRightP
 	return foods
 }
 
-func (r *repository) SetDirection(room *model.Room, userID int, direction int) error {
+func (r *repository) SetDirection(roomID int, userID int, direction int) error {
+	room := r.GetRoomByID(roomID)
 	if room == nil {
-		return errors.New("game not started")
+		return fmt.Errorf("room with id %v not found", roomID)
 	}
 	room.PlayersByID[userID].Direction = direction
 	return nil
 }
 
-func (r *repository) SetSpeed(room *model.Room, userID int, speed int) error {
-	r.roomsByID[room.ID].PlayersByID[userID].Speed = speed
+func (r *repository) SetSpeed(roomID int, userID int, speed int) error {
+	room := r.GetRoomByID(roomID)
+	if room == nil {
+		return fmt.Errorf("room with id %v not found", roomID)
+	}
+	room.PlayersByID[userID].Speed = speed
 	return nil
 }
 
-func (r *repository) SetPosition(room *model.Room, userID int, position model.Position) error {
-	r.roomsByID[room.ID].PlayersByID[userID].Position = position
+func (r *repository) SetPosition(roomID int, userID int, position model.Position) error {
+	room := r.GetRoomByID(roomID)
+	if room == nil {
+		return fmt.Errorf("room with id %v not found", roomID)
+	}
+	room.PlayersByID[userID].Position = position
 	return nil
 }

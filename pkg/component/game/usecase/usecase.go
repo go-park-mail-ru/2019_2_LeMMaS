@@ -43,7 +43,7 @@ func (u *gameUsecase) StartGame(userID int) error {
 	if _, ok := u.roomsIDsByUserID[userID]; ok {
 		return errors.New("start: game already started for this user")
 	}
-	room := u.getPlayerRoom(userID)
+	room := u.placePlayerInRoom(userID)
 	u.repository.AddPlayer(room, model.Player{
 		UserID: userID,
 		Position: model.Position{
@@ -68,14 +68,22 @@ func (u *gameUsecase) SetDirection(userID int, direction int) error {
 	if direction < minDirection || direction > maxDirection {
 		return fmt.Errorf("direction must be in range (%v, %v)", minDirection, maxDirection)
 	}
-	return u.repository.SetDirection(u.getPlayerRoom(userID), userID, direction)
+	room := u.getPlayerRoom(userID)
+	if room == nil {
+		return errors.New("game not started")
+	}
+	return u.repository.SetDirection(room.ID, userID, direction)
 }
 
 func (u *gameUsecase) SetSpeed(userID int, speed int) error {
 	if speed < minSpeed || speed > maxSpeed {
 		return fmt.Errorf("speed must be in range (%v, %v)", minSpeed, maxSpeed)
 	}
-	return u.repository.SetSpeed(u.getPlayerRoom(userID), userID, speed)
+	room := u.getPlayerRoom(userID)
+	if room == nil {
+		return errors.New("game not started")
+	}
+	return u.repository.SetSpeed(room.ID, userID, speed)
 }
 
 func (u gameUsecase) GetPlayers(userID int) map[int]*model.Player {
@@ -104,7 +112,7 @@ func (u *gameUsecase) processEvents(room *model.Room, userID int, events chan mo
 		player := room.PlayersByID[userID]
 		newPosition := u.getNextPlayerPosition(player)
 		if newPosition != player.Position {
-			u.repository.SetPosition(u.getPlayerRoom(userID), userID, newPosition)
+			u.repository.SetPosition(room.ID, userID, newPosition)
 
 			eatenFood := u.getEatenFood(room, newPosition)
 			eatenFoodIDs := make([]int, 0, len(eatenFood))
@@ -127,8 +135,16 @@ func (u *gameUsecase) processEvents(room *model.Room, userID int, events chan mo
 
 func (u *gameUsecase) getPlayerRoom(userID int) *model.Room {
 	roomID, ok := u.roomsIDsByUserID[userID]
-	if ok {
-		return u.repository.GetRoomByID(roomID)
+	if !ok {
+		return nil
+	}
+	return u.repository.GetRoomByID(roomID)
+}
+
+func (u *gameUsecase) placePlayerInRoom(userID int) *model.Room {
+	room := u.getPlayerRoom(userID)
+	if room != nil {
+		return room
 	}
 	availableRooms := u.repository.GetAllRooms()
 	if len(availableRooms) == 0 {

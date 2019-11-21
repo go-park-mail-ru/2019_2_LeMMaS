@@ -12,7 +12,7 @@ type Repository interface {
 	AddFood(room *model.Room, food []model.Food)
 	GetFoodInRange(room *model.Room, topLeftPoint, bottomRightPoint model.Position) []model.Food
 
-	SetDirection(room *model.Room, userID int, direction int) error
-	SetSpeed(room *model.Room, userID int, speed int) error
-	SetPosition(room *model.Room, userID int, position model.Position) error
+	SetDirection(roomID int, userID int, direction int) error
+	SetSpeed(roomID int, userID int, speed int) error
+	SetPosition(roomID int, userID int, position model.Position) error
 }
