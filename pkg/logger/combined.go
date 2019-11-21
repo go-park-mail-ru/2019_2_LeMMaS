@@ -1,32 +1,32 @@
 package logger
 
-type CombinedLogger struct {
+type combinedLogger struct {
 	Loggers []Logger
 }
 
 func NewCombinedLogger(loggers ...Logger) Logger {
-	return CombinedLogger{loggers}
+	return combinedLogger{loggers}
 }
 
-func (l CombinedLogger) Error(err error) {
+func (l combinedLogger) Error(err error) {
 	for _, logger := range l.Loggers {
 		logger.Error(err)
 	}
 }
 
-func (l CombinedLogger) Errorf(format string, args ...interface{}) {
+func (l combinedLogger) Errorf(format string, args ...interface{}) {
 	for _, logger := range l.Loggers {
 		logger.Errorf(format, args...)
 	}
 }
 
-func (l CombinedLogger) Warn(err error) {
+func (l combinedLogger) Warn(err error) {
 	for _, logger := range l.Loggers {
 		logger.Warn(err)
 	}
 }
 
-func (l CombinedLogger) Warnf(format string, args ...interface{}) {
+func (l combinedLogger) Warnf(format string, args ...interface{}) {
 	for _, logger := range l.Loggers {
 		logger.Warnf(format, args...)
 	}

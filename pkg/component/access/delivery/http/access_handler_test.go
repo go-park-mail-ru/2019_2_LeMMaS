@@ -44,13 +44,13 @@ func TestAccessHandler_CsrfMiddleware(t *testing.T) {
 	s.ExpectUsecase().CheckTokenBySession(test.CSRFToken, test.SessionID).Return(true, nil)
 	s.AddCookie(delivery.SessionIDCookieName, test.SessionID)
 	s.SetupRequest(http.MethodPost, delivery.ApiV1UserLogoutPath, "")
-	s.Request.Header.Add(CSRFTokenHeader, test.CSRFToken)
+	s.Request.Header.Add(csrfTokenHeader, test.CSRFToken)
 	middleware(s.NewContext())
 	s.TestResponse("middleware passed", http.StatusOK)
 
 	s.ExpectUsecase().CheckTokenBySession(test.CSRFToken, test.SessionID).Return(false, nil)
 	s.SetupRequest(http.MethodPost, delivery.ApiV1UserLogoutPath, "")
-	s.Request.Header.Add(CSRFTokenHeader, test.CSRFToken)
+	s.Request.Header.Add(csrfTokenHeader, test.CSRFToken)
 	middleware(s.NewContext())
 	s.TestResponse(s.Error("incorrect CSRF token"), http.StatusBadRequest)
 }

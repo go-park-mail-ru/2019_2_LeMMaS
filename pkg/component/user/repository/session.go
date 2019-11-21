@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	RedisCommandSet = "SET"
-	RedisCommandGet = "GET"
-	RedisCommandDel = "DEL"
+	redisCommandSet = "SET"
+	redisCommandGet = "GET"
+	redisCommandDel = "DEL"
 )
 
 type sessionRepository struct {
@@ -26,7 +26,7 @@ func NewSessionRepository(redis redis.Conn, logger logger.Logger) user.SessionRe
 }
 
 func (r *sessionRepository) AddSession(sessionID string, userID int) error {
-	_, err := r.redis.Do(RedisCommandSet, sessionID, userID)
+	_, err := r.redis.Do(redisCommandSet, sessionID, userID)
 	if err != nil {
 		r.logger.Error(err)
 	}
@@ -34,7 +34,7 @@ func (r *sessionRepository) AddSession(sessionID string, userID int) error {
 }
 
 func (r *sessionRepository) GetUserBySession(sessionID string) (int, bool) {
-	externalUserID, err := r.redis.Do(RedisCommandGet, sessionID)
+	externalUserID, err := r.redis.Do(redisCommandGet, sessionID)
 	if err != nil {
 		r.logger.Error(err)
 		return 0, false
@@ -52,7 +52,7 @@ func (r *sessionRepository) GetUserBySession(sessionID string) (int, bool) {
 }
 
 func (r *sessionRepository) DeleteSession(sessionID string) error {
-	_, err := r.redis.Do(RedisCommandDel, sessionID)
+	_, err := r.redis.Do(redisCommandDel, sessionID)
 	if err != nil {
 		r.logger.Error(err)
 	}

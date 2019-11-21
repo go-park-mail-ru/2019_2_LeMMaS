@@ -8,7 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const UserTable = "user"
+const userTable = "user"
 
 type databaseRepository struct {
 	db     *sqlx.DB
@@ -23,7 +23,7 @@ func NewDatabaseRepository(db *sqlx.DB, logger logger.Logger) user.Repository {
 }
 
 func (r *databaseRepository) Create(email string, passwordHash string, name string) error {
-	_, err := r.db.Exec(`insert into "`+UserTable+`" (email, password_hash, name) values ($1, $2, $3)`, email, passwordHash, name)
+	_, err := r.db.Exec(`insert into "`+userTable+`" (email, password_hash, name) values ($1, $2, $3)`, email, passwordHash, name)
 	if err != nil {
 		r.logger.Error(err)
 	}
@@ -32,7 +32,7 @@ func (r *databaseRepository) Create(email string, passwordHash string, name stri
 
 func (r *databaseRepository) Update(user model.User) error {
 	_, err := r.db.Exec(
-		`update "`+UserTable+`" set email=$1, password_hash=$2, name=$3, avatar_path=$4 where id=$5`,
+		`update "`+userTable+`" set email=$1, password_hash=$2, name=$3, avatar_path=$4 where id=$5`,
 		user.Email, user.PasswordHash, user.Name, user.AvatarPath, user.ID,
 	)
 	if err != nil {
@@ -43,7 +43,7 @@ func (r *databaseRepository) Update(user model.User) error {
 
 func (r *databaseRepository) UpdateAvatarPath(id int, avatarPath string) error {
 	_, err := r.db.Exec(
-		`update "`+UserTable+`" set avatar_path=$1 where id=$2`,
+		`update "`+userTable+`" set avatar_path=$1 where id=$2`,
 		avatarPath, id,
 	)
 	if err != nil {
@@ -54,7 +54,7 @@ func (r *databaseRepository) UpdateAvatarPath(id int, avatarPath string) error {
 
 func (r *databaseRepository) GetAll() ([]model.User, error) {
 	var users []model.User
-	err := r.db.Select(&users, `select * from "`+UserTable+`" order by id`)
+	err := r.db.Select(&users, `select * from "`+userTable+`" order by id`)
 	if err != nil {
 		r.logger.Error(err)
 		return nil, err
@@ -64,7 +64,7 @@ func (r *databaseRepository) GetAll() ([]model.User, error) {
 
 func (r *databaseRepository) GetByID(id int) (*model.User, error) {
 	userByID := model.User{}
-	err := r.db.Get(&userByID, `select * from "`+UserTable+`" where id=$1`, id)
+	err := r.db.Get(&userByID, `select * from "`+userTable+`" where id=$1`, id)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
@@ -77,7 +77,7 @@ func (r *databaseRepository) GetByID(id int) (*model.User, error) {
 
 func (r *databaseRepository) GetByEmail(email string) (*model.User, error) {
 	userByEmail := model.User{}
-	err := r.db.Get(&userByEmail, `select * from "`+UserTable+`" where email=$1`, email)
+	err := r.db.Get(&userByEmail, `select * from "`+userTable+`" where email=$1`, email)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}

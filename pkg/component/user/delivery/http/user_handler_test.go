@@ -114,25 +114,25 @@ func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {
 
 func (s *UserHandlerTestSuite) TestUserList(expectedResponse string) {
 	s.SetupRequestWithBody("")
-	s.handler.HandleUserList(s.NewContext())
+	s.handler.handleUserList(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserRegister(requestBody, expectedResponse string, expectedCode int) {
 	s.SetupRequestWithBody(requestBody)
-	s.handler.HandleUserRegister(s.NewContext())
+	s.handler.handleUserRegister(s.NewContext())
 	s.TestResponse(expectedResponse, expectedCode)
 }
 
 func (s *UserHandlerTestSuite) TestUserUpdate(requestBody, expectedResponse string) {
 	s.SetupRequestWithBody(requestBody)
-	s.handler.HandleUserUpdate(s.NewContext())
+	s.handler.handleUserUpdate(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse string, mustHaveSessionCookie bool) {
 	s.SetupRequestWithBody(requestBody)
-	s.handler.HandleUserLogin(s.NewContext())
+	s.handler.handleUserLogin(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 	if mustHaveSessionCookie {
 		s.TestCookiePresent(delivery.SessionIDCookieName)
@@ -141,7 +141,7 @@ func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse strin
 
 func (s *UserHandlerTestSuite) TestUserLogout(expectedResponse string) {
 	s.SetupRequestWithBody("")
-	s.handler.HandleUserLogout(s.NewContext())
+	s.handler.handleUserLogout(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 	s.TestCookieNotPresent(delivery.SessionIDCookieName)
 }

@@ -18,14 +18,14 @@ type UserHandler struct {
 
 func NewUserHandler(e *echo.Echo, userUsecase user.Usecase, logger logger.Logger) *UserHandler {
 	handler := UserHandler{userUsecase: userUsecase, logger: logger}
-	e.GET(delivery.ApiV1UserListPath, handler.HandleUserList)
-	e.POST(delivery.ApiV1UserRegisterPath, handler.HandleUserRegister)
-	e.POST(delivery.ApiV1UserLoginPath, handler.HandleUserLogin)
-	e.POST(delivery.ApiV1UserLogoutPath, handler.HandleUserLogout)
-	e.GET(delivery.ApiV1UserProfilePath, handler.HandleUserProfile)
-	e.POST(delivery.ApiV1UserUpdatePath, handler.HandleUserUpdate)
-	e.POST(delivery.ApiV1UserAvatarUploadPath, handler.HandleAvatarUpload)
-	e.GET(delivery.ApiV1UserGetAvatarByNamePath, handler.HandleGetAvatarByName)
+	e.GET(delivery.ApiV1UserListPath, handler.handleUserList)
+	e.POST(delivery.ApiV1UserRegisterPath, handler.handleUserRegister)
+	e.POST(delivery.ApiV1UserLoginPath, handler.handleUserLogin)
+	e.POST(delivery.ApiV1UserLogoutPath, handler.handleUserLogout)
+	e.GET(delivery.ApiV1UserProfilePath, handler.handleUserProfile)
+	e.POST(delivery.ApiV1UserUpdatePath, handler.handleUserUpdate)
+	e.POST(delivery.ApiV1UserAvatarUploadPath, handler.handleAvatarUpload)
+	e.GET(delivery.ApiV1UserGetAvatarByNamePath, handler.handleGetAvatarByName)
 	return &handler
 }
 
@@ -36,7 +36,7 @@ type userToOutput struct {
 	AvatarPath string `json:"avatar_path"`
 }
 
-func (h *UserHandler) HandleUserList(c echo.Context) error {
+func (h *UserHandler) handleUserList(c echo.Context) error {
 	users, err := h.userUsecase.GetAllUsers()
 	if err != nil {
 		return h.Error(c, "error loading users")
@@ -69,7 +69,7 @@ type userToUpdate struct {
 	Name     string `json:"name"`
 }
 
-func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
+func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 	currentUser, err := h.getCurrentUser(c)
 	if err != nil {
 		return h.Error(c, err.Error())
@@ -85,7 +85,7 @@ func (h *UserHandler) HandleUserUpdate(c echo.Context) error {
 	return h.Ok(c)
 }
 
-func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
+func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 	currentUser, err := h.getCurrentUser(c)
 	if err != nil {
 		return h.Error(c, err.Error())
@@ -108,7 +108,7 @@ func (h *UserHandler) HandleAvatarUpload(c echo.Context) error {
 	return h.Ok(c)
 }
 
-func (h *UserHandler) HandleGetAvatarByName(c echo.Context) error {
+func (h *UserHandler) handleGetAvatarByName(c echo.Context) error {
 	name := c.FormValue("name")
 	avatarUrl := h.userUsecase.GetAvatarUrlByName(name)
 	return h.OkWithBody(c, map[string]string{
@@ -116,7 +116,7 @@ func (h *UserHandler) HandleGetAvatarByName(c echo.Context) error {
 	})
 }
 
-func (h *UserHandler) HandleUserProfile(c echo.Context) error {
+func (h *UserHandler) handleUserProfile(c echo.Context) error {
 	currentUser, err := h.getCurrentUser(c)
 	if err != nil {
 		return h.OkWithBody(c, map[string]interface{}{
@@ -134,7 +134,7 @@ type userToRegister struct {
 	Name     string `json:"name" valid:"required"`
 }
 
-func (h *UserHandler) HandleUserRegister(c echo.Context) error {
+func (h *UserHandler) handleUserRegister(c echo.Context) error {
 	userToRegister := &userToRegister{}
 	if err := c.Bind(userToRegister); err != nil {
 		return h.Error(c, err.Error())
@@ -154,7 +154,7 @@ type userToLogin struct {
 	Password string `json:"password" valid:"required"`
 }
 
-func (h *UserHandler) HandleUserLogin(c echo.Context) error {
+func (h *UserHandler) handleUserLogin(c echo.Context) error {
 	userToLogin := &userToLogin{}
 	if err := c.Bind(userToLogin); err != nil {
 		return err
@@ -170,7 +170,7 @@ func (h *UserHandler) HandleUserLogin(c echo.Context) error {
 	return h.Ok(c)
 }
 
-func (h *UserHandler) HandleUserLogout(c echo.Context) error {
+func (h *UserHandler) handleUserLogout(c echo.Context) error {
 	sessionIDCookie, err := c.Cookie(delivery.SessionIDCookieName)
 	if err != nil {
 		return h.Error(c, "no session cookie")

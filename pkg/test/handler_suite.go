@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const CookieExpiration = time.Hour * 10
+const cookieExpiration = time.Hour * 10
 
 type HandlerTestSuite struct {
 	T             *testing.T
@@ -49,7 +49,7 @@ func (s *HandlerTestSuite) SetupRequest(method, path, requestBody string) {
 }
 
 func (s HandlerTestSuite) AddCookie(name, value string) {
-	s.CookiesByName[name] = &http.Cookie{Name: name, Value: value, Expires: time.Now().Add(CookieExpiration)}
+	s.CookiesByName[name] = &http.Cookie{Name: name, Value: value, Expires: time.Now().Add(cookieExpiration)}
 }
 
 func (s *HandlerTestSuite) NewContext() echo.Context {
@@ -58,17 +58,17 @@ func (s *HandlerTestSuite) NewContext() echo.Context {
 
 func (s HandlerTestSuite) TestOkResponse(expectedResponse string) {
 	assert.Equal(s.T, http.StatusOK, s.Response.Code, "unexpected response status")
-	s.TestResponseBody(expectedResponse)
+	s.testResponseBody(expectedResponse)
 	s.updateCookies()
 }
 
 func (s HandlerTestSuite) TestResponse(expectedResponse string, expectedCode int) {
 	assert.Equal(s.T, expectedCode, s.Response.Code, "unexpected response status")
-	s.TestResponseBody(expectedResponse)
+	s.testResponseBody(expectedResponse)
 	s.updateCookies()
 }
 
-func (s HandlerTestSuite) TestResponseBody(expectedResponse string) {
+func (s HandlerTestSuite) testResponseBody(expectedResponse string) {
 	actualBody := s.Response.Body.String()
 	assert.Equal(s.T, strings.TrimSpace(expectedResponse), strings.TrimSpace(actualBody), "unexpected response body")
 }

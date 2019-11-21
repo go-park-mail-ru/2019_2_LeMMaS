@@ -13,7 +13,7 @@ func TestSessionRepository_AddSession(t *testing.T) {
 	redis := redigomock.NewConn()
 	repo := newTestSessionRepository(t, redis)
 	userID := 3
-	redis.Command(RedisCommandSet, test.SessionID, userID)
+	redis.Command(redisCommandSet, test.SessionID, userID)
 	err := repo.AddSession(test.SessionID, userID)
 	assert.NoError(t, err)
 	assert.NoError(t, redis.ExpectationsWereMet())

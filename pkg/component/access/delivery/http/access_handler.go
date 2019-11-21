@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	CSRFTokenHeader = "X-CSRF-Token"
+	csrfTokenHeader = "X-CSRF-Token"
 )
 
 type AccessHandler struct {
@@ -37,7 +37,7 @@ func (h *AccessHandler) csrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(c)
 		}
 
-		csrfToken := c.Request().Header.Get(CSRFTokenHeader)
+		csrfToken := c.Request().Header.Get(csrfTokenHeader)
 		if csrfToken == "" {
 			return h.Error(c, "csrf token required")
 		}

@@ -78,7 +78,7 @@ func (h GameHandler) handleGame(c echo.Context) error {
 	}
 }
 
-type Request struct {
+type request struct {
 	Type string `json:"type"`
 }
 
@@ -91,7 +91,7 @@ func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
 	if err != nil {
 		return err
 	}
-	request := Request{}
+	request := request{}
 	if err := json.Unmarshal(requestBytes, &request); err != nil {
 		return h.sendError(c, "invalid json")
 	}
