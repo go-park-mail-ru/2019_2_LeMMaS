@@ -48,12 +48,16 @@ func (r *repository) CreateRoom(userID int) *model.Room {
 	return &room
 }
 
-func (r repository) GetRoom(userID int) *model.Room {
-	roomID, ok := r.roomsIDsByUserID[userID]
-	if !ok {
-		return nil
+func (r repository) GetRoomByID(id int) *model.Room {
+	return r.roomsByID[id]
+}
+
+func (r repository) GetAllRooms() []*model.Room {
+	rooms := make([]*model.Room, 0, len(r.roomsByID))
+	for _, room := range r.roomsByID {
+		rooms = append(rooms, room)
 	}
-	return r.roomsByID[roomID]
+	return rooms
 }
 
 func (r *repository) DeleteRoom(userID int) error {
@@ -89,20 +93,20 @@ func (r *repository) GetFoodInRange(room *model.Room, topLeftPoint, bottomRightP
 	return foods
 }
 
-func (r *repository) SetDirection(userID int, direction int) error {
-	room := r.GetRoom(userID)
-	r.roomsByID[room.ID].PlayersByID[userID].Direction = direction
+func (r *repository) SetDirection(room *model.Room, userID int, direction int) error {
+	if room == nil {
+		return errors.New("game not started")
+	}
+	room.PlayersByID[userID].Direction = direction
 	return nil
 }
 
-func (r *repository) SetSpeed(userID int, speed int) error {
-	room := r.GetRoom(userID)
+func (r *repository) SetSpeed(room *model.Room, userID int, speed int) error {
 	r.roomsByID[room.ID].PlayersByID[userID].Speed = speed
 	return nil
 }
 
-func (r *repository) SetPosition(userID int, position model.Position) error {
-	room := r.GetRoom(userID)
+func (r *repository) SetPosition(room *model.Room, userID int, position model.Position) error {
 	r.roomsByID[room.ID].PlayersByID[userID].Position = position
 	return nil
 }
