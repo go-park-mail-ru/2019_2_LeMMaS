@@ -43,7 +43,7 @@ func (r *repository) CreateRoom(userID int) *model.Room {
 	r.roomsIDsByUserID[userID] = room.ID
 	r.foodIndexByRoomID[room.ID] = quadtree.New(orb.Bound{
 		Min: orb.Point{0, 0},
-		Max: orb.Point{model.MaxPositionX, model.MaxPositionY},
+		Max: orb.Point{game.MaxPositionX, game.MaxPositionY},
 	})
 	return &room
 }

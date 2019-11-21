@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	maxSpeed = 100
-	minSpeed = 0
+	maxSpeed   = 100
+	minSpeed   = 0
+	speedKoeff = float64(eventStreamRate / time.Millisecond / 500)
 
 	maxDirection = 359
 	minDirection = 0
@@ -124,7 +125,7 @@ func (u *gameUsecase) processEvents(room *model.Room, userID int, events chan mo
 
 func (u gameUsecase) getNextPlayerPosition(player *model.Player) model.Position {
 	directionRadians := float64(player.Direction) * math.Pi / 180
-	distance := float64(player.Speed) * float64(eventStreamRate/time.Millisecond) / 200
+	distance := float64(player.Speed) * speedKoeff
 	deltaX := distance * math.Sin(directionRadians)
 	deltaY := distance * math.Cos(directionRadians)
 	oldPosition := player.Position
