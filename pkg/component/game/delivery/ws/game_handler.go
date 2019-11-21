@@ -2,6 +2,7 @@ package ws
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user"
@@ -26,7 +27,7 @@ func NewGameHandler(e *echo.Echo, gameUsecase game.Usecase, userUsecase user.Use
 		gameUsecase: gameUsecase,
 		userUsecase: userUsecase,
 	}
-	e.GET(httpDelivery.ApiV1GamePath, handler.HandleGame)
+	e.GET(httpDelivery.ApiV1GamePath, handler.handleGame)
 	return &handler
 }
 
@@ -42,7 +43,7 @@ func (h GameHandler) sendError(c *websocket.Conn, message string) error {
 	return c.WriteJSON(body)
 }
 
-func (h GameHandler) HandleGame(c echo.Context) error {
+func (h GameHandler) handleGame(c echo.Context) error {
 	upgrader := websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
 		return true
 	}}
@@ -53,22 +54,25 @@ func (h GameHandler) HandleGame(c echo.Context) error {
 	}
 	defer conn.Close()
 
-	currUser, err := h.getCurrentUser(c)
+	pCurrentUser, err := h.getCurrentUser(c)
 	if err != nil {
 		h.sendError(conn, err.Error())
 		return nil
 	}
+	currentUser := *pCurrentUser
+	userID := currentUser.ID
 
 	go func() {
-		events := h.gameUsecase.GetEventsStream(*currUser)
+		events := h.gameUsecase.GetEventsStream(userID)
 		for event := range events {
 			h.sendEvent(conn, event)
 		}
 	}()
 
 	for {
-		err := h.processRequest(*currUser, conn)
+		err := h.processRequest(userID, conn)
 		if err != nil {
+			h.gameUsecase.StopGame(userID)
 			return nil
 		}
 	}
@@ -78,8 +82,11 @@ type Request struct {
 	Type string `json:"type"`
 }
 
-func (h GameHandler) processRequest(user model.User, c *websocket.Conn) error {
+func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
 	_, requestReader, _ := c.NextReader()
+	if requestReader == nil {
+		return errors.New("no content")
+	}
 	requestBytes, err := ioutil.ReadAll(requestReader)
 	if err != nil {
 		return err
@@ -90,59 +97,38 @@ func (h GameHandler) processRequest(user model.User, c *websocket.Conn) error {
 	}
 	switch request.Type {
 	case "start":
-		return h.processGameStart(user, c)
+		return h.processGameStart(userID, c)
 	case "direction":
-		return h.processSetDirection(user, c, requestBytes)
+		return h.processSetDirection(userID, c, requestBytes)
 	case "speed":
-		return h.processSetSpeed(user, c, requestBytes)
+		return h.processSetSpeed(userID, c, requestBytes)
 	default:
 		return h.sendError(c, "unknown request type")
 	}
 }
 
-func (h GameHandler) processGameStart(user model.User, c *websocket.Conn) error {
-	h.gameUsecase.StartGame(user)
+func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
+	err := h.gameUsecase.StartGame(userID)
+	if err != nil {
+		return h.sendError(c, err.Error())
+	}
 	return h.sendEvent(c, map[string]interface{}{
 		"type":    model.GameEventStart,
-		"players": h.convertPlayersToOutput(h.gameUsecase.GetPlayers(user)),
-		"foods":   h.convertFoodToOutput(h.gameUsecase.GetFood(user)),
+		"players": h.convertPlayersToOutput(h.gameUsecase.GetPlayers(userID)),
+		"foods":   h.convertFoodToOutput(h.gameUsecase.GetFood(userID)),
 	})
-}
-
-func (h GameHandler) convertPlayersToOutput(playersByID map[int]*model.Player) []map[string]interface{} {
-	players := make([]map[string]interface{}, 0, len(playersByID))
-	for id, player := range playersByID {
-		players = append(players, map[string]interface{}{
-			"id": id,
-			"x":  player.Position.X,
-			"y":  player.Position.Y,
-		})
-	}
-	return players
-}
-
-func (h GameHandler) convertFoodToOutput(foodByID map[int]*model.Position) []map[string]interface{} {
-	foods := make([]map[string]interface{}, 0, len(foodByID))
-	for id, food := range foodByID {
-		foods = append(foods, map[string]interface{}{
-			"id": id,
-			"x":  food.X,
-			"y":  food.Y,
-		})
-	}
-	return foods
 }
 
 type directionRequest struct {
 	Direction int `json:"direction"`
 }
 
-func (h GameHandler) processSetDirection(user model.User, c *websocket.Conn, data []byte) error {
+func (h GameHandler) processSetDirection(userID int, c *websocket.Conn, data []byte) error {
 	request := directionRequest{}
 	if err := json.Unmarshal(data, &request); err != nil {
 		return h.sendError(c, "invalid json")
 	}
-	err := h.gameUsecase.SetDirection(user, request.Direction)
+	err := h.gameUsecase.SetDirection(userID, request.Direction)
 	if err != nil {
 		return h.sendError(c, err.Error())
 	}
@@ -153,12 +139,12 @@ type speedRequest struct {
 	Speed int `json:"speed"`
 }
 
-func (h GameHandler) processSetSpeed(user model.User, c *websocket.Conn, data []byte) error {
+func (h GameHandler) processSetSpeed(userID int, c *websocket.Conn, data []byte) error {
 	request := speedRequest{}
 	if err := json.Unmarshal(data, &request); err != nil {
 		return h.sendError(c, "invalid json")
 	}
-	err := h.gameUsecase.SetSpeed(user, request.Speed)
+	err := h.gameUsecase.SetSpeed(userID, request.Speed)
 	if err != nil {
 		return h.sendError(c, err.Error())
 	}
@@ -175,4 +161,28 @@ func (h GameHandler) getCurrentUser(c echo.Context) (*model.User, error) {
 		return nil, fmt.Errorf("invalid session id")
 	}
 	return currentUser, nil
+}
+
+func (h GameHandler) convertPlayersToOutput(playersByID map[int]*model.Player) []map[string]interface{} {
+	players := make([]map[string]interface{}, 0, len(playersByID))
+	for id, player := range playersByID {
+		players = append(players, map[string]interface{}{
+			"id": id,
+			"x":  player.Position.X,
+			"y":  player.Position.Y,
+		})
+	}
+	return players
+}
+
+func (h GameHandler) convertFoodToOutput(foodByID map[int]model.Food) []map[string]interface{} {
+	foods := make([]map[string]interface{}, 0, len(foodByID))
+	for _, food := range foodByID {
+		foods = append(foods, map[string]interface{}{
+			"id": food.ID,
+			"x":  food.Position.X,
+			"y":  food.Position.Y,
+		})
+	}
+	return foods
 }
