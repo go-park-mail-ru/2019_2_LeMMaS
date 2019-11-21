@@ -26,14 +26,16 @@ const (
 )
 
 type gameUsecase struct {
-	repository  game.Repository
-	gameStarted map[int]chan bool
+	repository       game.Repository
+	roomsIDsByUserID map[int]int
+	gameStarted      map[int]chan bool
 }
 
-func NewGameUsecase(roomRepository game.Repository) game.Usecase {
+func NewGameUsecase(repository game.Repository) game.Usecase {
 	return &gameUsecase{
-		repository:  roomRepository,
-		gameStarted: map[int]chan bool{},
+		repository:       repository,
+		roomsIDsByUserID: map[int]int{},
+		gameStarted:      map[int]chan bool{},
 	}
 }
 

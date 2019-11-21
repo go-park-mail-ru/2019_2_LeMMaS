@@ -47,8 +47,8 @@ func NewAccessHandler() (*http2.AccessHandler, error) {
 
 func NewGameHandler() (*ws.GameHandler, error) {
 	echo := NewEcho()
-	roomRepository := repository.NewRoomRepository()
-	gameUsecase := usecase2.NewGameUsecase(roomRepository)
+	repository := repository.NewRepository()
+	gameUsecase := usecase2.NewGameUsecase(repository)
 	db, err := NewDB()
 	if err != nil {
 		return nil, err

@@ -14,7 +14,7 @@ type repository struct {
 	foodIndexByRoomID map[int]*quadtree.Quadtree
 }
 
-func NewRoomRepository() game.Repository {
+func NewRepository() game.Repository {
 	return &repository{
 		roomsByID:         map[int]*model.Room{},
 		roomsIDsByUserID:  map[int]int{},

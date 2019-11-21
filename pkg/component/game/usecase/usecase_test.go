@@ -9,7 +9,7 @@ import (
 
 func newTestGameUsecase() gameUsecase {
 	return gameUsecase{
-		repository:  repository.NewRoomRepository(),
+		repository:  repository.NewRepository(),
 		gameStarted: map[int]chan bool{},
 	}
 }
