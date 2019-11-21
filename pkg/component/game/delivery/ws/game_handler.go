@@ -37,7 +37,7 @@ func (h GameHandler) sendEvent(c *websocket.Conn, event model.GameEvent) error {
 
 func (h GameHandler) sendError(c *websocket.Conn, message string) error {
 	body := map[string]interface{}{
-		"type":    model.GameEventError,
+		"type":    game.EventError,
 		"message": message,
 	}
 	return c.WriteJSON(body)
@@ -113,7 +113,7 @@ func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
 		return h.sendError(c, err.Error())
 	}
 	return h.sendEvent(c, map[string]interface{}{
-		"type":    model.GameEventStart,
+		"type":    game.EventStart,
 		"players": h.convertPlayersToOutput(h.gameUsecase.GetPlayers(userID)),
 		"foods":   h.convertFoodToOutput(h.gameUsecase.GetFood(userID)),
 	})

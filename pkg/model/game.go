@@ -1,20 +1,9 @@
 package model
 
-const (
-	MaxPositionX = 4000
-	MaxPositionY = 2000
-)
-
 type Position struct {
 	X int `json:"x"`
 	Y int `json:"y"`
 }
-
-const (
-	GameEventStart = "start"
-	GameEventMove  = "move"
-	GameEventError = "error"
-)
 
 type GameEvent = map[string]interface{}
 

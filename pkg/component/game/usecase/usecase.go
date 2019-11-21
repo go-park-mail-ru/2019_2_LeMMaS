@@ -44,8 +44,8 @@ func (u *gameUsecase) StartGame(userID int) error {
 	u.repository.AddPlayer(room, model.Player{
 		UserID: userID,
 		Position: model.Position{
-			X: model.MaxPositionX / 2,
-			Y: model.MaxPositionY / 2,
+			X: game.MaxPositionX / 2,
+			Y: game.MaxPositionY / 2,
 		},
 	})
 	u.repository.AddFood(room, u.generateFood())
@@ -110,7 +110,7 @@ func (u *gameUsecase) processEvents(room *model.Room, userID int, events chan mo
 			}
 
 			events <- model.GameEvent{
-				"type": model.GameEventMove,
+				"type": game.EventMove,
 				"players": map[string]interface{}{
 					"id": userID,
 					"x":  player.Position.X,
@@ -132,11 +132,11 @@ func (u gameUsecase) getNextPlayerPosition(player *model.Player) model.Position 
 		X: int(math.Round(float64(oldPosition.X) + deltaX)),
 		Y: int(math.Round(float64(oldPosition.Y) + deltaY)),
 	}
-	if newPosition.X > model.MaxPositionX {
-		newPosition.X = model.MaxPositionX
+	if newPosition.X > game.MaxPositionX {
+		newPosition.X = game.MaxPositionX
 	}
-	if newPosition.Y > model.MaxPositionY {
-		newPosition.Y = model.MaxPositionY
+	if newPosition.Y > game.MaxPositionY {
+		newPosition.Y = game.MaxPositionY
 	}
 	if newPosition.X < 0 {
 		newPosition.X = 0
@@ -152,7 +152,7 @@ func (u gameUsecase) generateFood() []model.Food {
 	for i := 0; i < generatedFoodAmount; i++ {
 		foods = append(foods, model.Food{
 			ID:       i + 1,
-			Position: model.Position{X: rand.Intn(model.MaxPositionX), Y: rand.Intn(model.MaxPositionY)},
+			Position: model.Position{X: rand.Intn(game.MaxPositionX), Y: rand.Intn(game.MaxPositionY)},
 		})
 	}
 	return foods
@@ -161,7 +161,7 @@ func (u gameUsecase) generateFood() []model.Food {
 func (u gameUsecase) getEatenFood(room *model.Room, position model.Position) []model.Food {
 	return u.repository.GetFoodInRange(
 		room,
-		model.Position{X: position.X - playerSize, Y: position.Y - playerSize},
-		model.Position{X: position.X + playerSize, Y: position.Y + playerSize},
+		model.Position{X: position.X - playerSize/2, Y: position.Y - playerSize/2},
+		model.Position{X: position.X + playerSize/2, Y: position.Y + playerSize/2},
 	)
 }
