@@ -3,7 +3,6 @@ package ws
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user"
 	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
@@ -14,6 +13,9 @@ import (
 	"io/ioutil"
 	"net/http"
 )
+
+var errInvalidJSON = errors.New("invalid json")
+var errUnknownRequestType = errors.New("unknown request type")
 
 type GameHandler struct {
 	logger      logger.Logger
@@ -35,10 +37,10 @@ func (h GameHandler) sendEvent(c *websocket.Conn, event model.GameEvent) error {
 	return c.WriteJSON(event)
 }
 
-func (h GameHandler) sendError(c *websocket.Conn, message string) error {
+func (h GameHandler) sendError(c *websocket.Conn, err error) error {
 	body := map[string]interface{}{
 		"type":    game.EventError,
-		"message": message,
+		"message": err.Error(),
 	}
 	return c.WriteJSON(body)
 }
@@ -56,22 +58,16 @@ func (h GameHandler) handleGame(c echo.Context) error {
 
 	pCurrentUser, err := h.getCurrentUser(c)
 	if err != nil {
-		h.sendError(conn, err.Error())
+		h.sendError(conn, err)
 		return nil
 	}
 	currentUser := *pCurrentUser
 	userID := currentUser.ID
 
-	go func() {
-		events := h.gameUsecase.GetEventsStream(userID)
-		for event := range events {
-			h.sendEvent(conn, event)
-		}
-	}()
-
 	for {
 		err := h.processRequest(userID, conn)
 		if err != nil {
+			h.gameUsecase.StopGame(userID)
 			return nil
 		}
 	}
@@ -92,7 +88,7 @@ func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
 	}
 	request := request{}
 	if err := json.Unmarshal(requestBytes, &request); err != nil {
-		return h.sendError(c, "invalid json")
+		return h.sendError(c, errInvalidJSON)
 	}
 	switch request.Type {
 	case "start":
@@ -104,16 +100,28 @@ func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
 	case "speed":
 		return h.processSetSpeed(userID, c, requestBytes)
 	default:
-		return h.sendError(c, "unknown request type")
+		return h.sendError(c, errUnknownRequestType)
 	}
 }
 
 func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
-	if !h.gameUsecase.GameAlreadyStarted(userID) {
-		if err := h.gameUsecase.StartGame(userID); err != nil {
-			return h.sendError(c, err.Error())
-		}
+	if err := h.gameUsecase.StartGame(userID); err != nil {
+		return h.sendError(c, err)
 	}
+	go func() {
+		events, err := h.gameUsecase.ListenEvents(userID)
+		if err != nil {
+			h.sendError(c, err)
+			return
+		}
+		for event := range events {
+			err := h.sendEvent(c, event)
+			if err != nil {
+				h.gameUsecase.StopListenEvents(userID)
+				break
+			}
+		}
+	}()
 	return h.sendEvent(c, map[string]interface{}{
 		"type":    game.EventStart,
 		"players": h.convertPlayersToOutput(h.gameUsecase.GetPlayers(userID)),
@@ -124,7 +132,7 @@ func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
 func (h GameHandler) processGameStop(userID int, c *websocket.Conn) error {
 	err := h.gameUsecase.StopGame(userID)
 	if err != nil {
-		return h.sendError(c, err.Error())
+		return h.sendError(c, err)
 	}
 	return h.sendEvent(c, map[string]interface{}{
 		"type": game.EventStop,
@@ -138,11 +146,11 @@ type directionRequest struct {
 func (h GameHandler) processSetDirection(userID int, c *websocket.Conn, data []byte) error {
 	request := directionRequest{}
 	if err := json.Unmarshal(data, &request); err != nil {
-		return h.sendError(c, "invalid json")
+		return h.sendError(c, errInvalidJSON)
 	}
 	err := h.gameUsecase.SetDirection(userID, request.Direction)
 	if err != nil {
-		return h.sendError(c, err.Error())
+		return h.sendError(c, err)
 	}
 	return nil
 }
@@ -154,11 +162,11 @@ type speedRequest struct {
 func (h GameHandler) processSetSpeed(userID int, c *websocket.Conn, data []byte) error {
 	request := speedRequest{}
 	if err := json.Unmarshal(data, &request); err != nil {
-		return h.sendError(c, "invalid json")
+		return h.sendError(c, errInvalidJSON)
 	}
 	err := h.gameUsecase.SetSpeed(userID, request.Speed)
 	if err != nil {
-		return h.sendError(c, err.Error())
+		return h.sendError(c, err)
 	}
 	return nil
 }
@@ -166,11 +174,11 @@ func (h GameHandler) processSetSpeed(userID int, c *websocket.Conn, data []byte)
 func (h GameHandler) getCurrentUser(c echo.Context) (*model.User, error) {
 	sessionIDCookie, err := c.Cookie(httpDelivery.SessionIDCookieName)
 	if err != nil {
-		return nil, fmt.Errorf("no session cookie")
+		return nil, errors.New("no session cookie")
 	}
 	currentUser, _ := h.userUsecase.GetUserBySessionID(sessionIDCookie.Value)
 	if currentUser == nil {
-		return nil, fmt.Errorf("invalid session id")
+		return nil, errors.New("invalid session id")
 	}
 	return currentUser, nil
 }

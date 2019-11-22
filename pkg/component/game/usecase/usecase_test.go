@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/repository"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/test/mock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -12,9 +13,9 @@ var userID = 1
 
 func newTestGameUsecase() gameUsecase {
 	return gameUsecase{
+		logger:           mock.NewMockLogger(),
 		repository:       repository.NewRepository(),
 		roomsIDsByUserID: map[int]int{},
-		gameStarted:      map[int]chan bool{},
 	}
 }
 

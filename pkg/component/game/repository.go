@@ -8,9 +8,12 @@ type Repository interface {
 	GetRoomByID(id int) *model.Room
 	DeleteRoom(id int) error
 
-	AddPlayer(room *model.Room, player model.Player)
-	AddFood(room *model.Room, food []model.Food)
-	GetFoodInRange(room *model.Room, topLeftPoint, bottomRightPoint model.Position) []model.Food
+	AddPlayer(roomID int, player model.Player) error
+	DeletePlayer(roomID, userID int) error
+
+	AddFood(roomID int, food []model.Food) error
+	DeleteFood(roomID int, foodIDs []int) error
+	GetFoodInRange(roomID int, topLeftPoint, bottomRightPoint model.Position) ([]int, error)
 
 	SetDirection(roomID int, userID int, direction int) error
 	SetSpeed(roomID int, userID int, speed int) error

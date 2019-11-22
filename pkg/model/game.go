@@ -20,7 +20,7 @@ type Food struct {
 }
 
 type Room struct {
-	ID          int
-	PlayersByID map[int]*Player
-	FoodByID    map[int]Food
+	ID      int
+	Players map[int]*Player
+	Food    map[int]Food
 }

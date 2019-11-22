@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"fmt"
+	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/paulmach/orb"
@@ -9,16 +9,16 @@ import (
 )
 
 type repository struct {
-	roomsByID         map[int]*model.Room
-	roomsIDsByUserID  map[int]int
-	foodIndexByRoomID map[int]*quadtree.Quadtree
+	rooms     map[int]*model.Room
+	foodIndex map[int]*quadtree.Quadtree
 }
+
+var ErrRoomNotFound = errors.New("room not found")
 
 func NewRepository() game.Repository {
 	return &repository{
-		roomsByID:         map[int]*model.Room{},
-		roomsIDsByUserID:  map[int]int{},
-		foodIndexByRoomID: map[int]*quadtree.Quadtree{},
+		rooms:     map[int]*model.Room{},
+		foodIndex: map[int]*quadtree.Quadtree{},
 	}
 }
 
@@ -35,12 +35,12 @@ var roomIDCounter = 0
 func (r *repository) CreateRoom() *model.Room {
 	roomIDCounter++
 	room := model.Room{
-		ID:          roomIDCounter,
-		PlayersByID: map[int]*model.Player{},
-		FoodByID:    map[int]model.Food{},
+		ID:      roomIDCounter,
+		Players: map[int]*model.Player{},
+		Food:    map[int]model.Food{},
 	}
-	r.roomsByID[room.ID] = &room
-	r.foodIndexByRoomID[room.ID] = quadtree.New(orb.Bound{
+	r.rooms[room.ID] = &room
+	r.foodIndex[room.ID] = quadtree.New(orb.Bound{
 		Min: orb.Point{0, 0},
 		Max: orb.Point{game.MaxPositionX, game.MaxPositionY},
 	})
@@ -48,7 +48,7 @@ func (r *repository) CreateRoom() *model.Room {
 }
 
 func (r repository) GetRoomByID(id int) *model.Room {
-	room, ok := r.roomsByID[id]
+	room, ok := r.rooms[id]
 	if !ok {
 		return nil
 	}
@@ -56,64 +56,103 @@ func (r repository) GetRoomByID(id int) *model.Room {
 }
 
 func (r repository) GetAllRooms() []*model.Room {
-	rooms := make([]*model.Room, 0, len(r.roomsByID))
-	for _, room := range r.roomsByID {
+	rooms := make([]*model.Room, 0, len(r.rooms))
+	for _, room := range r.rooms {
 		rooms = append(rooms, room)
 	}
 	return rooms
 }
 
 func (r *repository) DeleteRoom(id int) error {
-	delete(r.roomsByID, id)
+	if !r.roomExists(id) {
+		return ErrRoomNotFound
+	}
+	delete(r.rooms, id)
 	return nil
 }
 
-func (r *repository) AddPlayer(room *model.Room, player model.Player) {
-	r.roomsByID[room.ID].PlayersByID[player.UserID] = &player
-}
-
-func (r *repository) AddFood(room *model.Room, foods []model.Food) {
-	for _, food := range foods {
-		r.roomsByID[room.ID].FoodByID[food.ID] = food
-		r.foodIndexByRoomID[room.ID].Add(foodWrapper{food})
+func (r *repository) AddPlayer(roomID int, player model.Player) error {
+	if !r.roomExists(roomID) {
+		return ErrRoomNotFound
 	}
+	r.rooms[roomID].Players[player.UserID] = &player
+	return nil
 }
 
-func (r *repository) GetFoodInRange(room *model.Room, topLeftPoint, bottomRightPoint model.Position) []model.Food {
-	wrappers := r.foodIndexByRoomID[room.ID].InBound(nil, orb.Bound{
+func (r *repository) DeletePlayer(roomID, userID int) error {
+	if !r.roomExists(roomID) {
+		return ErrRoomNotFound
+	}
+	delete(r.rooms[roomID].Players, userID)
+	return nil
+}
+
+func (r *repository) AddFood(roomID int, foods []model.Food) error {
+	if !r.roomExists(roomID) {
+		return ErrRoomNotFound
+	}
+	for _, food := range foods {
+		r.rooms[roomID].Food[food.ID] = food
+		r.foodIndex[roomID].Add(foodWrapper{food})
+	}
+	return nil
+}
+
+func (r *repository) DeleteFood(roomID int, foodIDs []int) error {
+	if !r.roomExists(roomID) {
+		return ErrRoomNotFound
+	}
+	for _, id := range foodIDs {
+		food := r.rooms[roomID].Food[id]
+		r.foodIndex[roomID].Remove(foodWrapper{food}, nil)
+		delete(r.rooms[roomID].Food, id)
+	}
+	return nil
+}
+
+func (r *repository) GetFoodInRange(roomID int, topLeftPoint, bottomRightPoint model.Position) ([]int, error) {
+	if _, ok := r.foodIndex[roomID]; !ok {
+		return nil, ErrRoomNotFound
+	}
+	wrappers := r.foodIndex[roomID].InBound(nil, orb.Bound{
 		Min: orb.Point{float64(topLeftPoint.X), float64(topLeftPoint.Y)},
 		Max: orb.Point{float64(bottomRightPoint.X), float64(bottomRightPoint.Y)},
 	})
-	foods := make([]model.Food, 0, len(wrappers))
+	foods := make([]int, 0, len(wrappers))
 	for _, wrapper := range wrappers {
-		foods = append(foods, wrapper.(foodWrapper).food)
+		foods = append(foods, wrapper.(foodWrapper).food.ID)
 	}
-	return foods
+	return foods, nil
 }
 
 func (r *repository) SetDirection(roomID int, userID int, direction int) error {
 	room := r.GetRoomByID(roomID)
 	if room == nil {
-		return fmt.Errorf("room with id %v not found", roomID)
+		return ErrRoomNotFound
 	}
-	room.PlayersByID[userID].Direction = direction
+	room.Players[userID].Direction = direction
 	return nil
 }
 
 func (r *repository) SetSpeed(roomID int, userID int, speed int) error {
 	room := r.GetRoomByID(roomID)
 	if room == nil {
-		return fmt.Errorf("room with id %v not found", roomID)
+		return ErrRoomNotFound
 	}
-	room.PlayersByID[userID].Speed = speed
+	room.Players[userID].Speed = speed
 	return nil
 }
 
 func (r *repository) SetPosition(roomID int, userID int, position model.Position) error {
 	room := r.GetRoomByID(roomID)
 	if room == nil {
-		return fmt.Errorf("room with id %v not found", roomID)
+		return ErrRoomNotFound
 	}
-	room.PlayersByID[userID].Position = position
+	room.Players[userID].Position = position
 	return nil
+}
+
+func (r *repository) roomExists(roomID int) bool {
+	_, exists := r.rooms[roomID]
+	return exists
 }
