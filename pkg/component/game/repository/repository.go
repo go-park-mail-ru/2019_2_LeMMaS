@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
@@ -33,7 +32,7 @@ func (f foodWrapper) Point() orb.Point {
 
 var roomIDCounter = 0
 
-func (r *repository) CreateRoom(userID int) *model.Room {
+func (r *repository) CreateRoom() *model.Room {
 	roomIDCounter++
 	room := model.Room{
 		ID:          roomIDCounter,
@@ -41,7 +40,6 @@ func (r *repository) CreateRoom(userID int) *model.Room {
 		FoodByID:    map[int]model.Food{},
 	}
 	r.roomsByID[room.ID] = &room
-	r.roomsIDsByUserID[userID] = room.ID
 	r.foodIndexByRoomID[room.ID] = quadtree.New(orb.Bound{
 		Min: orb.Point{0, 0},
 		Max: orb.Point{game.MaxPositionX, game.MaxPositionY},
@@ -65,13 +63,8 @@ func (r repository) GetAllRooms() []*model.Room {
 	return rooms
 }
 
-func (r *repository) DeleteRoom(userID int) error {
-	roomID, ok := r.roomsIDsByUserID[userID]
-	if !ok {
-		return errors.New("stop: no game for this user to stop")
-	}
-	delete(r.roomsByID, roomID)
-	delete(r.roomsIDsByUserID, userID)
+func (r *repository) DeleteRoom(id int) error {
+	delete(r.roomsByID, id)
 	return nil
 }
 

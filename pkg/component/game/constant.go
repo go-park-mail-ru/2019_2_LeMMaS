@@ -5,6 +5,7 @@ const (
 	MaxPositionY = 900
 
 	EventStart = "start"
+	EventStop  = "stop"
 	EventMove  = "move"
 	EventError = "error"
 )

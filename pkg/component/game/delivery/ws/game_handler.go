@@ -72,7 +72,6 @@ func (h GameHandler) handleGame(c echo.Context) error {
 	for {
 		err := h.processRequest(userID, conn)
 		if err != nil {
-			h.gameUsecase.StopGame(userID)
 			return nil
 		}
 	}
@@ -98,6 +97,8 @@ func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
 	switch request.Type {
 	case "start":
 		return h.processGameStart(userID, c)
+	case "stop":
+		return h.processGameStop(userID, c)
 	case "direction":
 		return h.processSetDirection(userID, c, requestBytes)
 	case "speed":
@@ -108,14 +109,25 @@ func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
 }
 
 func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
-	err := h.gameUsecase.StartGame(userID)
-	if err != nil {
-		return h.sendError(c, err.Error())
+	if !h.gameUsecase.GameAlreadyStarted(userID) {
+		if err := h.gameUsecase.StartGame(userID); err != nil {
+			return h.sendError(c, err.Error())
+		}
 	}
 	return h.sendEvent(c, map[string]interface{}{
 		"type":    game.EventStart,
 		"players": h.convertPlayersToOutput(h.gameUsecase.GetPlayers(userID)),
 		"foods":   h.convertFoodToOutput(h.gameUsecase.GetFood(userID)),
+	})
+}
+
+func (h GameHandler) processGameStop(userID int, c *websocket.Conn) error {
+	err := h.gameUsecase.StopGame(userID)
+	if err != nil {
+		return h.sendError(c, err.Error())
+	}
+	return h.sendEvent(c, map[string]interface{}{
+		"type": game.EventStop,
 	})
 }
 

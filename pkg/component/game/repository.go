@@ -3,10 +3,10 @@ package game
 import "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 
 type Repository interface {
-	CreateRoom(userID int) *model.Room
+	CreateRoom() *model.Room
 	GetAllRooms() []*model.Room
 	GetRoomByID(id int) *model.Room
-	DeleteRoom(userID int) error
+	DeleteRoom(id int) error
 
 	AddPlayer(room *model.Room, player model.Player)
 	AddFood(room *model.Room, food []model.Food)

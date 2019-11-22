@@ -4,6 +4,7 @@ import "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 
 type Usecase interface {
 	StartGame(userID int) error
+	GameAlreadyStarted(userID int) bool
 	StopGame(userID int) error
 
 	SetDirection(userID int, direction int) error

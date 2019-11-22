@@ -40,7 +40,7 @@ func NewGameUsecase(repository game.Repository) game.Usecase {
 }
 
 func (u *gameUsecase) StartGame(userID int) error {
-	if _, ok := u.roomsIDsByUserID[userID]; ok {
+	if u.getPlayerRoom(userID) != nil {
 		return errors.New("start: game already started for this user")
 	}
 	room := u.placePlayerInRoom(userID)
@@ -60,8 +60,17 @@ func (u *gameUsecase) StartGame(userID int) error {
 	return nil
 }
 
+func (u *gameUsecase) GameAlreadyStarted(userID int) bool {
+	return u.getPlayerRoom(userID) != nil
+}
+
 func (u *gameUsecase) StopGame(userID int) error {
-	return u.repository.DeleteRoom(userID)
+	roomID, ok := u.roomsIDsByUserID[userID]
+	if !ok {
+		return errors.New("stop: no game for this user to stop")
+	}
+	delete(u.roomsIDsByUserID, userID)
+	return u.repository.DeleteRoom(roomID)
 }
 
 func (u *gameUsecase) SetDirection(userID int, direction int) error {
@@ -148,11 +157,16 @@ func (u *gameUsecase) placePlayerInRoom(userID int) *model.Room {
 	}
 	availableRooms := u.repository.GetAllRooms()
 	if len(availableRooms) == 0 {
-		room := u.repository.CreateRoom(userID)
-		u.roomsIDsByUserID[userID] = room.ID
-		return room
+		room = u.repository.CreateRoom()
+	} else {
+		room = u.getAvailableRoom(availableRooms)
 	}
-	return availableRooms[0]
+	u.roomsIDsByUserID[userID] = room.ID
+	return room
+}
+
+func (u gameUsecase) getAvailableRoom(rooms []*model.Room) *model.Room {
+	return rooms[0]
 }
 
 func (u gameUsecase) getNextPlayerPosition(player *model.Player) model.Position {
