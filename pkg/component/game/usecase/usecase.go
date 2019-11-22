@@ -15,7 +15,7 @@ import (
 const (
 	maxSpeed   = 100
 	minSpeed   = 0
-	speedKoeff = float64(eventStreamRate / time.Millisecond / 500)
+	speedKoeff = float64(eventStreamRate/time.Millisecond) / 300
 
 	maxDirection = 359
 	minDirection = 0
@@ -24,7 +24,7 @@ const (
 
 	generatedFoodAmount = 10
 
-	eventStreamRate = 600 * time.Millisecond
+	eventStreamRate = 100 * time.Millisecond
 )
 
 var (

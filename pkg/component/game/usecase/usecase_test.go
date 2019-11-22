@@ -62,6 +62,7 @@ func TestGameUsecase_PlayerMove(t *testing.T) {
 	assert.Equal(t, testUserID, player["id"])
 	assert.Greater(t, player["x"], initialPosition.X)
 	assert.Equal(t, player["y"], initialPosition.Y)
+	t.Logf("player moved from (%v, %v) to (%v, %v), time %v", initialPosition.X, initialPosition.Y, player["x"], player["y"], eventStreamRate)
 }
 
 //func TestGameUsecase_EatFood(t *testing.T) {
@@ -105,7 +106,7 @@ func (s gameUsecaseTestSuite) ExpectRepo() *game.MockRepositoryMockRecorder {
 }
 
 func (s *gameUsecaseTestSuite) initTestGame() {
-	room := s.getTestRoom()
+	room := s.newTestRoom()
 	s.ExpectRepo().GetAllRooms().Return([]*model.Room{})
 	s.ExpectRepo().CreateRoom().Return(&room)
 	s.ExpectRepo().AddPlayer(room.ID, gomock.Any()).Return(nil)
@@ -116,8 +117,13 @@ func (s *gameUsecaseTestSuite) initTestGame() {
 	s.ExpectRepo().GetFoodInRange(room.ID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
 }
 
-func (s gameUsecaseTestSuite) getTestRoom() model.Room {
-	player := model.Player{UserID: testUserID, Direction: 90, Speed: 100, Position: model.Position{X: game.MaxPositionX / 2, Y: game.MaxPositionY / 2}}
+func (s gameUsecaseTestSuite) newTestRoom() model.Room {
+	player := model.Player{
+		UserID:    testUserID,
+		Direction: 90,
+		Speed:     100,
+		Position:  model.Position{X: game.MaxPositionX / 2, Y: game.MaxPositionY / 2},
+	}
 	food1 := model.Food{ID: 1, Position: model.Position{X: 10, Y: 10}}
 	food2 := model.Food{ID: 2, Position: model.Position{X: 8, Y: 15}}
 	food3 := model.Food{ID: 3, Position: model.Position{X: 20, Y: 50}}
