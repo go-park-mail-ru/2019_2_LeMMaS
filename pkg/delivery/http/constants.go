@@ -10,6 +10,8 @@ const (
 
 	ApiV1GamePath = ApiV1Private + "/game"
 
+	ApiV1PrometheusPath = ApiV1Public + "/metrics"
+
 	ApiV1UserListPath            = ApiV1Public + "/user/list"
 	ApiV1UserRegisterPath        = ApiV1Public + "/user/register"
 	ApiV1UserLoginPath           = ApiV1Public + "/user/login"
