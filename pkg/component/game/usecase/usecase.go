@@ -24,7 +24,7 @@ const (
 
 	generatedFoodAmount = 10
 
-	eventStreamRate = 100 * time.Millisecond
+	eventStreamRate = 600 * time.Millisecond
 )
 
 var (
@@ -142,35 +142,39 @@ func (u *gameUsecase) sendEvent(roomID int, event model.GameEvent) {
 func (u *gameUsecase) startRoomEventsLoop(room *model.Room) {
 	go func() {
 		for range time.Tick(eventStreamRate) {
-			u.processPlayersMove(room)
+			err := u.processPlayersMove(room)
+			if err != nil {
+				return
+			}
 		}
 	}()
 }
 
-func (u *gameUsecase) processPlayersMove(room *model.Room) {
+func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 	for _, player := range room.Players {
 		newPosition := u.getNextPlayerPosition(player)
 		if newPosition != player.Position {
 			err := u.repository.SetPosition(room.ID, player.UserID, newPosition)
 			if err == repository.ErrRoomNotFound {
-				break
+				return err
 			}
 			eatenFoodIDs, err := u.eatFood(room.ID, newPosition)
 			if err == repository.ErrRoomNotFound {
-				break
+				return err
 			}
 			event := model.GameEvent{
 				"type": game.EventMove,
 				"player": map[string]interface{}{
 					"id": player.UserID,
-					"x":  player.Position.X,
-					"y":  player.Position.Y,
+					"x":  newPosition.X,
+					"y":  newPosition.Y,
 				},
 				"eatenFood": eatenFoodIDs,
 			}
 			u.sendEvent(room.ID, event)
 		}
 	}
+	return nil
 }
 
 func (u *gameUsecase) getPlayerRoom(userID int) *model.Room {

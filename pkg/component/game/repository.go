@@ -1,3 +1,5 @@
+//go:generate mockgen -source=$GOFILE -destination=repository_mock.go -package=$GOPACKAGE
+
 package game
 
 import "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
