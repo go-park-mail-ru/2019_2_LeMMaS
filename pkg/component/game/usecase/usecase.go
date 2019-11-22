@@ -20,7 +20,7 @@ const (
 	maxDirection = 359
 	minDirection = 0
 
-	playerSize = 500
+	playerSize = 40
 
 	generatedFoodAmount = 10
 
