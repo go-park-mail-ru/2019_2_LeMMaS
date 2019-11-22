@@ -205,7 +205,7 @@ func (u gameUsecase) getNextPlayerPosition(player *model.Player) model.Position 
 	directionRadians := float64(player.Direction) * math.Pi / 180
 	distance := float64(player.Speed) * speedKoeff
 	deltaX := distance * math.Sin(directionRadians)
-	deltaY := distance * math.Cos(directionRadians)
+	deltaY := -distance * math.Cos(directionRadians)
 	oldPosition := player.Position
 	newPosition := model.Position{
 		X: int(math.Round(float64(oldPosition.X) + deltaX)),
