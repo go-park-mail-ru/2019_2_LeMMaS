@@ -24,7 +24,7 @@ const (
 
 	generatedFoodAmount = 10
 
-	eventStreamRate = 1000 * time.Millisecond
+	eventStreamRate = 100 * time.Millisecond
 )
 
 var (
