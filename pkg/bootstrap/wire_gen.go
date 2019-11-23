@@ -6,15 +6,16 @@
 package bootstrap
 
 import (
-	http2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
+	http3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
 	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
-	http3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
+	http4 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	usecase3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
+	http2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/monitoring/prometheus/delivery/http"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
@@ -23,24 +24,34 @@ import (
 
 // Injectors from wire.go:
 
-func NewMiddleware() (http.CommonMiddlewaresHandler, error) {
+func NewPrometheusHandler() (*http.PrometheusHandler, error) {
 	echo := NewEcho()
 	logger, err := NewLogger()
 	if err != nil {
-		return http.CommonMiddlewaresHandler{}, err
+		return nil, err
 	}
-	commonMiddlewaresHandler := http.NewCommonMiddlewaresHandler(echo, logger)
+	prometheusHandler := http.NewPrometheusHandler(echo, logger)
+	return prometheusHandler, nil
+}
+
+func NewMiddleware() (http2.CommonMiddlewaresHandler, error) {
+	echo := NewEcho()
+	logger, err := NewLogger()
+	if err != nil {
+		return http2.CommonMiddlewaresHandler{}, err
+	}
+	commonMiddlewaresHandler := http2.NewCommonMiddlewaresHandler(echo, logger)
 	return commonMiddlewaresHandler, nil
 }
 
-func NewAccessHandler() (*http2.AccessHandler, error) {
+func NewAccessHandler() (*http3.AccessHandler, error) {
 	echo := NewEcho()
 	csrfUsecase := usecase.NewCSRFUsecase()
 	logger, err := NewLogger()
 	if err != nil {
 		return nil, err
 	}
-	accessHandler := http2.NewAccessHandler(echo, csrfUsecase, logger)
+	accessHandler := http3.NewAccessHandler(echo, csrfUsecase, logger)
 	return accessHandler, nil
 }
 
@@ -67,7 +78,7 @@ func NewGameHandler() (*ws.GameHandler, error) {
 	return gameHandler, nil
 }
 
-func NewUserHandler() (*http3.UserHandler, error) {
+func NewUserHandler() (*http4.UserHandler, error) {
 	echo := NewEcho()
 	db, err := NewDB()
 	if err != nil {
@@ -85,7 +96,7 @@ func NewUserHandler() (*http3.UserHandler, error) {
 	}
 	sessionRepository := repository.NewSessionRepository(conn, logger)
 	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository)
-	userHandler := http3.NewUserHandler(echo, userUsecase, logger)
+	userHandler := http4.NewUserHandler(echo, userUsecase, logger)
 	return userHandler, nil
 }
 

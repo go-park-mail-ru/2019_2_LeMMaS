@@ -2,6 +2,7 @@ package prometheus
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"time"
 )
 
 var (
@@ -10,7 +11,7 @@ var (
 )
 
 var (
-	usersCount = prometheus.NewCounter(
+	usersRegistered = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name:		"count of users",
 		})
@@ -31,9 +32,16 @@ var (
 )
 
 func init() {
-	prometheus.MustRegister(usersCount)
+	prometheus.MustRegister(usersRegistered)
 	prometheus.MustRegister(rpcDurations)
 	prometheus.MustRegister(rpcDurationsHistogram)
 	// Add Go module build info.
 	prometheus.MustRegister(prometheus.NewBuildInfoCollector())
+
+	go func() {
+		for {
+			usersRegistered.Inc()
+			time.Sleep(1000 * time.Millisecond)
+		}
+	}()
 }

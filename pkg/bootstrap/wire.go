@@ -8,6 +8,7 @@ import (
 	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	gameWS "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
 	gameUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
+	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/monitoring/prometheus/delivery/http"
 	userHTTP "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	userRepo "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
@@ -19,6 +20,15 @@ import (
 	"github.com/labstack/echo"
 	"os"
 )
+
+func NewPrometheusHandler() (*prometheus.PrometheusHandler, error) {
+	wire.Build(
+		prometheus.NewPrometheusHandler,
+		NewEcho,
+		NewLogger,
+	)
+	return &prometheus.PrometheusHandler{}, nil
+}
 
 func NewMiddleware() (http.CommonMiddlewaresHandler, error) {
 	wire.Build(
