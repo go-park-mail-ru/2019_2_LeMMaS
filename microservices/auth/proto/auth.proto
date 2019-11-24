@@ -6,11 +6,11 @@ package auth;
 service Auth {
     rpc CreateSession(Session) returns (SessionID) {}
     rpc CheckSession(SessionID) returns (Session) {}
-    rpc DeleteSession(SessionID) returns (Nothing) {}
+    rpc DeleteSession(SessionID) returns (Error) {}
 }
 
-message Nothing {
-    bool nothing = 1;
+message Error {
+    bool error = 1;
 }
 
 message SessionID {
