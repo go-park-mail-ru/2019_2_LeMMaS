@@ -14,7 +14,7 @@ message Nothing {
 }
 
 message SessionID {
-    string ID = 1;
+    string id = 1;
 }
 
 message Session {

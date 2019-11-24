@@ -3,5 +3,5 @@ syntax = "proto3";
 package game;
 
 service Game {
-    rpc Gaming(Request) returns (Response) {}
+    //rpc Gaming(Request) returns (Response) {}
 }

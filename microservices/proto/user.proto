@@ -3,24 +3,35 @@ syntax = "proto3";
 package user;
 
 service User {
-    rpc GetUser(Request) returns (Response) {}
-    rpc RegisterUser(Request) returns (Response) {}
-    rpc UpdateUser(Request) returns (Response) {}
-    rpc GetUsersResults(Request) returns (Response) {}
+    rpc GetUser(SessionID) returns (Error) {}
+    rpc RegisterUser(UserData) returns (Error) {}
+    rpc UpdateUser(UserToUpdate) returns (Error) {}
+    rpc GetUsersResults(UserName) returns (Users) {}
 }
 
-message GetUser {
-
-
-
-message RegisterUser {
-
+message UserData {
+    string email = 1;
+    string password = 2;
+    string name = 3;
 }
 
-message UpdateUser {
-
+message Error {
+    string error = 1;
 }
 
-message GetUsersResults {
+message SessionID {
+    string id = 1;
+}
 
+message UserToUpdate {
+    UserData user = 1;
+    SessionID sessionID = 2;
+}
+
+message UserName {
+    string name = 1;
+}
+
+message Users {
+    repeated UserData user = 1;
 }
