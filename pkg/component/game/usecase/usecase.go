@@ -248,11 +248,14 @@ func (u gameUsecase) getNextPlayerPosition(player *model.Player) model.Position 
 	return newPosition
 }
 
+var foodIDCounter = 0
+
 func (u gameUsecase) generateFood() []model.Food {
 	foods := make([]model.Food, 0, generatedFoodAmount)
 	for i := 0; i < generatedFoodAmount; i++ {
+		foodIDCounter++
 		foods = append(foods, model.Food{
-			ID:       i + 1,
+			ID:       foodIDCounter,
 			Position: model.Position{X: rand.Intn(game.MaxPositionX), Y: rand.Intn(game.MaxPositionY)},
 		})
 	}
