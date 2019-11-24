@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/repository"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"math"
@@ -35,7 +34,12 @@ type gameUsecase struct {
 	logger           logger.Logger
 	repository       game.Repository
 	roomsIDsByUserID map[int]int
-	eventsListeners  map[int]map[int]chan model.GameEvent
+	events           map[int]roomEvents
+}
+
+type roomEvents struct {
+	listeners map[int]chan model.GameEvent
+	stop      chan bool
 }
 
 func NewGameUsecase(repository game.Repository, logger logger.Logger) game.Usecase {
@@ -43,7 +47,7 @@ func NewGameUsecase(repository game.Repository, logger logger.Logger) game.Useca
 		logger:           logger,
 		repository:       repository,
 		roomsIDsByUserID: map[int]int{},
-		eventsListeners:  map[int]map[int]chan model.GameEvent{},
+		events:           map[int]roomEvents{},
 	}
 }
 
@@ -51,7 +55,8 @@ func (u *gameUsecase) StartGame(userID int) error {
 	if u.getPlayerRoom(userID) != nil {
 		return errors.New("start: game already started for this user")
 	}
-	room := u.placePlayerInRoom(userID)
+	room := u.getOrCreateRoom()
+	u.roomsIDsByUserID[userID] = room.ID
 	err := u.repository.AddPlayer(room.ID, model.Player{
 		UserID: userID,
 		Position: model.Position{
@@ -114,10 +119,15 @@ func (u *gameUsecase) ListenEvents(userID int) (chan model.GameEvent, error) {
 		return nil, errGameNotStarted
 	}
 	listener := make(chan model.GameEvent)
-	if _, ok := u.eventsListeners[room.ID]; !ok {
-		u.eventsListeners[room.ID] = map[int]chan model.GameEvent{}
+	if _, ok := u.events[room.ID]; !ok {
+		stop := make(chan bool)
+		u.events[room.ID] = roomEvents{
+			listeners: map[int]chan model.GameEvent{},
+			stop:      stop,
+		}
+		u.startEventsLoop(room, stop)
 	}
-	u.eventsListeners[room.ID][userID] = listener
+	u.events[room.ID].listeners[userID] = listener
 	return listener, nil
 }
 
@@ -126,28 +136,39 @@ func (u *gameUsecase) StopListenEvents(userID int) error {
 	if room == nil {
 		return errGameNotStarted
 	}
-	if _, ok := u.eventsListeners[room.ID]; !ok {
+	if _, ok := u.events[room.ID]; !ok {
 		return errors.New("no event listeners")
 	}
-	delete(u.eventsListeners[room.ID], userID)
+	if _, ok := u.events[room.ID].listeners[userID]; !ok {
+		return errors.New("no event listeners")
+	}
+	delete(u.events[room.ID].listeners, userID)
+	if len(u.events[room.ID].listeners) == 0 {
+		u.stopEventsLoop(room)
+	}
 	return nil
 }
 
-func (u *gameUsecase) sendEvent(roomID int, event model.GameEvent) {
-	for _, listener := range u.eventsListeners[roomID] {
-		listener <- event
-	}
-}
-
-func (u *gameUsecase) startRoomEventsLoop(room *model.Room) {
+func (u *gameUsecase) startEventsLoop(room *model.Room, stop chan bool) error {
 	go func() {
-		for range time.Tick(eventStreamRate) {
-			err := u.processPlayersMove(room)
-			if err != nil {
+		tick := time.Tick(eventStreamRate)
+		for {
+			select {
+			case <-tick:
+				err := u.processPlayersMove(room)
+				if err != nil {
+					return
+				}
+			case <-stop:
 				return
 			}
 		}
 	}()
+	return nil
+}
+
+func (u *gameUsecase) stopEventsLoop(room *model.Room) {
+	u.events[room.ID].stop <- true
 }
 
 func (u *gameUsecase) processPlayersMove(room *model.Room) error {
@@ -155,11 +176,11 @@ func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 		newPosition := u.getNextPlayerPosition(player)
 		if newPosition != player.Position {
 			err := u.repository.SetPosition(room.ID, player.UserID, newPosition)
-			if err == repository.ErrRoomNotFound {
+			if err != nil {
 				return err
 			}
 			eatenFoodIDs, err := u.eatFood(room.ID, newPosition)
-			if err == repository.ErrRoomNotFound {
+			if err != nil {
 				return err
 			}
 			event := model.GameEvent{
@@ -177,6 +198,12 @@ func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 	return nil
 }
 
+func (u *gameUsecase) sendEvent(roomID int, event model.GameEvent) {
+	for _, listener := range u.events[roomID].listeners {
+		listener <- event
+	}
+}
+
 func (u *gameUsecase) getPlayerRoom(userID int) *model.Room {
 	roomID, ok := u.roomsIDsByUserID[userID]
 	if !ok {
@@ -185,24 +212,15 @@ func (u *gameUsecase) getPlayerRoom(userID int) *model.Room {
 	return u.repository.GetRoomByID(roomID)
 }
 
-func (u *gameUsecase) placePlayerInRoom(userID int) *model.Room {
-	room := u.getPlayerRoom(userID)
-	if room != nil {
-		return room
-	}
+func (u *gameUsecase) getOrCreateRoom() *model.Room {
+	var room *model.Room
 	availableRooms := u.repository.GetAllRooms()
 	if len(availableRooms) == 0 {
 		room = u.repository.CreateRoom()
-		u.startRoomEventsLoop(room)
 	} else {
-		room = u.getAvailableRoom(availableRooms)
+		room = availableRooms[0]
 	}
-	u.roomsIDsByUserID[userID] = room.ID
 	return room
-}
-
-func (u gameUsecase) getAvailableRoom(rooms []*model.Room) *model.Room {
-	return rooms[0]
 }
 
 func (u gameUsecase) getNextPlayerPosition(player *model.Player) model.Position {

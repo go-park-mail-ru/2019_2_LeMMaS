@@ -16,7 +16,7 @@ import (
 const cookieExpiration = time.Hour * 10
 
 type HandlerTestSuite struct {
-	T             *testing.T
+	t             *testing.T
 	E             *echo.Echo
 	Request       *http.Request
 	Response      *httptest.ResponseRecorder
@@ -29,8 +29,8 @@ func NewHandlerTestSuite() *HandlerTestSuite {
 	}
 }
 
-func (s *HandlerTestSuite) SetTesting(t *testing.T) {
-	s.T = t
+func (s *HandlerTestSuite) StartTest(t *testing.T) {
+	s.t = t
 	s.E = echo.New()
 }
 
@@ -57,30 +57,30 @@ func (s *HandlerTestSuite) NewContext() echo.Context {
 }
 
 func (s HandlerTestSuite) TestOkResponse(expectedResponse string) {
-	assert.Equal(s.T, http.StatusOK, s.Response.Code, "unexpected response status")
+	assert.Equal(s.t, http.StatusOK, s.Response.Code, "unexpected response status")
 	s.testResponseBody(expectedResponse)
 	s.updateCookies()
 }
 
 func (s HandlerTestSuite) TestResponse(expectedResponse string, expectedCode int) {
-	assert.Equal(s.T, expectedCode, s.Response.Code, "unexpected response status")
+	assert.Equal(s.t, expectedCode, s.Response.Code, "unexpected response status")
 	s.testResponseBody(expectedResponse)
 	s.updateCookies()
 }
 
 func (s HandlerTestSuite) testResponseBody(expectedResponse string) {
 	actualBody := s.Response.Body.String()
-	assert.Equal(s.T, strings.TrimSpace(expectedResponse), strings.TrimSpace(actualBody), "unexpected response body")
+	assert.Equal(s.t, strings.TrimSpace(expectedResponse), strings.TrimSpace(actualBody), "unexpected response body")
 }
 
 func (s HandlerTestSuite) TestCookiePresent(cookieName string) {
 	_, present := s.CookiesByName[cookieName]
-	assert.True(s.T, present, fmt.Sprintf("cookie %v not found in response", cookieName))
+	assert.True(s.t, present, fmt.Sprintf("cookie %v not found in response", cookieName))
 }
 
 func (s HandlerTestSuite) TestCookieNotPresent(cookieName string) {
 	_, present := s.CookiesByName[cookieName]
-	assert.False(s.T, present, fmt.Sprintf("cookie %v must not be present in response", cookieName))
+	assert.False(s.t, present, fmt.Sprintf("cookie %v must not be present in response", cookieName))
 }
 
 func (s *HandlerTestSuite) Ok() string {

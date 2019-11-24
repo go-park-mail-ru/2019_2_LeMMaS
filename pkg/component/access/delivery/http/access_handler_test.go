@@ -15,7 +15,7 @@ import (
 var s = NewAccessHandlerTestSuite()
 
 func TestAccessHandler_HandleGetCSRFToken(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	s.ExpectUsecase().CreateTokenBySession(test.SessionID).Return(test.CSRFToken, nil)
 
@@ -26,7 +26,7 @@ func TestAccessHandler_HandleGetCSRFToken(t *testing.T) {
 }
 
 func TestAccessHandler_CsrfMiddleware(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	next := func(c echo.Context) error {
 		return c.String(http.StatusOK, "middleware passed")
@@ -56,7 +56,7 @@ func TestAccessHandler_CsrfMiddleware(t *testing.T) {
 }
 
 func TestCors(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	middleware := s.handler.corsMiddleware(func(c echo.Context) error {
 		return nil
@@ -97,8 +97,8 @@ func NewAccessHandlerTestSuite() *AccessHandlerTestSuite {
 	}
 }
 
-func (s *AccessHandlerTestSuite) SetTesting(t *testing.T) {
-	s.HandlerTestSuite.SetTesting(t)
+func (s *AccessHandlerTestSuite) StartTest(t *testing.T) {
+	s.HandlerTestSuite.StartTest(t)
 	s.usecase = access.NewMockCsrfUsecase(gomock.NewController(t))
 	logger := testMock.NewMockLogger()
 	s.handler = NewAccessHandler(s.E, s.usecase, logger)

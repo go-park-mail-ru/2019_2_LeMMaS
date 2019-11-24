@@ -15,14 +15,14 @@ import (
 var s = NewUserHandlerTestSuite()
 
 func TestUserHandler_HandleUserList(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	s.ExpectUsecase().GetAllUsers().Return([]model.User{{Name: "Ivan"}}, nil)
 	s.TestUserList(`{"status":"ok","body":{"users":[{"id":0,"email":"","name":"Ivan","avatar_path":""}]}}`)
 }
 
 func TestUserHandler_HandleUserRegister(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	user1 := model.User{ID: 1, Email: "testik1@mail.ru", Name: "Test The Best 1"}
 	s.ExpectUsecase().Register(user1.Email, test.Password, user1.Name).Return(nil)
@@ -50,7 +50,7 @@ func TestUserHandler_HandleUserRegister(t *testing.T) {
 }
 
 func TestUserHandler_HandleUserUpdate(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(test.SessionID, nil)
 	s.ExpectUsecase().GetUserBySessionID(test.SessionID).Return(&model.User{ID: 1}, nil)
@@ -65,7 +65,7 @@ func TestUserHandler_HandleUserUpdate(t *testing.T) {
 }
 
 func TestUserHandler_HandleUserLogin(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return("", nil)
 	s.TestUserLogin(
 		`{"email":"testik1@mail.ru","password":"ssc-tuatara"}`,
@@ -75,7 +75,7 @@ func TestUserHandler_HandleUserLogin(t *testing.T) {
 }
 
 func TestUserHandler_HandleUserLogout(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	sessionID := "sess"
 	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(sessionID, nil)
@@ -101,8 +101,8 @@ func NewUserHandlerTestSuite() *UserHandlerTestSuite {
 	}
 }
 
-func (s *UserHandlerTestSuite) SetTesting(t *testing.T) {
-	s.HandlerTestSuite.SetTesting(t)
+func (s *UserHandlerTestSuite) StartTest(t *testing.T) {
+	s.HandlerTestSuite.StartTest(t)
 	s.usecase = user.NewMockUsecase(gomock.NewController(t))
 	logger := testMock.NewMockLogger()
 	s.handler = NewUserHandler(s.E, s.usecase, logger)

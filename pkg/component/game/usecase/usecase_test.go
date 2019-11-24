@@ -10,65 +10,73 @@ import (
 )
 
 const (
-	testUserID     = 1
-	testRoomID     = 1
-	testFoodAmount = 3
-	testDirection  = 90
-	testSpeed      = 100
+	userID     = 1
+	roomID     = 1
+	foodAmount = 3
+	direction  = 90
+	speed      = 100
 )
 
-func TestGameUsecase_StartGame(t *testing.T) {
-	s := newGameUsecaseTestSuite(t)
-	s.ExpectRepo().GetFoodInRange(testRoomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
+var s = gameUsecaseTestSuite{}
 
-	err := s.usecase.StartGame(testUserID)
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(s.usecase.GetPlayers(testUserID)))
-	assert.Equal(t, testFoodAmount, len(s.usecase.GetFood(testUserID)))
+func TestGameUsecase_StartGame(t *testing.T) {
+	s.StartTest(t)
+	s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
+
+	assert.NoError(t, s.usecase.StartGame(userID))
+	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
+
+	assert.Equal(t, 1, len(s.usecase.GetPlayers(userID)))
+	assert.Equal(t, foodAmount, len(s.usecase.GetFood(userID)))
 }
 
 func TestGameUsecase_SetDirectionAndSpeed(t *testing.T) {
-	s := newGameUsecaseTestSuite(t)
-	s.ExpectRepo().GetFoodInRange(testRoomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
-	s.ExpectRepo().SetDirection(testRoomID, testUserID, testDirection).Return(nil)
-	s.ExpectRepo().SetSpeed(testRoomID, testUserID, testSpeed).Return(nil)
+	s.StartTest(t)
+	s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
+	s.ExpectRepo().SetDirection(roomID, userID, direction).Return(nil)
+	s.ExpectRepo().SetSpeed(roomID, userID, speed).Return(nil)
 
-	err := s.usecase.StartGame(testUserID)
-	assert.NoError(t, err)
-	assert.NoError(t, s.usecase.SetDirection(testUserID, testDirection))
-	assert.NoError(t, s.usecase.SetSpeed(testUserID, testSpeed))
-	player := s.usecase.GetPlayers(testUserID)[testUserID]
-	assert.Equal(t, testDirection, player.Direction)
-	assert.Equal(t, testSpeed, player.Speed)
+	assert.NoError(t, s.usecase.StartGame(userID))
+	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
+
+	assert.NoError(t, s.usecase.SetDirection(userID, direction))
+	assert.NoError(t, s.usecase.SetSpeed(userID, speed))
+	player := s.usecase.GetPlayers(userID)[userID]
+	assert.Equal(t, direction, player.Direction)
+	assert.Equal(t, speed, player.Speed)
 }
 
 func TestGameUsecase_PlayerMove(t *testing.T) {
-	s := newGameUsecaseTestSuite(t)
-	s.ExpectRepo().GetFoodInRange(testRoomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
+	s.StartTest(t)
+	s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
 
-	assert.NoError(t, s.usecase.StartGame(testUserID))
-	initialPosition := s.usecase.GetPlayers(testUserID)[testUserID].Position
-	events, err := s.usecase.ListenEvents(testUserID)
+	assert.NoError(t, s.usecase.StartGame(userID))
+	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
+
+	initialPosition := s.usecase.GetPlayers(userID)[userID].Position
+	events, err := s.usecase.ListenEvents(userID)
 	assert.NoError(t, err)
 	event := <-events
 	if !assert.Equal(t, game.EventMove, event["type"]) {
 		return
 	}
 	player := event["player"].(map[string]interface{})
-	assert.Equal(t, testUserID, player["id"])
+	assert.Equal(t, userID, player["id"])
 	assert.Greater(t, player["x"], initialPosition.X)
 	assert.Equal(t, player["y"], initialPosition.Y)
 	t.Logf("player moved (%v, %v) -> (%v, %v) in %v", initialPosition.X, initialPosition.Y, player["x"], player["y"], eventStreamRate)
 }
 
 func TestGameUsecase_EatFood(t *testing.T) {
-	s := newGameUsecaseTestSuite(t)
+	s.StartTest(t)
 	foodIDs := []int{3, 5}
-	s.ExpectRepo().GetFoodInRange(testRoomID, gomock.Any(), gomock.Any()).Return(foodIDs, nil)
-	s.ExpectRepo().DeleteFood(testRoomID, foodIDs).Return(nil)
+	s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return(foodIDs, nil)
+	s.ExpectRepo().DeleteFood(roomID, gomock.Any()).Return(nil)
 
-	assert.NoError(t, s.usecase.StartGame(testUserID))
-	events, err := s.usecase.ListenEvents(testUserID)
+	assert.NoError(t, s.usecase.StartGame(userID))
+	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
+
+	events, err := s.usecase.ListenEvents(userID)
 	assert.NoError(t, err)
 	event := <-events
 	if !assert.Equal(t, game.EventMove, event["type"]) {
@@ -78,54 +86,51 @@ func TestGameUsecase_EatFood(t *testing.T) {
 }
 
 type gameUsecaseTestSuite struct {
-	t          *testing.T
-	usecase    gameUsecase
-	repository *game.MockRepository
+	t              *testing.T
+	usecase        game.Usecase
+	mockRepository *game.MockRepository
+	controller     *gomock.Controller
 }
 
-func newGameUsecaseTestSuite(t *testing.T) *gameUsecaseTestSuite {
-	s := gameUsecaseTestSuite{}
+func (s *gameUsecaseTestSuite) StartTest(t *testing.T) {
 	s.t = t
-	s.repository = game.NewMockRepository(gomock.NewController(t))
-	s.usecase = gameUsecase{
-		logger:           mock.NewMockLogger(),
-		repository:       s.repository,
-		roomsIDsByUserID: map[int]int{},
-		eventsListeners:  map[int]map[int]chan model.GameEvent{},
-	}
+	s.controller = gomock.NewController(t)
+	mockRepo := game.NewMockRepository(s.controller)
+	s.usecase = NewGameUsecase(mockRepo, mock.NewMockLogger())
+	s.mockRepository = mockRepo
 	s.initTestGame()
-	return &s
 }
 
 func (s *gameUsecaseTestSuite) ExpectRepo() *game.MockRepositoryMockRecorder {
-	return s.repository.EXPECT()
+	return s.mockRepository.EXPECT()
 }
 
 func (s *gameUsecaseTestSuite) initTestGame() {
 	room := s.newTestRoom()
 	s.ExpectRepo().GetAllRooms().Return([]*model.Room{})
 	s.ExpectRepo().CreateRoom().Return(&room)
+	s.ExpectRepo().DeleteRoom(room.ID).Return(nil)
 	s.ExpectRepo().AddPlayer(room.ID, gomock.Any()).Return(nil)
 	s.ExpectRepo().AddFood(room.ID, gomock.Any()).Return(nil)
 	s.ExpectRepo().DeleteFood(room.ID, gomock.Any()).Return(nil)
 	s.ExpectRepo().GetRoomByID(room.ID).Return(&room).AnyTimes()
-	s.ExpectRepo().SetPosition(room.ID, testUserID, gomock.Any()).Return(nil).AnyTimes()
+	s.ExpectRepo().SetPosition(room.ID, userID, gomock.Any()).Return(nil).AnyTimes()
 }
 
 func (s gameUsecaseTestSuite) newTestRoom() model.Room {
 	player := model.Player{
-		UserID:    testUserID,
-		Direction: testDirection,
-		Speed:     testSpeed,
+		UserID:    userID,
+		Direction: direction,
+		Speed:     speed,
 		Position:  model.Position{X: game.MaxPositionX / 2, Y: game.MaxPositionY / 2},
 	}
 	food1 := model.Food{ID: 1, Position: model.Position{X: 10, Y: 10}}
 	food2 := model.Food{ID: 2, Position: model.Position{X: 8, Y: 15}}
 	food3 := model.Food{ID: 3, Position: model.Position{X: 20, Y: 50}}
 	room := model.Room{
-		ID: testRoomID,
+		ID: roomID,
 		Players: map[int]*model.Player{
-			testUserID: &player,
+			userID: &player,
 		},
 		Food: map[int]model.Food{
 			1: food1,
