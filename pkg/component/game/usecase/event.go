@@ -57,7 +57,7 @@ func (u *eventsDispatcher) sendStop(roomID, userID int) {
 	})
 }
 
-func (u *eventsDispatcher) sendMove(roomID int, userID int, newPosition model.Position, newSize int, eatenFood []int, eatenPlayers []int) {
+func (u *eventsDispatcher) sendMove(roomID int, userID int, newPosition model.Position, newSize int, eatenFood []int) {
 	u.sendEvent(roomID, map[string]interface{}{
 		"type": game.EventMove,
 		"player": map[string]interface{}{
@@ -66,8 +66,7 @@ func (u *eventsDispatcher) sendMove(roomID int, userID int, newPosition model.Po
 			"y":    newPosition.Y,
 			"size": newSize,
 		},
-		"eatenFood":    eatenFood,
-		"eatenPlayers": eatenPlayers,
+		"eatenFood": eatenFood,
 	})
 }
 

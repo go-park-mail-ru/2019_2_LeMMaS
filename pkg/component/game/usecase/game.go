@@ -201,7 +201,7 @@ func (u *gameUsecase) movePlayer(room *model.Room, player *model.Player, newPosi
 	if err := u.repository.SetPlayerPosition(room.ID, player.UserID, newPosition); err != nil {
 		return err
 	}
-	u.events.sendMove(room.ID, player.UserID, newPosition, newSize, eatenFood, eatenPlayers)
+	u.events.sendMove(room.ID, player.UserID, newPosition, newSize, eatenFood)
 	return nil
 }
 
