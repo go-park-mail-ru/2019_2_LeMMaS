@@ -116,12 +116,22 @@ func (u *gameUsecase) SetSpeed(userID int, speed int) error {
 	return u.repository.SetSpeed(room.ID, userID, speed)
 }
 
-func (u gameUsecase) GetPlayers(userID int) map[int]*model.Player {
-	return u.getPlayerRoom(userID).Players
+func (u gameUsecase) GetPlayers(userID int) []*model.Player {
+	players := u.getPlayerRoom(userID).Players
+	result := make([]*model.Player, 0, len(players))
+	for _, player := range players {
+		result = append(result, player)
+	}
+	return result
 }
 
-func (u gameUsecase) GetFood(userID int) map[int]model.Food {
-	return u.getPlayerRoom(userID).Food
+func (u gameUsecase) GetFood(userID int) []model.Food {
+	foods := u.getPlayerRoom(userID).Food
+	result := make([]model.Food, 0, len(foods))
+	for _, food := range foods {
+		result = append(result, food)
+	}
+	return result
 }
 
 func (u *gameUsecase) ListenEvents(userID int) (chan map[string]interface{}, error) {
@@ -207,8 +217,8 @@ func (u *gameUsecase) sendEvent(roomID int, event map[string]interface{}) {
 
 func (u *gameUsecase) sendEventStop(roomID, userID int) {
 	u.sendEvent(roomID, map[string]interface{}{
-		"type":      game.EventStop,
-		"player_id": userID,
+		"type":    game.EventStop,
+		"user_id": userID,
 	})
 }
 

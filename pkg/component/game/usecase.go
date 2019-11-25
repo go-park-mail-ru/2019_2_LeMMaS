@@ -9,8 +9,8 @@ type Usecase interface {
 	SetDirection(userID int, direction int) error
 	SetSpeed(userID int, speed int) error
 
-	GetPlayers(userID int) map[int]*model.Player
-	GetFood(userID int) map[int]model.Food
+	GetPlayers(userID int) []*model.Player
+	GetFood(userID int) []model.Food
 
 	ListenEvents(userID int) (chan map[string]interface{}, error)
 	StopListenEvents(userID int) error

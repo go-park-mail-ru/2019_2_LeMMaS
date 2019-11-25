@@ -8,8 +8,8 @@ type Position struct {
 type Player struct {
 	UserID    int      `json:"user_id"`
 	Position  Position `json:"position"`
-	Direction int      `json:"direction"`
-	Speed     int      `json:"speed"`
+	Direction int      `json:"-"`
+	Speed     int      `json:"-"`
 }
 
 type Food struct {
