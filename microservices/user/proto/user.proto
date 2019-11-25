@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package user;
+
+service User {
+    rpc GetUserBySessionID(SessionID) returns (UserAndError) {}
+    rpc RegisterUser(UserData) returns (Error) {}
+    rpc UpdateUser(UserToUpdate) returns (Error) {}
+    rpc UpdateUserAvatar(UserToUpdateAvatar) returns (Error) {}
+    rpc GetAllUsers(UserName) returns (Users) {}
+    rpc GetAvatarUrlByName(UserName) returns (AvatarUrl) {}
+    rpc Login(UserAuth) returns (AuthData) {}
+    rpc Logout(SessionID) returns (Error) {}
+}
+
+message UserData {
+    string email = 1;
+    string password = 2;
+    string name = 3;
+}
+
+message Error {
+    string error = 1;
+}
+
+message UserAndError {
+    UserData user = 1;
+    Error error = 2;
+}
+
+message SessionID {
+    string id = 1;
+}
+
+message UserToUpdate {
+    UserData user = 1;
+}
+
+message UserToUpdateAvatar {
+    UserData user = 1;
+    bytes avatarFile = 2;
+}
+
+message UserName {
+    string name = 1;
+}
+
+message Users {
+    repeated UserData user = 1;
+}
+
+message AvatarUrl {
+    string avatarUrl = 1;
+}
+
+message UserAuth {
+    string email = 1;
+    string password = 2;
+}
+
+message AuthData {
+    SessionID sessionID = 1;
+    Error error = 2;
+}
