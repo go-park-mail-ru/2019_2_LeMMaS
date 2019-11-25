@@ -41,7 +41,7 @@ func TestGameUsecase_SetDirectionAndSpeed(t *testing.T) {
 
 	assert.NoError(t, s.usecase.SetDirection(userID, direction))
 	assert.NoError(t, s.usecase.SetSpeed(userID, speed))
-	player := s.usecase.GetPlayers(userID)[userID]
+	player := s.usecase.GetPlayer(userID)
 	assert.Equal(t, direction, player.Direction)
 	assert.Equal(t, speed, player.Speed)
 }
@@ -53,7 +53,7 @@ func TestGameUsecase_PlayerMove(t *testing.T) {
 	assert.NoError(t, s.usecase.StartGame(userID))
 	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
 
-	initialPosition := s.usecase.GetPlayers(userID)[userID].Position
+	initialPosition := s.usecase.GetPlayer(userID).Position
 	events, err := s.usecase.ListenEvents(userID)
 	assert.NoError(t, err)
 	event := <-events
@@ -112,7 +112,7 @@ func (s *gameUsecaseTestSuite) initTestGame() {
 	s.ExpectRepo().DeleteRoom(room.ID).Return(nil)
 	s.ExpectRepo().AddPlayer(room.ID, gomock.Any()).Return(nil)
 	s.ExpectRepo().AddFood(room.ID, gomock.Any()).Return(nil)
-	s.ExpectRepo().DeleteFood(room.ID, gomock.Any()).Return(nil)
+	s.ExpectRepo().DeleteFood(room.ID, gomock.Any()).Return(nil).AnyTimes()
 	s.ExpectRepo().GetRoomByID(room.ID).Return(&room).AnyTimes()
 	s.ExpectRepo().SetPosition(room.ID, userID, gomock.Any()).Return(nil).AnyTimes()
 }

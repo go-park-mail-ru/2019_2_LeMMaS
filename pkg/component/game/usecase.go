@@ -9,6 +9,7 @@ type Usecase interface {
 	SetDirection(userID int, direction int) error
 	SetSpeed(userID int, speed int) error
 
+	GetPlayer(userID int) *model.Player
 	GetPlayers(userID int) []*model.Player
 	GetFood(userID int) []model.Food
 
