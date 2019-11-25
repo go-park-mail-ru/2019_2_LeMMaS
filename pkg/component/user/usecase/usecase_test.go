@@ -30,6 +30,22 @@ func TestUserUsecase_GetAllUsers(t *testing.T) {
 	assert.Nil(t, users)
 }
 
+func TestUserUsecase_GetUserByID(t *testing.T) {
+	userRepo := user.NewMockRepository(gomock.NewController(t))
+	usecase := NewUserUsecase(userRepo, nil, nil)
+
+	expectedUser := &model.User{ID: 4, Email: "test4@mail.ru", Name: "Testik 4"}
+	userRepo.EXPECT().GetByID(expectedUser.ID).Return(expectedUser, nil)
+	users, err := usecase.GetUserByID(expectedUser.ID)
+	assert.Nil(t, err, "unexpected error")
+	assert.Equal(t, users, expectedUser)
+
+	userRepo.EXPECT().GetByID(expectedUser.ID).Return(nil, fmt.Errorf("error"))
+	users, err = usecase.GetUserByID(expectedUser.ID)
+	assert.EqualError(t, err, "error")
+	assert.Nil(t, users)
+}
+
 func TestUserUsecase_Register(t *testing.T) {
 	userRepo := user.NewMockRepository(gomock.NewController(t))
 	usecase := NewUserUsecase(userRepo, nil, nil)

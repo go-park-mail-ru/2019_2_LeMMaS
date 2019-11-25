@@ -14,6 +14,7 @@ const (
 	ApiV1GamePath = privatePrefix + "/game"
 
 	ApiV1UserListPath            = publicPrefix + "/user/list"
+	ApiV1UserByIDPath            = publicPrefix + "/user/:id"
 	ApiV1UserRegisterPath        = publicPrefix + "/user/register"
 	ApiV1UserLoginPath           = publicPrefix + "/user/login"
 	ApiV1UserLogoutPath          = privatePrefix + "/user/logout"

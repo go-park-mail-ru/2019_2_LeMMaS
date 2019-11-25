@@ -36,6 +36,10 @@ func (u *userUsecase) GetAllUsers() ([]model.User, error) {
 	return u.repository.GetAll()
 }
 
+func (u *userUsecase) GetUserByID(userID int) (*model.User, error) {
+	return u.repository.GetByID(userID)
+}
+
 func (u *userUsecase) GetUserBySessionID(sessionID string) (*model.User, error) {
 	userID, ok := u.sessionRepository.GetUserBySession(sessionID)
 	if !ok {

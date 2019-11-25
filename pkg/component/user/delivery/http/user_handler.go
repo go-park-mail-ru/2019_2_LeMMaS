@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/labstack/echo"
+	"strconv"
 	"time"
 )
 
@@ -19,6 +20,7 @@ type UserHandler struct {
 func NewUserHandler(e *echo.Echo, userUsecase user.Usecase, logger logger.Logger) *UserHandler {
 	handler := UserHandler{userUsecase: userUsecase, logger: logger}
 	e.GET(delivery.ApiV1UserListPath, handler.handleUserList)
+	e.GET(delivery.ApiV1UserByIDPath, handler.handleUserByID)
 	e.POST(delivery.ApiV1UserRegisterPath, handler.handleUserRegister)
 	e.POST(delivery.ApiV1UserLoginPath, handler.handleUserLogin)
 	e.POST(delivery.ApiV1UserLogoutPath, handler.handleUserLogout)
@@ -44,6 +46,23 @@ func (h *UserHandler) handleUserList(c echo.Context) error {
 	usersToOutput := h.convertUsersForOutput(users)
 	return h.OkWithBody(c, map[string]interface{}{
 		"users": usersToOutput,
+	})
+}
+
+func (h *UserHandler) handleUserByID(c echo.Context) error {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return h.Error(c, "user id must be an integer")
+	}
+	userByID, err := h.userUsecase.GetUserByID(userID)
+	if err != nil {
+		return h.Error(c, "error loading user")
+	}
+	if userByID == nil {
+		return h.Error(c, "user with this id not found")
+	}
+	return h.OkWithBody(c, map[string]interface{}{
+		"user": h.convertUserForOutput(*userByID),
 	})
 }
 
