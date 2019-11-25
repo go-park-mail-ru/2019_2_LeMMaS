@@ -20,6 +20,6 @@ func TestSessionRepository_AddSession(t *testing.T) {
 }
 
 func newTestSessionRepository(t *testing.T, redis *redigomock.Conn) user.SessionRepository {
-	logger := testMock.NewMockLogger()
+	logger := testMock.NewMockLogger(t)
 	return NewSessionRepository(redis, logger)
 }

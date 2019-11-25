@@ -126,6 +126,6 @@ func TestDatabaseUserRepository_UpdateAvatarPath(t *testing.T) {
 
 func newTestDatabaseRepository(t *testing.T, db *sql.DB) user.Repository {
 	dbx := sqlx.NewDb(db, "")
-	logger := testMock.NewMockLogger()
+	logger := testMock.NewMockLogger(t)
 	return NewDatabaseRepository(dbx, logger)
 }

@@ -120,7 +120,7 @@ func (s *gameUsecaseTestSuite) StartTest(t *testing.T) {
 	s.t = t
 	s.controller = gomock.NewController(t)
 	mockRepo := game.NewMockRepository(s.controller)
-	s.usecase = NewGameUsecase(mockRepo, mock.NewMockLogger())
+	s.usecase = NewGameUsecase(mockRepo, mock.NewMockLogger(t))
 	s.mockRepository = mockRepo
 	s.initTestGame()
 }

@@ -90,7 +90,7 @@ func (mr *MockRepositoryMockRecorder) DeleteRoom(id interface{}) *gomock.Call {
 }
 
 // AddPlayer mocks base method
-func (m *MockRepository) AddPlayer(roomID int, player model.Player) error {
+func (m *MockRepository) AddPlayer(roomID int, player *model.Player) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddPlayer", roomID, player)
 	ret0, _ := ret[0].(error)
@@ -171,6 +171,21 @@ func (m *MockRepository) SetPlayerSize(roomID, userID, size int) error {
 func (mr *MockRepositoryMockRecorder) SetPlayerSize(roomID, userID, size interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPlayerSize", reflect.TypeOf((*MockRepository)(nil).SetPlayerSize), roomID, userID, size)
+}
+
+// GetPlayersInRange mocks base method
+func (m *MockRepository) GetPlayersInRange(roomID int, topLeftPoint, bottomRightPoint model.Position) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPlayersInRange", roomID, topLeftPoint, bottomRightPoint)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPlayersInRange indicates an expected call of GetPlayersInRange
+func (mr *MockRepositoryMockRecorder) GetPlayersInRange(roomID, topLeftPoint, bottomRightPoint interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPlayersInRange", reflect.TypeOf((*MockRepository)(nil).GetPlayersInRange), roomID, topLeftPoint, bottomRightPoint)
 }
 
 // AddFood mocks base method

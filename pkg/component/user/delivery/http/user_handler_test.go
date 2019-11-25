@@ -104,7 +104,7 @@ func NewUserHandlerTestSuite() *UserHandlerTestSuite {
 func (s *UserHandlerTestSuite) StartTest(t *testing.T) {
 	s.HandlerTestSuite.StartTest(t)
 	s.usecase = user.NewMockUsecase(gomock.NewController(t))
-	logger := testMock.NewMockLogger()
+	logger := testMock.NewMockLogger(t)
 	s.handler = NewUserHandler(s.E, s.usecase, logger)
 }
 

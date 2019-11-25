@@ -100,7 +100,7 @@ func NewAccessHandlerTestSuite() *AccessHandlerTestSuite {
 func (s *AccessHandlerTestSuite) StartTest(t *testing.T) {
 	s.HandlerTestSuite.StartTest(t)
 	s.usecase = access.NewMockCsrfUsecase(gomock.NewController(t))
-	logger := testMock.NewMockLogger()
+	logger := testMock.NewMockLogger(t)
 	s.handler = NewAccessHandler(s.E, s.usecase, logger)
 }
 
