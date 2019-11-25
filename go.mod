@@ -22,6 +22,9 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/lib/pq v1.2.0 // indirect
+	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33
+	github.com/paulmach/go.geojson v1.4.0 // indirect
+	github.com/paulmach/orb v0.1.5
 	github.com/rafaeljusto/redigomock v0.0.0-20191016070255-2f957ca2c86c
 	github.com/shopspring/decimal v0.0.0-20180709203117-cd690d0c9e24 // indirect
 	github.com/stretchr/testify v1.4.0

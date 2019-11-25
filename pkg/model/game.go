@@ -5,16 +5,21 @@ type Position struct {
 	Y int `json:"y"`
 }
 
-const (
-	GameEventStart = "start"
-	GameEventMove  = "move"
-	GameEventError = "error"
-)
-
-type GameEvent = map[string]interface{}
-
 type Player struct {
-	Position  Position
-	Direction int
-	Speed     int
+	UserID    int      `json:"user_id"`
+	Size      int      `json:"size"`
+	Position  Position `json:"position"`
+	Direction int      `json:"-"`
+	Speed     int      `json:"-"`
+}
+
+type Food struct {
+	ID       int      `json:"id"`
+	Position Position `json:"position"`
+}
+
+type Room struct {
+	ID      int
+	Players map[int]*Player
+	Food    map[int]Food
 }

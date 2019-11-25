@@ -15,14 +15,14 @@ import (
 var s = NewUserHandlerTestSuite()
 
 func TestUserHandler_HandleUserList(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	s.ExpectUsecase().GetAllUsers().Return([]model.User{{Name: "Ivan"}}, nil)
 	s.TestUserList(`{"status":"ok","body":{"users":[{"id":0,"email":"","name":"Ivan","avatar_path":""}]}}`)
 }
 
 func TestUserHandler_HandleUserRegister(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	user1 := model.User{ID: 1, Email: "testik1@mail.ru", Name: "Test The Best 1"}
 	s.ExpectUsecase().Register(user1.Email, test.Password, user1.Name).Return(nil)
@@ -50,7 +50,7 @@ func TestUserHandler_HandleUserRegister(t *testing.T) {
 }
 
 func TestUserHandler_HandleUserUpdate(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(test.SessionID, nil)
 	s.ExpectUsecase().GetUserBySessionID(test.SessionID).Return(&model.User{ID: 1}, nil)
@@ -65,7 +65,7 @@ func TestUserHandler_HandleUserUpdate(t *testing.T) {
 }
 
 func TestUserHandler_HandleUserLogin(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return("", nil)
 	s.TestUserLogin(
 		`{"email":"testik1@mail.ru","password":"ssc-tuatara"}`,
@@ -75,7 +75,7 @@ func TestUserHandler_HandleUserLogin(t *testing.T) {
 }
 
 func TestUserHandler_HandleUserLogout(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	sessionID := "sess"
 	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(sessionID, nil)
@@ -101,10 +101,10 @@ func NewUserHandlerTestSuite() *UserHandlerTestSuite {
 	}
 }
 
-func (s *UserHandlerTestSuite) SetTesting(t *testing.T) {
-	s.HandlerTestSuite.SetTesting(t)
+func (s *UserHandlerTestSuite) StartTest(t *testing.T) {
+	s.HandlerTestSuite.StartTest(t)
 	s.usecase = user.NewMockUsecase(gomock.NewController(t))
-	logger := testMock.NewMockLogger()
+	logger := testMock.NewMockLogger(t)
 	s.handler = NewUserHandler(s.E, s.usecase, logger)
 }
 
@@ -114,25 +114,25 @@ func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {
 
 func (s *UserHandlerTestSuite) TestUserList(expectedResponse string) {
 	s.SetupRequestWithBody("")
-	s.handler.HandleUserList(s.NewContext())
+	s.handler.handleUserList(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserRegister(requestBody, expectedResponse string, expectedCode int) {
 	s.SetupRequestWithBody(requestBody)
-	s.handler.HandleUserRegister(s.NewContext())
+	s.handler.handleUserRegister(s.NewContext())
 	s.TestResponse(expectedResponse, expectedCode)
 }
 
 func (s *UserHandlerTestSuite) TestUserUpdate(requestBody, expectedResponse string) {
 	s.SetupRequestWithBody(requestBody)
-	s.handler.HandleUserUpdate(s.NewContext())
+	s.handler.handleUserUpdate(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 }
 
 func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse string, mustHaveSessionCookie bool) {
 	s.SetupRequestWithBody(requestBody)
-	s.handler.HandleUserLogin(s.NewContext())
+	s.handler.handleUserLogin(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 	if mustHaveSessionCookie {
 		s.TestCookiePresent(delivery.SessionIDCookieName)
@@ -141,7 +141,7 @@ func (s *UserHandlerTestSuite) TestUserLogin(requestBody, expectedResponse strin
 
 func (s *UserHandlerTestSuite) TestUserLogout(expectedResponse string) {
 	s.SetupRequestWithBody("")
-	s.handler.HandleUserLogout(s.NewContext())
+	s.handler.handleUserLogout(s.NewContext())
 	s.TestOkResponse(expectedResponse)
 	s.TestCookieNotPresent(delivery.SessionIDCookieName)
 }
