@@ -1,26 +1,33 @@
 package http
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 const (
-	ApiV1Public  = "/api/v1/public"
-	ApiV1Private = "/api/v1/private"
+	publicPrefix  = "/api/v1/public"
+	privatePrefix = "/api/v1/private"
 
-	ApiV1AccessCSRFPath = ApiV1Public + "/access/csrf"
+	ApiV1AccessCSRFPath = publicPrefix + "/access/csrf"
 
-	ApiV1GamePath = ApiV1Private + "/game"
+	ApiV1GamePath = privatePrefix + "/game"
 
-	ApiV1UserListPath            = ApiV1Public + "/user/list"
-	ApiV1UserRegisterPath        = ApiV1Public + "/user/register"
-	ApiV1UserLoginPath           = ApiV1Public + "/user/login"
-	ApiV1UserLogoutPath          = ApiV1Private + "/user/logout"
-	ApiV1UserProfilePath         = ApiV1Private + "/user/me"
-	ApiV1UserUpdatePath          = ApiV1Private + "/user/update"
-	ApiV1UserAvatarUploadPath    = ApiV1Private + "/user/avatar/upload"
-	ApiV1UserGetAvatarByNamePath = ApiV1Private + "/user/avatar/getByName"
+	ApiV1UserListPath            = publicPrefix + "/user/list"
+	ApiV1UserRegisterPath        = publicPrefix + "/user/register"
+	ApiV1UserLoginPath           = publicPrefix + "/user/login"
+	ApiV1UserLogoutPath          = privatePrefix + "/user/logout"
+	ApiV1UserProfilePath         = privatePrefix + "/user/me"
+	ApiV1UserUpdatePath          = privatePrefix + "/user/update"
+	ApiV1UserAvatarUploadPath    = privatePrefix + "/user/avatar/upload"
+	ApiV1UserGetAvatarByNamePath = privatePrefix + "/user/avatar/getByName"
 )
 
 const (
 	SessionIDCookieName   = "session_id"
 	SessionIDCookieExpire = 10 * time.Hour
 )
+
+func IsPrivatePath(path string) bool {
+	return strings.HasPrefix(path, privatePrefix)
+}

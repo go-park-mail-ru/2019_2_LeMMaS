@@ -31,7 +31,7 @@ func NewAccessHandler(e *echo.Echo, csrfUsecase access.CsrfUsecase, logger logge
 
 func (h *AccessHandler) csrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		isPrivate := strings.HasPrefix(c.Request().URL.Path, delivery.ApiV1Private)
+		isPrivate := delivery.IsPrivatePath(c.Request().URL.Path)
 		method := c.Request().Method
 		if !isPrivate || method == http.MethodGet || method == http.MethodHead || method == http.MethodOptions {
 			return next(c)
