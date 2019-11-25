@@ -302,12 +302,8 @@ func (u *gameUsecase) eatPlayers(room *model.Room, player *model.Player, newPosi
 }
 
 func (u *gameUsecase) getEatenPlayers(room *model.Room, player *model.Player, position model.Position) ([]int, error) {
-	r := player.Size / 2
-	playerIDs, err := u.repository.GetPlayersInRange(
-		room.ID,
-		model.Position{X: position.X - r, Y: position.Y - r},
-		model.Position{X: position.X + r, Y: position.Y + r},
-	)
+	p1, p2 := u.getEatingBound(player)
+	playerIDs, err := u.repository.GetPlayersInRange(room.ID, p1, p2)
 	if err != nil {
 		return nil, err
 	}
@@ -328,14 +324,16 @@ func (u *gameUsecase) getEatenPlayers(room *model.Room, player *model.Player, po
 }
 
 func (u *gameUsecase) getEatenFood(roomID int, player *model.Player, position model.Position) ([]int, error) {
-	r := player.Size / 2
-	eatenFood, err := u.repository.GetFoodInRange(
-		roomID,
-		model.Position{X: position.X - r, Y: position.Y - r},
-		model.Position{X: position.X + r, Y: position.Y + r},
-	)
+	p1, p2 := u.getEatingBound(player)
+	eatenFood, err := u.repository.GetFoodInRange(roomID, p1, p2)
 	if err != nil {
 		return nil, err
 	}
 	return eatenFood, nil
+}
+
+func (u *gameUsecase) getEatingBound(player *model.Player) (model.Position, model.Position) {
+	r := player.Size/2 - 2
+	return model.Position{X: player.Position.X - r, Y: player.Position.Y - r},
+		model.Position{X: player.Position.X + r, Y: player.Position.Y + r}
 }
