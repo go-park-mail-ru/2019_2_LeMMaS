@@ -135,6 +135,7 @@ func (s *gameUsecaseTestSuite) initTestGame() {
 	s.ExpectRepo().CreateRoom().Return(&room)
 	s.ExpectRepo().DeleteRoom(room.ID).Return(nil)
 	s.ExpectRepo().AddPlayer(room.ID, gomock.Any()).Return(nil)
+	s.ExpectRepo().GetPlayersInRange(room.ID, gomock.Any(), gomock.Any()).Return(nil, nil).AnyTimes()
 	s.ExpectRepo().AddFood(room.ID, gomock.Any()).Return(nil)
 	s.ExpectRepo().DeleteFood(room.ID, gomock.Any()).Return(nil).AnyTimes()
 	s.ExpectRepo().GetRoomByID(room.ID).Return(&room).AnyTimes()

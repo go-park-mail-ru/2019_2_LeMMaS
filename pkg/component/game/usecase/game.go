@@ -334,6 +334,7 @@ func (u *gameUsecase) getEatenFood(roomID int, player *model.Player, position mo
 
 func (u *gameUsecase) getEatingBound(player *model.Player) (model.Position, model.Position) {
 	r := player.Size/2 - 2
-	return model.Position{X: player.Position.X - r, Y: player.Position.Y - r},
-		model.Position{X: player.Position.X + r, Y: player.Position.Y + r}
+	pos := player.Position
+	return model.Position{pos.X - r, pos.Y - r},
+		model.Position{pos.X + r, pos.Y + r}
 }
