@@ -33,10 +33,6 @@ func NewGameHandler(e *echo.Echo, gameUsecase game.Usecase, userUsecase user.Use
 	return &handler
 }
 
-func (h GameHandler) sendEvent(c *websocket.Conn, event model.GameEvent) error {
-	return c.WriteJSON(event)
-}
-
 func (h GameHandler) sendError(c *websocket.Conn, err error) error {
 	body := map[string]interface{}{
 		"type":    game.EventError,
@@ -115,17 +111,17 @@ func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
 			return
 		}
 		for event := range events {
-			err := h.sendEvent(c, event)
+			err := c.WriteJSON(event)
 			if err != nil {
 				h.gameUsecase.StopListenEvents(userID)
 				break
 			}
 		}
 	}()
-	return h.sendEvent(c, map[string]interface{}{
+	return c.WriteJSON(map[string]interface{}{
 		"type":    game.EventStart,
-		"players": h.convertPlayersToOutput(h.gameUsecase.GetPlayers(userID)),
-		"foods":   h.convertFoodToOutput(h.gameUsecase.GetFood(userID)),
+		"players": h.gameUsecase.GetPlayers(userID),
+		"foods":   h.gameUsecase.GetFood(userID),
 	})
 }
 
@@ -134,9 +130,7 @@ func (h GameHandler) processGameStop(userID int, c *websocket.Conn) error {
 	if err != nil {
 		return h.sendError(c, err)
 	}
-	return h.sendEvent(c, map[string]interface{}{
-		"type": game.EventStop,
-	})
+	return nil
 }
 
 type directionRequest struct {
@@ -181,28 +175,4 @@ func (h GameHandler) getCurrentUser(c echo.Context) (*model.User, error) {
 		return nil, errors.New("invalid session id")
 	}
 	return currentUser, nil
-}
-
-func (h GameHandler) convertPlayersToOutput(playersByID map[int]*model.Player) []map[string]interface{} {
-	players := make([]map[string]interface{}, 0, len(playersByID))
-	for id, player := range playersByID {
-		players = append(players, map[string]interface{}{
-			"id": id,
-			"x":  player.Position.X,
-			"y":  player.Position.Y,
-		})
-	}
-	return players
-}
-
-func (h GameHandler) convertFoodToOutput(foodByID map[int]model.Food) []map[string]interface{} {
-	foods := make([]map[string]interface{}, 0, len(foodByID))
-	for _, food := range foodByID {
-		foods = append(foods, map[string]interface{}{
-			"id": food.ID,
-			"x":  food.Position.X,
-			"y":  food.Position.Y,
-		})
-	}
-	return foods
 }

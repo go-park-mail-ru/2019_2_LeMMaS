@@ -27,7 +27,8 @@ const (
 )
 
 var (
-	errGameNotStarted = errors.New("game not started")
+	errGameNotStarted   = errors.New("game not started")
+	errNoEventListeners = errors.New("no event listeners")
 )
 
 type gameUsecase struct {
@@ -38,7 +39,7 @@ type gameUsecase struct {
 }
 
 type roomEvents struct {
-	listeners map[int]chan model.GameEvent
+	listeners map[int]chan map[string]interface{}
 	stop      chan bool
 }
 
@@ -55,19 +56,24 @@ func (u *gameUsecase) StartGame(userID int) error {
 	if u.getPlayerRoom(userID) != nil {
 		return errors.New("start: game already started for this user")
 	}
+
 	room := u.getOrCreateRoom()
-	u.roomsIDsByUserID[userID] = room.ID
-	err := u.repository.AddPlayer(room.ID, model.Player{
-		UserID: userID,
-		Position: model.Position{
-			X: game.MaxPositionX / 2,
-			Y: game.MaxPositionY / 2,
-		},
-	})
-	if err != nil {
+	u.setPlayerRoom(userID, room.ID)
+
+	player := u.newPlayer(userID)
+	if err := u.repository.AddPlayer(room.ID, player); err != nil {
 		return err
 	}
-	return u.repository.AddFood(room.ID, u.generateFood())
+
+	food := u.generateFood()
+	if err := u.repository.AddFood(room.ID, food); err != nil {
+		return err
+	}
+
+	u.sendEventNewFood(room.ID, food)
+	u.sendEventNewPlayer(room.ID, player)
+
+	return nil
 }
 
 func (u *gameUsecase) StopGame(userID int) error {
@@ -76,11 +82,16 @@ func (u *gameUsecase) StopGame(userID int) error {
 		return errors.New("stop: no game for this user to stop")
 	}
 	u.StopListenEvents(userID)
+	u.sendEventStop(room.ID, userID)
 	delete(u.roomsIDsByUserID, userID)
 	if len(room.Players) == 1 {
 		return u.repository.DeleteRoom(room.ID)
 	}
-	return u.repository.DeletePlayer(room.ID, userID)
+	err := u.repository.DeletePlayer(room.ID, userID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *gameUsecase) SetDirection(userID int, direction int) error {
@@ -113,16 +124,16 @@ func (u gameUsecase) GetFood(userID int) map[int]model.Food {
 	return u.getPlayerRoom(userID).Food
 }
 
-func (u *gameUsecase) ListenEvents(userID int) (chan model.GameEvent, error) {
+func (u *gameUsecase) ListenEvents(userID int) (chan map[string]interface{}, error) {
 	room := u.getPlayerRoom(userID)
 	if room == nil {
 		return nil, errGameNotStarted
 	}
-	listener := make(chan model.GameEvent)
+	listener := make(chan map[string]interface{})
 	if _, ok := u.events[room.ID]; !ok {
 		stop := make(chan bool)
 		u.events[room.ID] = roomEvents{
-			listeners: map[int]chan model.GameEvent{},
+			listeners: map[int]chan map[string]interface{}{},
 			stop:      stop,
 		}
 		u.startEventsLoop(room, stop)
@@ -137,10 +148,10 @@ func (u *gameUsecase) StopListenEvents(userID int) error {
 		return errGameNotStarted
 	}
 	if _, ok := u.events[room.ID]; !ok {
-		return errors.New("no event listeners")
+		return errNoEventListeners
 	}
 	if _, ok := u.events[room.ID].listeners[userID]; !ok {
-		return errors.New("no event listeners")
+		return errNoEventListeners
 	}
 	delete(u.events[room.ID].listeners, userID)
 	if len(u.events[room.ID].listeners) == 0 {
@@ -149,7 +160,7 @@ func (u *gameUsecase) StopListenEvents(userID int) error {
 	return nil
 }
 
-func (u *gameUsecase) startEventsLoop(room *model.Room, stop chan bool) error {
+func (u *gameUsecase) startEventsLoop(room *model.Room, stop chan bool) {
 	go func() {
 		tick := time.Tick(eventStreamRate)
 		for {
@@ -164,7 +175,6 @@ func (u *gameUsecase) startEventsLoop(room *model.Room, stop chan bool) error {
 			}
 		}
 	}()
-	return nil
 }
 
 func (u *gameUsecase) stopEventsLoop(room *model.Room) {
@@ -183,24 +193,58 @@ func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 			if err != nil {
 				return err
 			}
-			event := model.GameEvent{
-				"type": game.EventMove,
-				"player": map[string]interface{}{
-					"id": player.UserID,
-					"x":  newPosition.X,
-					"y":  newPosition.Y,
-				},
-				"eatenFood": eatenFoodIDs,
-			}
-			u.sendEvent(room.ID, event)
+			u.sendEventMove(room.ID, player.UserID, newPosition, eatenFoodIDs)
 		}
 	}
 	return nil
 }
 
-func (u *gameUsecase) sendEvent(roomID int, event model.GameEvent) {
+func (u *gameUsecase) sendEvent(roomID int, event map[string]interface{}) {
 	for _, listener := range u.events[roomID].listeners {
 		listener <- event
+	}
+}
+
+func (u *gameUsecase) sendEventStop(roomID, userID int) {
+	u.sendEvent(roomID, map[string]interface{}{
+		"type":      game.EventStop,
+		"player_id": userID,
+	})
+}
+
+func (u *gameUsecase) sendEventMove(roomID int, userID int, newPosition model.Position, eatenFoodIDs []int) {
+	u.sendEvent(roomID, map[string]interface{}{
+		"type": game.EventMove,
+		"player": map[string]interface{}{
+			"id": userID,
+			"x":  newPosition.X,
+			"y":  newPosition.Y,
+		},
+		"eatenFood": eatenFoodIDs,
+	})
+}
+
+func (u *gameUsecase) sendEventNewPlayer(roomID int, player model.Player) {
+	u.sendEvent(roomID, map[string]interface{}{
+		"type":   game.EventNewPlayer,
+		"player": player,
+	})
+}
+
+func (u *gameUsecase) sendEventNewFood(roomID int, food []model.Food) {
+	u.sendEvent(roomID, map[string]interface{}{
+		"type": game.EventNewFood,
+		"food": food,
+	})
+}
+
+func (u *gameUsecase) newPlayer(userID int) model.Player {
+	return model.Player{
+		UserID: userID,
+		Position: model.Position{
+			X: game.MaxPositionX / 2,
+			Y: game.MaxPositionY / 2,
+		},
 	}
 }
 
@@ -210,6 +254,10 @@ func (u *gameUsecase) getPlayerRoom(userID int) *model.Room {
 		return nil
 	}
 	return u.repository.GetRoomByID(roomID)
+}
+
+func (u *gameUsecase) setPlayerRoom(userID, roomID int) {
+	u.roomsIDsByUserID[userID] = roomID
 }
 
 func (u *gameUsecase) getOrCreateRoom() *model.Room {

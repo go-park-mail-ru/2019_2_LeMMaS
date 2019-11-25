@@ -12,6 +12,6 @@ type Usecase interface {
 	GetPlayers(userID int) map[int]*model.Player
 	GetFood(userID int) map[int]model.Food
 
-	ListenEvents(userID int) (chan model.GameEvent, error)
+	ListenEvents(userID int) (chan map[string]interface{}, error)
 	StopListenEvents(userID int) error
 }
