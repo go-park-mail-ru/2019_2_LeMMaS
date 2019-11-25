@@ -125,7 +125,7 @@ func (r *repository) GetFoodInRange(roomID int, topLeftPoint, bottomRightPoint m
 	return foods, nil
 }
 
-func (r *repository) SetDirection(roomID int, userID int, direction int) error {
+func (r *repository) SetPlayerDirection(roomID int, userID int, direction int) error {
 	room := r.GetRoomByID(roomID)
 	if room == nil {
 		return ErrRoomNotFound
@@ -134,7 +134,7 @@ func (r *repository) SetDirection(roomID int, userID int, direction int) error {
 	return nil
 }
 
-func (r *repository) SetSpeed(roomID int, userID int, speed int) error {
+func (r *repository) SetPlayerSpeed(roomID int, userID int, speed int) error {
 	room := r.GetRoomByID(roomID)
 	if room == nil {
 		return ErrRoomNotFound
@@ -143,12 +143,21 @@ func (r *repository) SetSpeed(roomID int, userID int, speed int) error {
 	return nil
 }
 
-func (r *repository) SetPosition(roomID int, userID int, position model.Position) error {
+func (r *repository) SetPlayerPosition(roomID int, userID int, position model.Position) error {
 	room := r.GetRoomByID(roomID)
 	if room == nil {
 		return ErrRoomNotFound
 	}
 	room.Players[userID].Position = position
+	return nil
+}
+
+func (r *repository) SetPlayerSize(roomID int, userID int, size int) error {
+	room := r.GetRoomByID(roomID)
+	if room == nil {
+		return ErrRoomNotFound
+	}
+	room.Players[userID].Size = size
 	return nil
 }
 

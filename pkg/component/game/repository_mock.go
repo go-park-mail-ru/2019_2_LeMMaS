@@ -117,6 +117,62 @@ func (mr *MockRepositoryMockRecorder) DeletePlayer(roomID, userID interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeletePlayer", reflect.TypeOf((*MockRepository)(nil).DeletePlayer), roomID, userID)
 }
 
+// SetPlayerDirection mocks base method
+func (m *MockRepository) SetPlayerDirection(roomID, userID, direction int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetPlayerDirection", roomID, userID, direction)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetPlayerDirection indicates an expected call of SetPlayerDirection
+func (mr *MockRepositoryMockRecorder) SetPlayerDirection(roomID, userID, direction interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPlayerDirection", reflect.TypeOf((*MockRepository)(nil).SetPlayerDirection), roomID, userID, direction)
+}
+
+// SetPlayerSpeed mocks base method
+func (m *MockRepository) SetPlayerSpeed(roomID, userID, speed int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetPlayerSpeed", roomID, userID, speed)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetPlayerSpeed indicates an expected call of SetPlayerSpeed
+func (mr *MockRepositoryMockRecorder) SetPlayerSpeed(roomID, userID, speed interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPlayerSpeed", reflect.TypeOf((*MockRepository)(nil).SetPlayerSpeed), roomID, userID, speed)
+}
+
+// SetPlayerPosition mocks base method
+func (m *MockRepository) SetPlayerPosition(roomID, userID int, position model.Position) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetPlayerPosition", roomID, userID, position)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetPlayerPosition indicates an expected call of SetPlayerPosition
+func (mr *MockRepositoryMockRecorder) SetPlayerPosition(roomID, userID, position interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPlayerPosition", reflect.TypeOf((*MockRepository)(nil).SetPlayerPosition), roomID, userID, position)
+}
+
+// SetPlayerSize mocks base method
+func (m *MockRepository) SetPlayerSize(roomID, userID, size int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetPlayerSize", roomID, userID, size)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetPlayerSize indicates an expected call of SetPlayerSize
+func (mr *MockRepositoryMockRecorder) SetPlayerSize(roomID, userID, size interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPlayerSize", reflect.TypeOf((*MockRepository)(nil).SetPlayerSize), roomID, userID, size)
+}
+
 // AddFood mocks base method
 func (m *MockRepository) AddFood(roomID int, food []model.Food) error {
 	m.ctrl.T.Helper()
@@ -158,46 +214,4 @@ func (m *MockRepository) GetFoodInRange(roomID int, topLeftPoint, bottomRightPoi
 func (mr *MockRepositoryMockRecorder) GetFoodInRange(roomID, topLeftPoint, bottomRightPoint interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFoodInRange", reflect.TypeOf((*MockRepository)(nil).GetFoodInRange), roomID, topLeftPoint, bottomRightPoint)
-}
-
-// SetDirection mocks base method
-func (m *MockRepository) SetDirection(roomID, userID, direction int) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetDirection", roomID, userID, direction)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetDirection indicates an expected call of SetDirection
-func (mr *MockRepositoryMockRecorder) SetDirection(roomID, userID, direction interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetDirection", reflect.TypeOf((*MockRepository)(nil).SetDirection), roomID, userID, direction)
-}
-
-// SetSpeed mocks base method
-func (m *MockRepository) SetSpeed(roomID, userID, speed int) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetSpeed", roomID, userID, speed)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetSpeed indicates an expected call of SetSpeed
-func (mr *MockRepositoryMockRecorder) SetSpeed(roomID, userID, speed interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSpeed", reflect.TypeOf((*MockRepository)(nil).SetSpeed), roomID, userID, speed)
-}
-
-// SetPosition mocks base method
-func (m *MockRepository) SetPosition(roomID, userID int, position model.Position) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetPosition", roomID, userID, position)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetPosition indicates an expected call of SetPosition
-func (mr *MockRepositoryMockRecorder) SetPosition(roomID, userID, position interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPosition", reflect.TypeOf((*MockRepository)(nil).SetPosition), roomID, userID, position)
 }

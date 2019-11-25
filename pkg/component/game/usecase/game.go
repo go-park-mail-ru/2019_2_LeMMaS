@@ -100,7 +100,7 @@ func (u *gameUsecase) SetDirection(userID int, direction int) error {
 	if room == nil {
 		return errGameNotStarted
 	}
-	return u.repository.SetDirection(room.ID, userID, direction)
+	return u.repository.SetPlayerDirection(room.ID, userID, direction)
 }
 
 func (u *gameUsecase) SetSpeed(userID int, speed int) error {
@@ -111,7 +111,7 @@ func (u *gameUsecase) SetSpeed(userID int, speed int) error {
 	if room == nil {
 		return errGameNotStarted
 	}
-	return u.repository.SetSpeed(room.ID, userID, speed)
+	return u.repository.SetPlayerSpeed(room.ID, userID, speed)
 }
 
 func (u gameUsecase) GetPlayer(userID int) *model.Player {
@@ -170,17 +170,23 @@ func (u *gameUsecase) startEventsLoop(room *model.Room) {
 
 func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 	for _, player := range room.Players {
-		newPosition := u.getNextPlayerPosition(player)
+		newPosition := u.getNewPlayerPosition(player)
 		if newPosition != player.Position {
-			err := u.repository.SetPosition(room.ID, player.UserID, newPosition)
+			if err := u.repository.SetPlayerPosition(room.ID, player.UserID, newPosition); err != nil {
+				return err
+			}
+			eatenFood, err := u.getEatenFood(room.ID, player, newPosition)
 			if err != nil {
 				return err
 			}
-			eatenFoodIDs, err := u.eatFood(room.ID, player, newPosition)
-			if err != nil {
+			if err := u.repository.DeleteFood(room.ID, eatenFood); err != nil {
 				return err
 			}
-			u.events.sendMove(room.ID, player.UserID, newPosition, eatenFoodIDs)
+			newSize := player.Size + len(eatenFood)
+			if err := u.repository.SetPlayerSize(room.ID, player.UserID, newSize); err != nil {
+				return err
+			}
+			u.events.sendMove(room.ID, player.UserID, newPosition, newSize, eatenFood)
 		}
 	}
 	return nil
@@ -217,7 +223,7 @@ func (u *gameUsecase) getAvailableRoom() *model.Room {
 	return availableRooms[0]
 }
 
-func (u gameUsecase) getNextPlayerPosition(player *model.Player) model.Position {
+func (u gameUsecase) getNewPlayerPosition(player *model.Player) model.Position {
 	directionRadians := float64(player.Direction) * math.Pi / 180
 	distance := float64(player.Speed) * speedKoeff
 	deltaX := distance * math.Sin(directionRadians)
@@ -256,7 +262,7 @@ func (u gameUsecase) generateFood() []model.Food {
 	return foods
 }
 
-func (u *gameUsecase) eatFood(roomID int, player *model.Player, position model.Position) ([]int, error) {
+func (u *gameUsecase) getEatenFood(roomID int, player *model.Player, position model.Position) ([]int, error) {
 	r := player.Size / 2
 	eatenFoodIDs, err := u.repository.GetFoodInRange(
 		roomID,
@@ -266,6 +272,5 @@ func (u *gameUsecase) eatFood(roomID int, player *model.Player, position model.P
 	if err != nil {
 		return nil, err
 	}
-	err = u.repository.DeleteFood(roomID, eatenFoodIDs)
-	return eatenFoodIDs, err
+	return eatenFoodIDs, nil
 }

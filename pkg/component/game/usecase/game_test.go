@@ -36,8 +36,8 @@ func TestGameUsecase_StartGame(t *testing.T) {
 func TestGameUsecase_SetDirectionAndSpeed(t *testing.T) {
 	s.StartTest(t)
 	s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
-	s.ExpectRepo().SetDirection(roomID, userID, direction).Return(nil)
-	s.ExpectRepo().SetSpeed(roomID, userID, speed).Return(nil)
+	s.ExpectRepo().SetPlayerDirection(roomID, userID, direction).Return(nil)
+	s.ExpectRepo().SetPlayerSpeed(roomID, userID, speed).Return(nil)
 
 	assert.NoError(t, s.usecase.StartGame(userID))
 	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
@@ -138,7 +138,8 @@ func (s *gameUsecaseTestSuite) initTestGame() {
 	s.ExpectRepo().AddFood(room.ID, gomock.Any()).Return(nil)
 	s.ExpectRepo().DeleteFood(room.ID, gomock.Any()).Return(nil).AnyTimes()
 	s.ExpectRepo().GetRoomByID(room.ID).Return(&room).AnyTimes()
-	s.ExpectRepo().SetPosition(room.ID, userID, gomock.Any()).Return(nil).AnyTimes()
+	s.ExpectRepo().SetPlayerPosition(room.ID, userID, gomock.Any()).Return(nil).AnyTimes()
+	s.ExpectRepo().SetPlayerSize(room.ID, userID, gomock.Any()).Return(nil).AnyTimes()
 }
 
 func (s gameUsecaseTestSuite) newTestRoom() model.Room {
