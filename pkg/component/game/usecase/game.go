@@ -22,7 +22,7 @@ const (
 
 	generatedFoodAmount = 10
 
-	eventStreamRate = 1000 * time.Millisecond
+	eventStreamRate = 50 * time.Millisecond
 	speedKoeff      = float64(eventStreamRate/time.Millisecond) / 150
 )
 

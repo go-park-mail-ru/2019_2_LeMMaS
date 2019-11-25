@@ -7,14 +7,17 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 const (
 	userID     = 1
-	roomID     = 1
+	roomID     = 2
 	foodAmount = 3
 	direction  = 90
 	speed      = 100
+
+	testTimeout = 3 * time.Second
 )
 
 var s = gameUsecaseTestSuite{}
@@ -47,42 +50,63 @@ func TestGameUsecase_SetDirectionAndSpeed(t *testing.T) {
 }
 
 func TestGameUsecase_PlayerMove(t *testing.T) {
-	s.StartTest(t)
-	s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
+	timeout := time.After(testTimeout)
+	done := make(chan bool)
+	go func() {
+		s.StartTest(t)
+		s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return([]int{}, nil).AnyTimes()
 
-	assert.NoError(t, s.usecase.StartGame(userID))
-	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
+		assert.NoError(t, s.usecase.StartGame(userID))
+		defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
 
-	initialPosition := s.usecase.GetPlayer(userID).Position
-	events, err := s.usecase.ListenEvents(userID)
-	assert.NoError(t, err)
-	event := <-events
-	if !assert.Equal(t, game.EventMove, event["type"]) {
-		return
+		initialPosition := s.usecase.GetPlayer(userID).Position
+		events, err := s.usecase.ListenEvents(userID)
+		assert.NoError(t, err)
+		event := <-events
+		if !assert.Equal(t, game.EventMove, event["type"]) {
+			return
+		}
+		player := event["player"].(map[string]interface{})
+		assert.Equal(t, userID, player["id"])
+		assert.Greater(t, player["x"], initialPosition.X)
+		assert.Equal(t, player["y"], initialPosition.Y)
+		t.Logf("player moved (%v, %v) -> (%v, %v) in %v", initialPosition.X, initialPosition.Y, player["x"], player["y"], eventStreamRate)
+
+		done <- true
+	}()
+	select {
+	case <-timeout:
+		t.Fatal("test timed out, probably no game events were occured")
+	case <-done:
 	}
-	player := event["player"].(map[string]interface{})
-	assert.Equal(t, userID, player["id"])
-	assert.Greater(t, player["x"], initialPosition.X)
-	assert.Equal(t, player["y"], initialPosition.Y)
-	t.Logf("player moved (%v, %v) -> (%v, %v) in %v", initialPosition.X, initialPosition.Y, player["x"], player["y"], eventStreamRate)
 }
 
 func TestGameUsecase_EatFood(t *testing.T) {
-	s.StartTest(t)
-	foodIDs := []int{3, 5}
-	s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return(foodIDs, nil)
-	s.ExpectRepo().DeleteFood(roomID, gomock.Any()).Return(nil)
+	timeout := time.After(testTimeout)
+	done := make(chan bool)
+	go func() {
+		s.StartTest(t)
+		foodIDs := []int{3, 5}
+		s.ExpectRepo().GetFoodInRange(roomID, gomock.Any(), gomock.Any()).Return(foodIDs, nil).AnyTimes()
+		s.ExpectRepo().DeleteFood(roomID, gomock.Any()).Return(nil)
 
-	assert.NoError(t, s.usecase.StartGame(userID))
-	defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
+		assert.NoError(t, s.usecase.StartGame(userID))
+		defer func() { assert.NoError(t, s.usecase.StopGame(userID)) }()
 
-	events, err := s.usecase.ListenEvents(userID)
-	assert.NoError(t, err)
-	event := <-events
-	if !assert.Equal(t, game.EventMove, event["type"]) {
-		return
+		events, err := s.usecase.ListenEvents(userID)
+		assert.NoError(t, err)
+		event := <-events
+		if !assert.Equal(t, game.EventMove, event["type"]) {
+			return
+		}
+		assert.Equal(t, foodIDs, event["eatenFood"])
+		done <- true
+	}()
+	select {
+	case <-timeout:
+		t.Fatal("test timed out, probably no game events were occured")
+	case <-done:
 	}
-	assert.Equal(t, foodIDs, event["eatenFood"])
 }
 
 type gameUsecaseTestSuite struct {
