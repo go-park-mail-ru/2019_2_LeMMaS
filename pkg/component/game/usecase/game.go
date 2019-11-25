@@ -82,8 +82,8 @@ func (u *gameUsecase) StopGame(userID int) error {
 	if room == nil {
 		return errors.New("stop: no game for this user to stop")
 	}
-	u.StopListenEvents(userID)
 	u.events.sendStop(room.ID, userID)
+	u.StopListenEvents(userID)
 	delete(u.roomsIDsByUserID, userID)
 	if len(room.Players) == 1 {
 		return u.repository.DeleteRoom(room.ID)
