@@ -7,6 +7,7 @@ type Position struct {
 
 type Player struct {
 	UserID    int      `json:"user_id"`
+	Size      int      `json:"size"`
 	Position  Position `json:"position"`
 	Direction int      `json:"-"`
 	Speed     int      `json:"-"`

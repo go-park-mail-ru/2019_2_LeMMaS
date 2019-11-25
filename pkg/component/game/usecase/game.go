@@ -12,18 +12,18 @@ import (
 )
 
 const (
-	maxSpeed   = 100
-	minSpeed   = 0
-	speedKoeff = float64(eventStreamRate/time.Millisecond) / 150
+	maxSpeed = 100
+	minSpeed = 0
 
 	maxDirection = 359
 	minDirection = 0
 
-	playerSize = 40
+	initialPlayerSize = 40
 
 	generatedFoodAmount = 10
 
-	eventStreamRate = 50 * time.Millisecond
+	eventStreamRate = 1000 * time.Millisecond
+	speedKoeff      = float64(eventStreamRate/time.Millisecond) / 150
 )
 
 var (
@@ -145,7 +145,7 @@ func (u *gameUsecase) ListenEvents(userID int) (chan map[string]interface{}, err
 	if room == nil {
 		return nil, errGameNotStarted
 	}
-	listener := u.events.Listen(userID, room.ID)
+	listener := u.events.Listen(room.ID, userID)
 	return listener, nil
 }
 
@@ -176,7 +176,7 @@ func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 			if err != nil {
 				return err
 			}
-			eatenFoodIDs, err := u.eatFood(room.ID, newPosition)
+			eatenFoodIDs, err := u.eatFood(room.ID, player, newPosition)
 			if err != nil {
 				return err
 			}
@@ -189,6 +189,7 @@ func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 func (u *gameUsecase) newPlayer(userID int) model.Player {
 	return model.Player{
 		UserID: userID,
+		Size:   initialPlayerSize,
 		Position: model.Position{
 			X: game.MaxPositionX / 2,
 			Y: game.MaxPositionY / 2,
@@ -255,11 +256,12 @@ func (u gameUsecase) generateFood() []model.Food {
 	return foods
 }
 
-func (u *gameUsecase) eatFood(roomID int, playerPosition model.Position) ([]int, error) {
+func (u *gameUsecase) eatFood(roomID int, player *model.Player, position model.Position) ([]int, error) {
+	r := player.Size / 2
 	eatenFoodIDs, err := u.repository.GetFoodInRange(
 		roomID,
-		model.Position{X: playerPosition.X - playerSize/2, Y: playerPosition.Y - playerSize/2},
-		model.Position{X: playerPosition.X + playerSize/2, Y: playerPosition.Y + playerSize/2},
+		model.Position{X: position.X - r, Y: position.Y - r},
+		model.Position{X: position.X + r, Y: position.Y + r},
 	)
 	if err != nil {
 		return nil, err
