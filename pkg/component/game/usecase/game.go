@@ -19,6 +19,7 @@ const (
 	minDirection = 0
 
 	initialPlayerSize = 40
+	maxPlayersInRoom  = 5
 
 	generatedFoodAmount = 10
 
@@ -217,10 +218,12 @@ func (u *gameUsecase) setPlayerRoom(userID, roomID int) {
 
 func (u *gameUsecase) getAvailableRoom() *model.Room {
 	availableRooms := u.repository.GetAllRooms()
-	if len(availableRooms) == 0 {
-		return nil
+	for _, room := range availableRooms {
+		if len(room.Players) < maxPlayersInRoom {
+			return room
+		}
 	}
-	return availableRooms[0]
+	return nil
 }
 
 func (u gameUsecase) getNewPlayerPosition(player *model.Player) model.Position {
