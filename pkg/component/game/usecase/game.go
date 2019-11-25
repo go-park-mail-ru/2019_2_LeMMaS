@@ -183,7 +183,7 @@ func (u *gameUsecase) processPlayersMove(room *model.Room) error {
 			if err := u.repository.DeleteFood(room.ID, eatenFood); err != nil {
 				return err
 			}
-			newSize := player.Size + len(eatenFood)
+			newSize := player.Size + len(eatenFood)*2
 			if err := u.repository.SetPlayerSize(room.ID, player.UserID, newSize); err != nil {
 				return err
 			}
