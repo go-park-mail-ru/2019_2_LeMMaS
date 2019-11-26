@@ -4,5 +4,5 @@ source `dirname $0`/env.sh
 
 ${COMPOSE} stop $1
 ${COMPOSE} rm -f -v $1
-${COMPOSE} create --force-recreate $1
+${COMPOSE} up --no-start $1
 ${COMPOSE} start $1
