@@ -121,7 +121,7 @@ func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
 	return c.WriteJSON(map[string]interface{}{
 		"type":    game.EventStart,
 		"players": h.gameUsecase.GetPlayers(userID),
-		"foods":   h.gameUsecase.GetFood(userID),
+		"food":    h.gameUsecase.GetFood(userID),
 	})
 }
 
