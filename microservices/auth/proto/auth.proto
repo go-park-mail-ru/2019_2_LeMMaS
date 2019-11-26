@@ -3,21 +3,38 @@ syntax = "proto3";
 
 package auth;
 
-service Auth {
-    rpc CreateSession(Session) returns (SessionID) {}
-    rpc CheckSession(SessionID) returns (Session) {}
-    rpc DeleteSession(SessionID) returns (Error) {}
-}
-
 message Error {
-    bool error = 1;
+    string error = 1;
 }
 
 message SessionID {
-    string id = 1;
+    string ID = 1;
 }
 
 message Session {
     string login = 1;
     string useragent = 2;
+}
+
+message UserAuth {
+    string email = 1;
+    string password = 2;
+}
+
+message SessionIDAndError {
+    SessionID sessionID = 1;
+    Error error = 2;
+}
+
+message UserDataRegister {
+    string email = 1;
+    string password = 2;
+    string name = 3;
+}
+
+service Auth {
+    rpc Login(UserAuth) returns (SessionIDAndError) {}
+    rpc Logout(SessionID) returns (Error) {}
+    rpc CheckSession(SessionID) returns (Session) {}
+    rpc RegisterUser(UserDataRegister) returns (Error) {}
 }

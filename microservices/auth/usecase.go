@@ -1,12 +1,14 @@
 package auth
 
 import (
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/auth/proto"
+	pb "github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/auth/proto"
 	"github.com/labstack/echo"
+	"golang.org/x/net/context"
 )
 
 type Service interface {
-	CreateSession(ctx echo.Context, session *proto.Session) (proto.SessionID, error)
-	CheckSession(ctx echo.Context, session *proto.SessionID) (proto.Session, error)
-	DeleteSession(ctx echo.Context, session *proto.SessionID) (proto.Error, error)
+	Login(ctx context.Context, session *pb.UserAuth) (pb.SessionIDAndError, error)
+	Logout(ctx context.Context, session *pb.SessionID) (pb.Error, error)
+	CheckSession(ctx echo.Context, session *pb.SessionID) (pb.Session, error)
+	RegisterUser(ctx echo.Context, session *pb.UserDataRegister) (pb.Error, error)
 }
