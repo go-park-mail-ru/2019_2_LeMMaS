@@ -3,5 +3,57 @@ syntax = "proto3";
 package game;
 
 service Game {
-    //rpc Gaming(Request) returns (Response) {}
+    rpc StartGame(UserID) returns (Error) {}
+    rpc StopGame(UserID) returns (Error) {}
+
+    rpc SetDirection(UserAndDirection) returns (Error) {}
+    rpc SetSpeed(UserAndSpeed) returns (Error) {}
+
+    rpc GetPlayer(UserID) returns (Player) {}
+    rpc GetPlayers(UserID) returns (Players) {}
+
+    rpc GetFood(UserID) returns (Food) {}
+
+    //rpc ListenEvents(UserID) returns (Channel) {}
+    rpc StopListenEvents(UserID) returns (Error) {}
+}
+
+message Position {
+    int32 X = 1;
+    int32 Y = 2;
+}
+
+message Food {
+    int32 id = 1;
+    Position position = 2;
+}
+
+message Players {
+    repeated Player player = 1;
+}
+
+message Player {
+    UserID userID = 1;
+    int32 size = 2;
+    Position position = 3;
+    int32 direction = 4;
+    int32 speed = 5;
+}
+
+message UserAndSpeed {
+    UserID userID = 1;
+    int32 speed = 2;
+}
+
+message UserAndDirection {
+    UserID userID = 1;
+    int32 direction = 2;
+}
+
+message UserID {
+    int32 userID = 1;
+}
+
+message Error {
+    string error = 1;
 }
