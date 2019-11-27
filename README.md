@@ -4,14 +4,24 @@
 
 [Документация по API](https://go-park-mail-ru.github.io/2019_2_LeMMaS).
 
+## Запуск
+
+```sh
+git clone https://github.com/go-park-mail-ru/2019_2_LeMMaS
+cd 2019_2_LeMMaS
+
+./docker/bin/start
+```
+
 ## Авторы
 
 - [Сударев Максим](https://github.com/smi97)
 - [Можевикина Леонарда](https://github.com/ledka17)
 - [Кобзев Антон](https://github.com/kzon)
 
-## Запуск
+## Менторы
 
-```sh
-./docker/bin/start
-```
+-   [Елизавета Щербакова](https://github.com/Liza-Shch)
+-   [Дмитрий Палий](https://github.com/stanf0rd)
+
+### [Репозиторий frontend`a](https://github.com/frontend-park-mail-ru/2019_2_LeMMaS)
