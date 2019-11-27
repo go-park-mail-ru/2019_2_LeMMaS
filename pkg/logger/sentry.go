@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type SentryLogger struct {
+type sentryLogger struct {
 }
 
 func NewSentryLogger() (Logger, error) {
@@ -16,21 +16,21 @@ func NewSentryLogger() (Logger, error) {
 	if err != nil {
 		return nil, err
 	}
-	return SentryLogger{}, nil
+	return sentryLogger{}, nil
 }
 
-func (l SentryLogger) Error(err error) {
+func (l sentryLogger) Error(err error) {
 	sentry.CaptureException(err)
 }
 
-func (l SentryLogger) Errorf(format string, args ...interface{}) {
+func (l sentryLogger) Errorf(format string, args ...interface{}) {
 	sentry.CaptureException(fmt.Errorf(format, args...))
 }
 
-func (l SentryLogger) Warn(err error) {
+func (l sentryLogger) Warn(err error) {
 	sentry.CaptureMessage(err.Error())
 }
 
-func (l SentryLogger) Warnf(format string, args ...interface{}) {
+func (l sentryLogger) Warnf(format string, args ...interface{}) {
 	sentry.CaptureMessage(fmt.Sprintf(format, args...))
 }

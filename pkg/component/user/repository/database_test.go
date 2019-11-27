@@ -23,7 +23,7 @@ func TestDatabaseUserRepository_GetAll(t *testing.T) {
 	for _, user := range expectedUsers {
 		expectedRows.AddRow(user.ID, user.Email)
 	}
-	mock.ExpectQuery(`select (.+) from "` + UserTable + `"`).WillReturnRows(expectedRows)
+	mock.ExpectQuery(`select (.+) from "` + userTable + `"`).WillReturnRows(expectedRows)
 
 	repo := newTestDatabaseRepository(t, db)
 	users, err := repo.GetAll()
@@ -41,7 +41,7 @@ func TestDatabaseUserRepository_GetByID(t *testing.T) {
 
 	expectedUser := model.User{ID: 2, Email: "test@m.ru"}
 	expectedRows := sqlmock.NewRows([]string{"id", "email"}).AddRow(expectedUser.ID, expectedUser.Email)
-	mock.ExpectQuery(`select (.+) from "` + UserTable + `"`).WithArgs(expectedUser.ID).WillReturnRows(expectedRows)
+	mock.ExpectQuery(`select (.+) from "` + userTable + `"`).WithArgs(expectedUser.ID).WillReturnRows(expectedRows)
 
 	repo := newTestDatabaseRepository(t, db)
 	user, err := repo.GetByID(expectedUser.ID)
@@ -61,7 +61,7 @@ func TestDatabaseUserRepository_GetByEmail(t *testing.T) {
 
 	expectedUser := model.User{ID: 2, Email: "test@m.ru"}
 	expectedRows := sqlmock.NewRows([]string{"id", "email"}).AddRow(expectedUser.ID, expectedUser.Email)
-	mock.ExpectQuery(`select (.+) from "` + UserTable + `"`).WithArgs(expectedUser.Email).WillReturnRows(expectedRows)
+	mock.ExpectQuery(`select (.+) from "` + userTable + `"`).WithArgs(expectedUser.Email).WillReturnRows(expectedRows)
 
 	repo := newTestDatabaseRepository(t, db)
 	user, err := repo.GetByEmail(expectedUser.Email)
@@ -80,7 +80,7 @@ func TestDatabaseUserRepository_Create(t *testing.T) {
 	defer db.Close()
 
 	user := model.User{Email: "test@m.ru", PasswordHash: "123456", Name: "Testik"}
-	mock.ExpectExec(`insert into "` + UserTable + `"`).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(`insert into "` + userTable + `"`).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	repo := newTestDatabaseRepository(t, db)
 	err = repo.Create(user.Email, user.PasswordHash, user.Name)
@@ -96,7 +96,7 @@ func TestDatabaseUserRepository_Update(t *testing.T) {
 	defer db.Close()
 
 	user := model.User{ID: 5, Email: "test@m.ru", PasswordHash: "123456", Name: "Testik", AvatarPath: "static/avatar.jpg"}
-	mock.ExpectExec(`update "`+UserTable+`"`).
+	mock.ExpectExec(`update "`+userTable+`"`).
 		WithArgs(user.Email, user.PasswordHash, user.Name, user.AvatarPath, user.ID).
 		WillReturnResult(sqlmock.NewResult(int64(user.ID), 1))
 
@@ -114,7 +114,7 @@ func TestDatabaseUserRepository_UpdateAvatarPath(t *testing.T) {
 	defer db.Close()
 
 	user := model.User{ID: 4, AvatarPath: "static/avatar.jpg"}
-	mock.ExpectExec(`update "`+UserTable+`"`).
+	mock.ExpectExec(`update "`+userTable+`"`).
 		WithArgs(user.AvatarPath, user.ID).
 		WillReturnResult(sqlmock.NewResult(int64(user.ID), 1))
 
@@ -126,6 +126,6 @@ func TestDatabaseUserRepository_UpdateAvatarPath(t *testing.T) {
 
 func newTestDatabaseRepository(t *testing.T, db *sql.DB) user.Repository {
 	dbx := sqlx.NewDb(db, "")
-	logger := testMock.NewMockLogger()
+	logger := testMock.NewMockLogger(t)
 	return NewDatabaseRepository(dbx, logger)
 }

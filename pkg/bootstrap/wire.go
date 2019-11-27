@@ -7,13 +7,14 @@ import (
 	accessHTTP "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
 	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	gameWS "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
+	gameRepo "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/repository"
 	gameUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
-	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/monitoring/prometheus/delivery/http"
 	userHTTP "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	userRepo "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
+	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/monitoring/prometheus/delivery/http"
 	"github.com/gomodule/redigo/redis"
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
@@ -53,6 +54,7 @@ func NewGameHandler() (*gameWS.GameHandler, error) {
 	wire.Build(
 		gameWS.NewGameHandler,
 		gameUsecase.NewGameUsecase,
+		gameRepo.NewRepository,
 		userUsecase.NewUserUsecase,
 		userRepo.NewDatabaseRepository,
 		userRepo.NewS3Repository,

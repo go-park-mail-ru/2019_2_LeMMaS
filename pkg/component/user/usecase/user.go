@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-const PasswordSaltLength = 8
+const passwordSaltLength = 8
 
 type userUsecase struct {
 	repository        user.Repository
@@ -34,6 +34,10 @@ func NewUserUsecase(
 
 func (u *userUsecase) GetAllUsers() ([]model.User, error) {
 	return u.repository.GetAll()
+}
+
+func (u *userUsecase) GetUserByID(userID int) (*model.User, error) {
+	return u.repository.GetByID(userID)
 }
 
 func (u *userUsecase) GetUserBySessionID(sessionID string) (*model.User, error) {
@@ -120,14 +124,14 @@ func (u *userUsecase) Logout(sessionID string) error {
 }
 
 func (u *userUsecase) getPasswordHash(password string) string {
-	salt := make([]byte, PasswordSaltLength)
+	salt := make([]byte, passwordSaltLength)
 	rand.Read(salt)
 	return u.getPasswordHashWithSalt(password, salt)
 }
 
 func (u *userUsecase) isPasswordsEqual(password string, passwordHash string) bool {
 	decodedPasswordHash, _ := base64.RawStdEncoding.DecodeString(passwordHash)
-	return u.getPasswordHashWithSalt(password, decodedPasswordHash[0:PasswordSaltLength]) == passwordHash
+	return u.getPasswordHashWithSalt(password, decodedPasswordHash[0:passwordSaltLength]) == passwordHash
 }
 
 func (u *userUsecase) getPasswordHashWithSalt(password string, salt []byte) string {

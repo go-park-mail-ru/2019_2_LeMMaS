@@ -23,7 +23,7 @@ func (h CommonMiddlewaresHandler) panicMiddleware(next echo.HandlerFunc) echo.Ha
 		defer func() {
 			if err := recover(); err != nil {
 				h.logger.Errorf("panic during request to %v: %v", c.Request().URL.Path, err)
-				h.ErrorWithStatus(c, "internal error", http.StatusInternalServerError)
+				h.errorWithStatus(c, "internal error", http.StatusInternalServerError)
 			}
 		}()
 		return next(c)

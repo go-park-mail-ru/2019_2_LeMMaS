@@ -9,6 +9,7 @@ services:
     build: images/web
     env_file: ../.env
     working_dir: /home/app/cmd/web
+    restart: on-failure
     depends_on:
       - postgres
       - redis

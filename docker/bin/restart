@@ -2,5 +2,7 @@
 
 source `dirname $0`/env.sh
 
-${SCRIPT_DIR}/stop
-${SCRIPT_DIR}/start
+${COMPOSE} stop $1
+${COMPOSE} rm -f -v $1
+${COMPOSE} up --no-start $1
+${COMPOSE} start $1
