@@ -31,13 +31,6 @@ func NewUserHandler(e *echo.Echo, userUsecase user.Usecase, logger logger.Logger
 	return &handler
 }
 
-type userToOutput struct {
-	ID         int    `json:"id"`
-	Email      string `json:"email"`
-	Name       string `json:"name"`
-	AvatarPath string `json:"avatar_path"`
-}
-
 func (h *UserHandler) handleUserList(c echo.Context) error {
 	users, err := h.userUsecase.GetAllUsers()
 	if err != nil {
@@ -82,12 +75,6 @@ func (h *UserHandler) convertUserForOutput(user model.User) userToOutput {
 		AvatarPath: user.AvatarPath,
 	}
 }
-
-type userToUpdate struct {
-	Password string `json:"password"`
-	Name     string `json:"name"`
-}
-
 func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 	currentUser, err := h.getCurrentUser(c)
 	if err != nil {
@@ -147,12 +134,6 @@ func (h *UserHandler) handleUserProfile(c echo.Context) error {
 	})
 }
 
-type userToRegister struct {
-	Email    string `json:"email" valid:"email,required"`
-	Password string `json:"password" valid:"required"`
-	Name     string `json:"name" valid:"required"`
-}
-
 func (h *UserHandler) handleUserRegister(c echo.Context) error {
 	userToRegister := &userToRegister{}
 	if err := c.Bind(userToRegister); err != nil {
@@ -166,11 +147,6 @@ func (h *UserHandler) handleUserRegister(c echo.Context) error {
 		return h.Error(c, err.Error())
 	}
 	return h.Ok(c)
-}
-
-type userToLogin struct {
-	Email    string `json:"email" valid:"email,required"`
-	Password string `json:"password" valid:"required"`
 }
 
 func (h *UserHandler) handleUserLogin(c echo.Context) error {
