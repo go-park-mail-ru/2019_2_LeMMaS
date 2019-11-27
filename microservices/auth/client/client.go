@@ -23,7 +23,7 @@ func main() {
 	ctx := context.Background()
 
 	userData := &session.UserDataRegister{
-		"leda",
+		"leda@mail.ru",
 		"asdfgh",
 		"leda",
 	}

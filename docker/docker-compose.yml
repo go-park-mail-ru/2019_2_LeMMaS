@@ -27,3 +27,16 @@ services:
     build: images/redis
     expose:
     - 6379
+
+  auth_ms:
+    build: images/auth_ms
+    working_dir: /home/app/microservices/auth/server
+    volumes:
+      - ../.:/home/app
+    env_file:
+      - ../.env
+    restart: on-failure
+    depends_on:
+      - web
+    ports:
+      - 8081:8081

@@ -11,10 +11,6 @@ message SessionID {
     string ID = 1;
 }
 
-message Session {
-    string login = 1;
-    string useragent = 2;
-}
 
 message UserAuth {
     string email = 1;
@@ -35,6 +31,5 @@ message UserDataRegister {
 service Auth {
     rpc Login(UserAuth) returns (SessionIDAndError) {}
     rpc Logout(SessionID) returns (Error) {}
-    rpc CheckSession(SessionID) returns (Session) {}
     rpc RegisterUser(UserDataRegister) returns (Error) {}
 }

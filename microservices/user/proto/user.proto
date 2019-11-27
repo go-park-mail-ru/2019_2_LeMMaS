@@ -1,16 +1,19 @@
 syntax = "proto3";
+// protoc --go_out=plugins=grpc:. *.proto
 
 package user;
 
 service User {
+    rpc GetUserByID(UserID) returns (UserAndError) {}
     rpc GetUserBySessionID(SessionID) returns (UserAndError) {}
-    rpc RegisterUser(UserData) returns (Error) {}
     rpc UpdateUser(UserToUpdate) returns (Error) {}
     rpc UpdateUserAvatar(UserToUpdateAvatar) returns (Error) {}
-    rpc GetAllUsers(UserName) returns (Users) {}
+    rpc GetLeaderUsers(UserID) returns (Users) {}
     rpc GetAvatarUrlByName(UserName) returns (AvatarUrl) {}
-    rpc Login(UserAuth) returns (AuthData) {}
-    rpc Logout(SessionID) returns (Error) {}
+}
+
+message UserID {
+    int32 ID = 1;
 }
 
 message UserData {
@@ -33,11 +36,13 @@ message SessionID {
 }
 
 message UserToUpdate {
-    UserData user = 1;
+    int32 userID = 1;
+    string password = 2;
+    string name = 3;
 }
 
 message UserToUpdateAvatar {
-    UserData user = 1;
+    int32 userID = 1;
     bytes avatarFile = 2;
 }
 
@@ -51,14 +56,4 @@ message Users {
 
 message AvatarUrl {
     string avatarUrl = 1;
-}
-
-message UserAuth {
-    string email = 1;
-    string password = 2;
-}
-
-message AuthData {
-    SessionID sessionID = 1;
-    Error error = 2;
 }

@@ -69,7 +69,7 @@ func NewGameHandler() (*ws.GameHandler, error) {
 	return gameHandler, nil
 }
 
-func NewUserHandler() (*http3.UserHandler, error) {
+func  NewUserHandler() (*http3.UserHandler, error) {
 	echo := NewEcho()
 	db, err := NewDB()
 	if err != nil {

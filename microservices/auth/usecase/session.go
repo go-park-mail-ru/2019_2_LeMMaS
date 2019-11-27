@@ -10,14 +10,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/gommon/log"
+	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"math/rand"
 	"os"
-	"sync"
 )
 
 const passwordSaltLength = 8
@@ -25,8 +23,6 @@ const passwordSaltLength = 8
 type AuthManager struct {
 	repository user.Repository
 	sessionRepository user.SessionRepository
-	mu       sync.RWMutex
-	sessions map[pb.SessionID]*pb.Session
 }
 
 func NewAuthManager() *AuthManager {
@@ -34,17 +30,17 @@ func NewAuthManager() *AuthManager {
 	if err != nil {
 		log.Error(err)
 	}
-	repo.NewSessionRepository(conn)
+	sessionRepository := repo.NewSessionRepository(conn)
 
 	db, err := newDB()
 	if err != nil {
 		log.Error(err)
 	}
-	repo.NewDatabaseRepository(db)
+	repository := repo.NewDatabaseRepository(db)
 
 	return &AuthManager{
-		mu:       sync.RWMutex{},
-		sessions: map[pb.SessionID]*pb.Session{},
+		repository:        repository,
+		sessionRepository: sessionRepository,
 	}
 }
 
@@ -98,15 +94,6 @@ func (sm *AuthManager) RegisterUser(ctx context.Context, userDataRegister *pb.Us
 		return &pb.Error{"unknown error"}, err
 	}
 	return &pb.Error{"ok"}, nil
-}
-
-func (sm *AuthManager) CheckSession(ctx context.Context, curSessionID *pb.SessionID) (*pb.Session, error) {
-	sm.mu.RLock()
-	defer sm.mu.RUnlock()
-	if sess, ok := sm.sessions[*curSessionID]; ok {
-		return sess, nil
-	}
-	return nil, grpc.Errorf(codes.NotFound, "session not found")
 }
 
 func (sm *AuthManager) getPasswordHash(password string) string {

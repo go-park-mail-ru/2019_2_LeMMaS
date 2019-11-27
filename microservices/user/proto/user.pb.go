@@ -24,20 +24,53 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type UserID struct {
+	ID                   int32    `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
+}
+
+func (m *UserID) Reset()         { *m = UserID{} }
+func (m *UserID) String() string { return proto.CompactTextString(m) }
+func (*UserID) ProtoMessage()    {}
+func (*UserID) Descriptor() ([]byte, []int) {
+	return fileDescriptor_116e343673f7ffaf, []int{0}
+}
+
+func (m *UserID) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserID.Unmarshal(m, b)
+}
+func (m *UserID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserID.Marshal(b, m, deterministic)
+}
+func (m *UserID) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserID.Merge(m, src)
+}
+func (m *UserID) XXX_Size() int {
+	return xxx_messageInfo_UserID.Size(m)
+}
+func (m *UserID) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserID.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserID proto.InternalMessageInfo
+
+func (m *UserID) GetID() int32 {
+	if m != nil {
+		return m.ID
+	}
+	return 0
+}
+
 type UserData struct {
 	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *UserData) Reset()         { *m = UserData{} }
 func (m *UserData) String() string { return proto.CompactTextString(m) }
 func (*UserData) ProtoMessage()    {}
 func (*UserData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{0}
+	return fileDescriptor_116e343673f7ffaf, []int{1}
 }
 
 func (m *UserData) XXX_Unmarshal(b []byte) error {
@@ -81,16 +114,13 @@ func (m *UserData) GetName() string {
 
 type Error struct {
 	Error                string   `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Error) Reset()         { *m = Error{} }
 func (m *Error) String() string { return proto.CompactTextString(m) }
 func (*Error) ProtoMessage()    {}
 func (*Error) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{1}
+	return fileDescriptor_116e343673f7ffaf, []int{2}
 }
 
 func (m *Error) XXX_Unmarshal(b []byte) error {
@@ -121,16 +151,13 @@ func (m *Error) GetError() string {
 type UserAndError struct {
 	User                 *UserData `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	Error                *Error    `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *UserAndError) Reset()         { *m = UserAndError{} }
 func (m *UserAndError) String() string { return proto.CompactTextString(m) }
 func (*UserAndError) ProtoMessage()    {}
 func (*UserAndError) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{2}
+	return fileDescriptor_116e343673f7ffaf, []int{3}
 }
 
 func (m *UserAndError) XXX_Unmarshal(b []byte) error {
@@ -167,16 +194,13 @@ func (m *UserAndError) GetError() *Error {
 
 type SessionID struct {
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *SessionID) Reset()         { *m = SessionID{} }
 func (m *SessionID) String() string { return proto.CompactTextString(m) }
 func (*SessionID) ProtoMessage()    {}
 func (*SessionID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{3}
+	return fileDescriptor_116e343673f7ffaf, []int{4}
 }
 
 func (m *SessionID) XXX_Unmarshal(b []byte) error {
@@ -205,17 +229,16 @@ func (m *SessionID) GetId() string {
 }
 
 type UserToUpdate struct {
-	User                 *UserData `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	UserID               int32    `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *UserToUpdate) Reset()         { *m = UserToUpdate{} }
 func (m *UserToUpdate) String() string { return proto.CompactTextString(m) }
 func (*UserToUpdate) ProtoMessage()    {}
 func (*UserToUpdate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{4}
+	return fileDescriptor_116e343673f7ffaf, []int{5}
 }
 
 func (m *UserToUpdate) XXX_Unmarshal(b []byte) error {
@@ -236,26 +259,37 @@ func (m *UserToUpdate) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UserToUpdate proto.InternalMessageInfo
 
-func (m *UserToUpdate) GetUser() *UserData {
+func (m *UserToUpdate) GetUserID() int32 {
 	if m != nil {
-		return m.User
+		return m.UserID
 	}
-	return nil
+	return 0
+}
+
+func (m *UserToUpdate) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+func (m *UserToUpdate) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
 }
 
 type UserToUpdateAvatar struct {
-	User                 *UserData `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	AvatarFile           []byte    `protobuf:"bytes,2,opt,name=avatarFile,proto3" json:"avatarFile,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	UserID               int32    `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	AvatarFile           []byte   `protobuf:"bytes,2,opt,name=avatarFile,proto3" json:"avatarFile,omitempty"`
 }
 
 func (m *UserToUpdateAvatar) Reset()         { *m = UserToUpdateAvatar{} }
 func (m *UserToUpdateAvatar) String() string { return proto.CompactTextString(m) }
 func (*UserToUpdateAvatar) ProtoMessage()    {}
 func (*UserToUpdateAvatar) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{5}
+	return fileDescriptor_116e343673f7ffaf, []int{6}
 }
 
 func (m *UserToUpdateAvatar) XXX_Unmarshal(b []byte) error {
@@ -276,11 +310,11 @@ func (m *UserToUpdateAvatar) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UserToUpdateAvatar proto.InternalMessageInfo
 
-func (m *UserToUpdateAvatar) GetUser() *UserData {
+func (m *UserToUpdateAvatar) GetUserID() int32 {
 	if m != nil {
-		return m.User
+		return m.UserID
 	}
-	return nil
+	return 0
 }
 
 func (m *UserToUpdateAvatar) GetAvatarFile() []byte {
@@ -292,16 +326,13 @@ func (m *UserToUpdateAvatar) GetAvatarFile() []byte {
 
 type UserName struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *UserName) Reset()         { *m = UserName{} }
 func (m *UserName) String() string { return proto.CompactTextString(m) }
 func (*UserName) ProtoMessage()    {}
 func (*UserName) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{6}
+	return fileDescriptor_116e343673f7ffaf, []int{7}
 }
 
 func (m *UserName) XXX_Unmarshal(b []byte) error {
@@ -331,16 +362,13 @@ func (m *UserName) GetName() string {
 
 type Users struct {
 	User                 []*UserData `protobuf:"bytes,1,rep,name=user,proto3" json:"user,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
 }
 
 func (m *Users) Reset()         { *m = Users{} }
 func (m *Users) String() string { return proto.CompactTextString(m) }
 func (*Users) ProtoMessage()    {}
 func (*Users) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{7}
+	return fileDescriptor_116e343673f7ffaf, []int{8}
 }
 
 func (m *Users) XXX_Unmarshal(b []byte) error {
@@ -370,16 +398,13 @@ func (m *Users) GetUser() []*UserData {
 
 type AvatarUrl struct {
 	AvatarUrl            string   `protobuf:"bytes,1,opt,name=avatarUrl,proto3" json:"avatarUrl,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *AvatarUrl) Reset()         { *m = AvatarUrl{} }
 func (m *AvatarUrl) String() string { return proto.CompactTextString(m) }
 func (*AvatarUrl) ProtoMessage()    {}
 func (*AvatarUrl) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{8}
+	return fileDescriptor_116e343673f7ffaf, []int{9}
 }
 
 func (m *AvatarUrl) XXX_Unmarshal(b []byte) error {
@@ -407,101 +432,8 @@ func (m *AvatarUrl) GetAvatarUrl() string {
 	return ""
 }
 
-type UserAuth struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *UserAuth) Reset()         { *m = UserAuth{} }
-func (m *UserAuth) String() string { return proto.CompactTextString(m) }
-func (*UserAuth) ProtoMessage()    {}
-func (*UserAuth) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{9}
-}
-
-func (m *UserAuth) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UserAuth.Unmarshal(m, b)
-}
-func (m *UserAuth) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UserAuth.Marshal(b, m, deterministic)
-}
-func (m *UserAuth) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserAuth.Merge(m, src)
-}
-func (m *UserAuth) XXX_Size() int {
-	return xxx_messageInfo_UserAuth.Size(m)
-}
-func (m *UserAuth) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserAuth.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UserAuth proto.InternalMessageInfo
-
-func (m *UserAuth) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *UserAuth) GetPassword() string {
-	if m != nil {
-		return m.Password
-	}
-	return ""
-}
-
-type AuthData struct {
-	SessionID            *SessionID `protobuf:"bytes,1,opt,name=sessionID,proto3" json:"sessionID,omitempty"`
-	Error                *Error     `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_unrecognized     []byte     `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
-}
-
-func (m *AuthData) Reset()         { *m = AuthData{} }
-func (m *AuthData) String() string { return proto.CompactTextString(m) }
-func (*AuthData) ProtoMessage()    {}
-func (*AuthData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{10}
-}
-
-func (m *AuthData) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AuthData.Unmarshal(m, b)
-}
-func (m *AuthData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AuthData.Marshal(b, m, deterministic)
-}
-func (m *AuthData) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AuthData.Merge(m, src)
-}
-func (m *AuthData) XXX_Size() int {
-	return xxx_messageInfo_AuthData.Size(m)
-}
-func (m *AuthData) XXX_DiscardUnknown() {
-	xxx_messageInfo_AuthData.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AuthData proto.InternalMessageInfo
-
-func (m *AuthData) GetSessionID() *SessionID {
-	if m != nil {
-		return m.SessionID
-	}
-	return nil
-}
-
-func (m *AuthData) GetError() *Error {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
-
 func init() {
+	proto.RegisterType((*UserID)(nil), "user.UserID")
 	proto.RegisterType((*UserData)(nil), "user.UserData")
 	proto.RegisterType((*Error)(nil), "user.Error")
 	proto.RegisterType((*UserAndError)(nil), "user.UserAndError")
@@ -511,42 +443,38 @@ func init() {
 	proto.RegisterType((*UserName)(nil), "user.UserName")
 	proto.RegisterType((*Users)(nil), "user.Users")
 	proto.RegisterType((*AvatarUrl)(nil), "user.AvatarUrl")
-	proto.RegisterType((*UserAuth)(nil), "user.UserAuth")
-	proto.RegisterType((*AuthData)(nil), "user.AuthData")
 }
 
 func init() { proto.RegisterFile("user.proto", fileDescriptor_116e343673f7ffaf) }
 
 var fileDescriptor_116e343673f7ffaf = []byte{
-	// 446 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x4d, 0x8b, 0xd4, 0x40,
-	0x10, 0xcd, 0x7c, 0x64, 0x99, 0xd4, 0x0c, 0xab, 0x14, 0x1e, 0x42, 0xd4, 0x45, 0xfb, 0xb4, 0x8b,
-	0xee, 0x0a, 0xe3, 0xc1, 0xc3, 0x7a, 0xc9, 0xb2, 0xba, 0x08, 0x8b, 0x48, 0x34, 0xe0, 0xc1, 0x4b,
-	0x4b, 0x9a, 0x31, 0x90, 0x49, 0x0f, 0xdd, 0x3d, 0xca, 0xfe, 0x17, 0x7f, 0xac, 0x74, 0x75, 0x3a,
-	0x69, 0xb3, 0x08, 0xe3, 0xad, 0x2b, 0xf5, 0xea, 0xd5, 0xe3, 0xbd, 0x22, 0x00, 0x7b, 0x2d, 0xd4,
-	0xc5, 0x4e, 0x49, 0x23, 0x71, 0x6e, 0xdf, 0xec, 0x13, 0x2c, 0x4a, 0x2d, 0xd4, 0x35, 0x37, 0x1c,
-	0x1f, 0x41, 0x2c, 0xb6, 0xbc, 0x6e, 0xd2, 0xc9, 0xb3, 0xc9, 0x69, 0x52, 0xb8, 0x02, 0x33, 0x58,
-	0xec, 0xb8, 0xd6, 0xbf, 0xa4, 0xaa, 0xd2, 0x29, 0x35, 0xfa, 0x1a, 0x11, 0xe6, 0x2d, 0xdf, 0x8a,
-	0x74, 0x46, 0xdf, 0xe9, 0xcd, 0x9e, 0x42, 0xfc, 0x4e, 0x29, 0xa9, 0x88, 0xce, 0x3e, 0x7a, 0x3a,
-	0x5b, 0xb0, 0x12, 0x56, 0x76, 0x61, 0xde, 0x56, 0x0e, 0xc5, 0x80, 0x84, 0x10, 0x68, 0xb9, 0x3e,
-	0xbe, 0x20, 0x85, 0x5e, 0x52, 0x41, 0x3d, 0x7c, 0xee, 0x99, 0xa6, 0x04, 0x5a, 0x3a, 0x10, 0xcd,
-	0x7b, 0xda, 0xc7, 0x90, 0x7c, 0x16, 0x5a, 0xd7, 0xb2, 0xfd, 0x70, 0x8d, 0xc7, 0x30, 0xad, 0xab,
-	0x6e, 0xed, 0xb4, 0xae, 0xd8, 0xda, 0xed, 0xfc, 0x22, 0xcb, 0x5d, 0xc5, 0x8d, 0x38, 0x64, 0x27,
-	0xfb, 0x0a, 0x18, 0xce, 0xe4, 0x3f, 0xb9, 0xe1, 0x87, 0xa9, 0x3d, 0x01, 0xe0, 0x84, 0x7e, 0x5f,
-	0x37, 0x82, 0x24, 0xaf, 0x8a, 0xe0, 0x0b, 0x3b, 0x71, 0x96, 0x7f, 0xe4, 0x5b, 0xd1, 0x1b, 0x38,
-	0x09, 0x0c, 0x7c, 0x01, 0xb1, 0xed, 0xeb, 0x60, 0xd9, 0xec, 0x9f, 0x32, 0xcf, 0x20, 0x71, 0xd2,
-	0x4a, 0xd5, 0xe0, 0x13, 0x48, 0xb8, 0x2f, 0x3a, 0xca, 0xe1, 0x03, 0x7b, 0xeb, 0xf6, 0xe6, 0x7b,
-	0xf3, 0xe3, 0xff, 0xa3, 0x66, 0xdf, 0x60, 0x61, 0x27, 0xe9, 0x50, 0xce, 0x21, 0xd1, 0xde, 0xec,
-	0xce, 0x8a, 0x07, 0x4e, 0x5d, 0x9f, 0x41, 0x31, 0x20, 0x0e, 0x88, 0x6f, 0xfd, 0x7b, 0x06, 0x73,
-	0x2b, 0x0e, 0x2f, 0x01, 0x6f, 0x84, 0xb1, 0xcf, 0xab, 0xbb, 0x21, 0xd0, 0x31, 0x7b, 0x86, 0x83,
-	0x19, 0xfe, 0x92, 0x58, 0x84, 0xe7, 0xb0, 0x2a, 0xc4, 0xa6, 0xd6, 0x46, 0x28, 0x22, 0x1b, 0x59,
-	0x96, 0x85, 0x9b, 0x59, 0x84, 0xaf, 0x00, 0x5c, 0xb8, 0x04, 0x0e, 0x28, 0x7d, 0xe8, 0xe3, 0x81,
-	0x4b, 0x78, 0x38, 0x0c, 0x74, 0x17, 0x91, 0xde, 0x1f, 0x73, 0x9d, 0xf1, 0xf0, 0x4b, 0x58, 0xde,
-	0x08, 0x93, 0x37, 0x8d, 0x0b, 0x37, 0xd0, 0x66, 0x2f, 0xc1, 0xa3, 0xa9, 0xc9, 0x22, 0x7c, 0x43,
-	0x3e, 0xf4, 0xd1, 0x5e, 0xdd, 0xd1, 0xb9, 0x8c, 0x87, 0x3a, 0x5f, 0x7a, 0x18, 0x8b, 0xf0, 0x0c,
-	0xe2, 0x5b, 0xb9, 0xa9, 0xdb, 0x10, 0x6b, 0x83, 0xcb, 0xba, 0xda, 0x87, 0xc8, 0x22, 0x3c, 0x85,
-	0xa3, 0x5b, 0xb9, 0x91, 0x7b, 0x73, 0xdf, 0xdf, 0xbf, 0xb5, 0x7f, 0x3f, 0xa2, 0x5f, 0xc6, 0xeb,
-	0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x07, 0xf3, 0xd9, 0xdc, 0x40, 0x04, 0x00, 0x00,
+	// 401 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0xcf, 0x4b, 0xeb, 0x40,
+	0x10, 0x6e, 0xd3, 0xa6, 0x34, 0x93, 0xd2, 0xf7, 0x18, 0x1e, 0x8f, 0x10, 0xb5, 0xe8, 0x9e, 0x14,
+	0xb1, 0x62, 0x3d, 0x78, 0xf0, 0xd4, 0x12, 0x2d, 0x81, 0x22, 0x12, 0x8d, 0xf7, 0x95, 0xec, 0x21,
+	0xd0, 0x36, 0x65, 0x37, 0x55, 0xfa, 0x3f, 0xfa, 0x47, 0xc9, 0xce, 0xe6, 0x97, 0x4a, 0x0f, 0xde,
+	0xf6, 0x9b, 0xf9, 0xe6, 0x9b, 0x99, 0x6f, 0x58, 0x80, 0xad, 0x12, 0x72, 0xbc, 0x91, 0x59, 0x9e,
+	0x61, 0x57, 0xbf, 0x99, 0x07, 0xbd, 0x58, 0x09, 0x19, 0x06, 0x38, 0x04, 0x2b, 0x0c, 0xbc, 0xf6,
+	0x71, 0xfb, 0xd4, 0x8e, 0xac, 0x30, 0x60, 0x8f, 0xd0, 0xd7, 0x99, 0x80, 0xe7, 0x1c, 0xff, 0x81,
+	0x2d, 0x56, 0x3c, 0x5d, 0x52, 0xda, 0x89, 0x0c, 0x40, 0x1f, 0xfa, 0x1b, 0xae, 0xd4, 0x7b, 0x26,
+	0x13, 0xcf, 0xa2, 0x44, 0x85, 0x11, 0xa1, 0xbb, 0xe6, 0x2b, 0xe1, 0x75, 0x28, 0x4e, 0x6f, 0x76,
+	0x04, 0xf6, 0x9d, 0x94, 0x99, 0x24, 0x39, 0xfd, 0xa8, 0xe4, 0x34, 0x60, 0x31, 0x0c, 0x74, 0xc3,
+	0xe9, 0x3a, 0x31, 0x2c, 0x06, 0x34, 0x22, 0x91, 0xdc, 0xc9, 0x70, 0x4c, 0xb3, 0x97, 0x23, 0x45,
+	0x94, 0xc3, 0x93, 0x52, 0xc9, 0x22, 0x92, 0x6b, 0x48, 0x54, 0x5f, 0xca, 0x1e, 0x80, 0xf3, 0x24,
+	0x94, 0x4a, 0xb3, 0xb5, 0x59, 0x32, 0x4d, 0x8a, 0xb6, 0x56, 0x9a, 0xb0, 0x17, 0xd3, 0xf3, 0x39,
+	0x8b, 0x37, 0x09, 0xcf, 0x05, 0xfe, 0x87, 0xde, 0x96, 0xec, 0x28, 0x8c, 0x28, 0xd0, 0xaf, 0x57,
+	0x5d, 0x00, 0x36, 0x75, 0xa7, 0x6f, 0x3c, 0xe7, 0x72, 0xaf, 0xfa, 0x08, 0x80, 0x13, 0xe3, 0x3e,
+	0x5d, 0x0a, 0xd2, 0x1f, 0x44, 0x8d, 0x08, 0x1b, 0x99, 0x53, 0x3c, 0xf0, 0x95, 0xa8, 0xba, 0xb5,
+	0x1b, 0xdd, 0xce, 0xc1, 0xd6, 0x79, 0xd5, 0xb0, 0xac, 0xb3, 0xcf, 0x32, 0x76, 0x06, 0x8e, 0x19,
+	0x27, 0x96, 0x4b, 0x3c, 0x04, 0x87, 0x97, 0xa0, 0x90, 0xac, 0x03, 0x93, 0x0f, 0x0b, 0xba, 0xba,
+	0x1a, 0xaf, 0xc0, 0x9d, 0x8b, 0x5c, 0x3f, 0x67, 0xbb, 0x30, 0xc0, 0x41, 0x2d, 0x1c, 0x06, 0x3e,
+	0xd6, 0xa8, 0xbc, 0x1d, 0x6b, 0xe1, 0x2d, 0x60, 0x55, 0x52, 0xfb, 0xff, 0xc7, 0x70, 0xab, 0xc0,
+	0x9e, 0xe2, 0x4b, 0x00, 0x63, 0x1c, 0x75, 0x6f, 0x70, 0x4a, 0x43, 0xfd, 0xe6, 0xa5, 0xa9, 0xdb,
+	0xdf, 0xba, 0xa0, 0x70, 0xdb, 0xfb, 0x59, 0x66, 0x32, 0xdf, 0x8b, 0x2f, 0x60, 0x38, 0x17, 0xf9,
+	0x42, 0xf0, 0x44, 0x48, 0xe3, 0xe3, 0xd7, 0x05, 0xdd, 0x1a, 0x29, 0xd6, 0xc2, 0x1b, 0xda, 0xac,
+	0xf2, 0x70, 0xb6, 0xa3, 0xbb, 0x34, 0xcc, 0xd6, 0xd8, 0x2f, 0x36, 0xad, 0x68, 0xac, 0xf5, 0xda,
+	0xa3, 0x8f, 0x77, 0xfd, 0x19, 0x00, 0x00, 0xff, 0xff, 0x99, 0xaa, 0x1b, 0x52, 0x86, 0x03, 0x00,
+	0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -561,14 +489,12 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UserClient interface {
+	GetUserByID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserAndError, error)
 	GetUserBySessionID(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*UserAndError, error)
-	RegisterUser(ctx context.Context, in *UserData, opts ...grpc.CallOption) (*Error, error)
 	UpdateUser(ctx context.Context, in *UserToUpdate, opts ...grpc.CallOption) (*Error, error)
 	UpdateUserAvatar(ctx context.Context, in *UserToUpdateAvatar, opts ...grpc.CallOption) (*Error, error)
-	GetAllUsers(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*Users, error)
+	GetLeaderUsers(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Users, error)
 	GetAvatarUrlByName(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*AvatarUrl, error)
-	Login(ctx context.Context, in *UserAuth, opts ...grpc.CallOption) (*AuthData, error)
-	Logout(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*Error, error)
 }
 
 type userClient struct {
@@ -579,18 +505,18 @@ func NewUserClient(cc *grpc.ClientConn) UserClient {
 	return &userClient{cc}
 }
 
-func (c *userClient) GetUserBySessionID(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*UserAndError, error) {
+func (c *userClient) GetUserByID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*UserAndError, error) {
 	out := new(UserAndError)
-	err := c.cc.Invoke(ctx, "/user.User/GetUserBySessionID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.User/GetUserByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) RegisterUser(ctx context.Context, in *UserData, opts ...grpc.CallOption) (*Error, error) {
-	out := new(Error)
-	err := c.cc.Invoke(ctx, "/user.User/RegisterUser", in, out, opts...)
+func (c *userClient) GetUserBySessionID(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*UserAndError, error) {
+	out := new(UserAndError)
+	err := c.cc.Invoke(ctx, "/user.User/GetUserBySessionID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -615,9 +541,9 @@ func (c *userClient) UpdateUserAvatar(ctx context.Context, in *UserToUpdateAvata
 	return out, nil
 }
 
-func (c *userClient) GetAllUsers(ctx context.Context, in *UserName, opts ...grpc.CallOption) (*Users, error) {
+func (c *userClient) GetLeaderUsers(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Users, error) {
 	out := new(Users)
-	err := c.cc.Invoke(ctx, "/user.User/GetAllUsers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/user.User/GetLeaderUsers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -633,45 +559,25 @@ func (c *userClient) GetAvatarUrlByName(ctx context.Context, in *UserName, opts 
 	return out, nil
 }
 
-func (c *userClient) Login(ctx context.Context, in *UserAuth, opts ...grpc.CallOption) (*AuthData, error) {
-	out := new(AuthData)
-	err := c.cc.Invoke(ctx, "/user.User/Login", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) Logout(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*Error, error) {
-	out := new(Error)
-	err := c.cc.Invoke(ctx, "/user.User/Logout", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // UserServer is the server API for User service.
 type UserServer interface {
+	GetUserByID(context.Context, *UserID) (*UserAndError, error)
 	GetUserBySessionID(context.Context, *SessionID) (*UserAndError, error)
-	RegisterUser(context.Context, *UserData) (*Error, error)
 	UpdateUser(context.Context, *UserToUpdate) (*Error, error)
 	UpdateUserAvatar(context.Context, *UserToUpdateAvatar) (*Error, error)
-	GetAllUsers(context.Context, *UserName) (*Users, error)
+	GetLeaderUsers(context.Context, *UserID) (*Users, error)
 	GetAvatarUrlByName(context.Context, *UserName) (*AvatarUrl, error)
-	Login(context.Context, *UserAuth) (*AuthData, error)
-	Logout(context.Context, *SessionID) (*Error, error)
 }
 
 // UnimplementedUserServer can be embedded to have forward compatible implementations.
 type UnimplementedUserServer struct {
 }
 
+func (*UnimplementedUserServer) GetUserByID(ctx context.Context, req *UserID) (*UserAndError, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
+}
 func (*UnimplementedUserServer) GetUserBySessionID(ctx context.Context, req *SessionID) (*UserAndError, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserBySessionID not implemented")
-}
-func (*UnimplementedUserServer) RegisterUser(ctx context.Context, req *UserData) (*Error, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
 }
 func (*UnimplementedUserServer) UpdateUser(ctx context.Context, req *UserToUpdate) (*Error, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -679,21 +585,33 @@ func (*UnimplementedUserServer) UpdateUser(ctx context.Context, req *UserToUpdat
 func (*UnimplementedUserServer) UpdateUserAvatar(ctx context.Context, req *UserToUpdateAvatar) (*Error, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserAvatar not implemented")
 }
-func (*UnimplementedUserServer) GetAllUsers(ctx context.Context, req *UserName) (*Users, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllUsers not implemented")
+func (*UnimplementedUserServer) GetLeaderUsers(ctx context.Context, req *UserID) (*Users, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLeaderUsers not implemented")
 }
 func (*UnimplementedUserServer) GetAvatarUrlByName(ctx context.Context, req *UserName) (*AvatarUrl, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvatarUrlByName not implemented")
 }
-func (*UnimplementedUserServer) Login(ctx context.Context, req *UserAuth) (*AuthData, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
-}
-func (*UnimplementedUserServer) Logout(ctx context.Context, req *SessionID) (*Error, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
-}
 
 func RegisterUserServer(s *grpc.Server, srv UserServer) {
 	s.RegisterService(&_User_serviceDesc, srv)
+}
+
+func _User_GetUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.User/GetUserByID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserByID(ctx, req.(*UserID))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _User_GetUserBySessionID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -710,24 +628,6 @@ func _User_GetUserBySessionID_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).GetUserBySessionID(ctx, req.(*SessionID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_RegisterUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserData)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).RegisterUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.User/RegisterUser",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).RegisterUser(ctx, req.(*UserData))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -768,20 +668,20 @@ func _User_UpdateUserAvatar_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetAllUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserName)
+func _User_GetLeaderUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetAllUsers(ctx, in)
+		return srv.(UserServer).GetLeaderUsers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/user.User/GetAllUsers",
+		FullMethod: "/user.User/GetLeaderUsers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetAllUsers(ctx, req.(*UserName))
+		return srv.(UserServer).GetLeaderUsers(ctx, req.(*UserID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -804,53 +704,17 @@ func _User_GetAvatarUrlByName_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserAuth)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).Login(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.User/Login",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).Login(ctx, req.(*UserAuth))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SessionID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).Logout(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.User/Logout",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).Logout(ctx, req.(*SessionID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _User_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "user.User",
 	HandlerType: (*UserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetUserBySessionID",
-			Handler:    _User_GetUserBySessionID_Handler,
+			MethodName: "GetUserByID",
+			Handler:    _User_GetUserByID_Handler,
 		},
 		{
-			MethodName: "RegisterUser",
-			Handler:    _User_RegisterUser_Handler,
+			MethodName: "GetUserBySessionID",
+			Handler:    _User_GetUserBySessionID_Handler,
 		},
 		{
 			MethodName: "UpdateUser",
@@ -861,20 +725,12 @@ var _User_serviceDesc = grpc.ServiceDesc{
 			Handler:    _User_UpdateUserAvatar_Handler,
 		},
 		{
-			MethodName: "GetAllUsers",
-			Handler:    _User_GetAllUsers_Handler,
+			MethodName: "GetLeaderUsers",
+			Handler:    _User_GetLeaderUsers_Handler,
 		},
 		{
 			MethodName: "GetAvatarUrlByName",
 			Handler:    _User_GetAvatarUrlByName_Handler,
-		},
-		{
-			MethodName: "Login",
-			Handler:    _User_Login_Handler,
-		},
-		{
-			MethodName: "Logout",
-			Handler:    _User_Logout_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
