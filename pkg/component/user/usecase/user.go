@@ -1,10 +1,10 @@
 package usecase
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
-	"fmt"
+	authProto "github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/auth/proto"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/google/uuid"
@@ -19,16 +19,15 @@ type userUsecase struct {
 	repository        user.Repository
 	fileRepository    user.FileRepository
 	sessionRepository user.SessionRepository
+	auth              authProto.AuthClient
 }
 
-func NewUserUsecase(
-	repository user.Repository,
-	fileRepository user.FileRepository,
-	sessionRepository user.SessionRepository) user.Usecase {
+func NewUserUsecase(repository user.Repository, fileRepository user.FileRepository, sessionRepository user.SessionRepository, auth authProto.AuthClient) user.Usecase {
 	return &userUsecase{
 		repository:        repository,
 		fileRepository:    fileRepository,
 		sessionRepository: sessionRepository,
+		auth:              auth,
 	}
 }
 
@@ -85,42 +84,24 @@ func (u *userUsecase) GetAvatarUrlByName(name string) string {
 }
 
 func (u *userUsecase) Register(email, password, name string) error {
-	userWithSameEmail, err := u.repository.GetByEmail(email)
-	if err != nil {
-		return errors.New("unknown error")
-	}
-	if userWithSameEmail != nil {
-		return errors.New("user with this email already registered")
-	}
-	passwordHash := u.getPasswordHash(password)
-	return u.repository.Create(email, passwordHash, name)
+	userData := &authProto.UserDataRegister{email, password, name}
+	_, err := u.auth.RegisterUser(context.Background(), userData)
+	return err
 }
 
 func (u *userUsecase) Login(email, password string) (sessionID string, err error) {
-	userToLogin, err := u.repository.GetByEmail(email)
-	if userToLogin == nil {
-		return "", fmt.Errorf("incorrect email")
-	}
-	if err != nil {
-		return "", fmt.Errorf("unknown error")
-	}
-	if !u.isPasswordsEqual(password, userToLogin.PasswordHash) {
-		return "", fmt.Errorf("incorrect password")
-	}
-	sessionID = u.getNewSessionID()
-	err = u.sessionRepository.AddSession(sessionID, userToLogin.ID)
+	userData := &authProto.UserAuth{email, password}
+	result, err := u.auth.Login(context.Background(), userData)
 	if err != nil {
 		return "", err
 	}
-	return sessionID, nil
+	return result.SessionID.ID, err
 }
 
 func (u *userUsecase) Logout(sessionID string) error {
-	err := u.sessionRepository.DeleteSession(sessionID)
-	if err != nil {
-		return fmt.Errorf("error deleting session")
-	}
-	return nil
+	userData := &authProto.SessionID{sessionID}
+	_, err := u.auth.Logout(context.Background(), userData)
+	return err
 }
 
 func (u *userUsecase) getPasswordHash(password string) string {

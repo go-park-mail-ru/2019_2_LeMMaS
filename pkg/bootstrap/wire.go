@@ -4,6 +4,7 @@
 package bootstrap
 
 import (
+	authProto "github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/auth/proto"
 	accessHTTP "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
 	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	gameWS "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
@@ -18,6 +19,7 @@ import (
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
+	"google.golang.org/grpc"
 	"os"
 )
 
@@ -49,6 +51,8 @@ func NewGameHandler() (*gameWS.GameHandler, error) {
 		userRepo.NewDatabaseRepository,
 		userRepo.NewS3Repository,
 		userRepo.NewSessionRepository,
+		authProto.NewAuthClient,
+		NewAuthClientConn,
 		NewEcho,
 		NewLogger,
 		NewDB,
@@ -64,6 +68,8 @@ func NewUserHandler() (*userHTTP.UserHandler, error) {
 		userRepo.NewDatabaseRepository,
 		userRepo.NewS3Repository,
 		userRepo.NewSessionRepository,
+		authProto.NewAuthClient,
+		NewAuthClientConn,
 		NewEcho,
 		NewLogger,
 		NewDB,
@@ -118,4 +124,15 @@ func NewLogger() (logger.Logger, error) {
 		loggerInstance = &combinedLogger
 	}
 	return *loggerInstance, nil
+}
+
+func NewAuthClientConn() (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(
+		"auth_ms:8081",
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }

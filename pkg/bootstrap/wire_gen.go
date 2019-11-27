@@ -6,6 +6,7 @@
 package bootstrap
 
 import (
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/auth/proto"
 	http2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
@@ -19,6 +20,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo"
+	"google.golang.org/grpc"
 	"os"
 )
 
@@ -64,12 +66,17 @@ func NewGameHandler() (*ws.GameHandler, error) {
 		return nil, err
 	}
 	sessionRepository := repository2.NewSessionRepository(conn, logger)
-	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository)
+	clientConn, err := NewAuthClientConn()
+	if err != nil {
+		return nil, err
+	}
+	authClient := auth.NewAuthClient(clientConn)
+	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository, authClient)
 	gameHandler := ws.NewGameHandler(echo, gameUsecase, userUsecase, logger)
 	return gameHandler, nil
 }
 
-func  NewUserHandler() (*http3.UserHandler, error) {
+func NewUserHandler() (*http3.UserHandler, error) {
 	echo := NewEcho()
 	db, err := NewDB()
 	if err != nil {
@@ -86,7 +93,12 @@ func  NewUserHandler() (*http3.UserHandler, error) {
 		return nil, err
 	}
 	sessionRepository := repository2.NewSessionRepository(conn, logger)
-	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository)
+	clientConn, err := NewAuthClientConn()
+	if err != nil {
+		return nil, err
+	}
+	authClient := auth.NewAuthClient(clientConn)
+	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository, authClient)
 	userHandler := http3.NewUserHandler(echo, userUsecase, logger)
 	return userHandler, nil
 }
@@ -139,4 +151,14 @@ func NewLogger() (logger.Logger, error) {
 		loggerInstance = &combinedLogger
 	}
 	return *loggerInstance, nil
+}
+
+func NewAuthClientConn() (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(
+		"auth_ms:8081", grpc.WithInsecure(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }
