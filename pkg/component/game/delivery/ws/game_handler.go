@@ -21,6 +21,8 @@ type GameHandler struct {
 	logger      logger.Logger
 	gameUsecase game.Usecase
 	userUsecase user.Usecase
+
+	upgrader websocket.Upgrader
 }
 
 func NewGameHandler(e *echo.Echo, gameUsecase game.Usecase, userUsecase user.Usecase, logger logger.Logger) *GameHandler {
@@ -28,9 +30,16 @@ func NewGameHandler(e *echo.Echo, gameUsecase game.Usecase, userUsecase user.Use
 		logger:      logger,
 		gameUsecase: gameUsecase,
 		userUsecase: userUsecase,
+		upgrader:    newWebsocketUpgrader(),
 	}
 	e.GET(httpDelivery.ApiV1GamePath, handler.handleGame)
 	return &handler
+}
+
+func newWebsocketUpgrader() websocket.Upgrader {
+	return websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
+		return true
+	}}
 }
 
 func (h GameHandler) sendError(c *websocket.Conn, err error) error {
@@ -42,10 +51,7 @@ func (h GameHandler) sendError(c *websocket.Conn, err error) error {
 }
 
 func (h GameHandler) handleGame(c echo.Context) error {
-	upgrader := websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
-		return true
-	}}
-	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	conn, err := h.upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		h.logger.Error(err)
 		return nil
