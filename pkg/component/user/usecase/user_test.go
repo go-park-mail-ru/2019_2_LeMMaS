@@ -13,7 +13,7 @@ import (
 
 func TestUserUsecase_GetAllUsers(t *testing.T) {
 	userRepo := user.NewMockRepository(gomock.NewController(t))
-	usecase := NewUserUsecase(userRepo, nil, nil)
+	usecase := NewUserUsecase(userRepo, nil, nil, nil)
 
 	expectedUsers := []model.User{
 		{ID: 4, Email: "test4@mail.ru", Name: "Testik 4"},
@@ -32,7 +32,7 @@ func TestUserUsecase_GetAllUsers(t *testing.T) {
 
 func TestUserUsecase_GetUserByID(t *testing.T) {
 	userRepo := user.NewMockRepository(gomock.NewController(t))
-	usecase := NewUserUsecase(userRepo, nil, nil)
+	usecase := NewUserUsecase(userRepo, nil, nil, nil)
 
 	expectedUser := &model.User{ID: 4, Email: "test4@mail.ru", Name: "Testik 4"}
 	userRepo.EXPECT().GetByID(expectedUser.ID).Return(expectedUser, nil)
@@ -48,7 +48,7 @@ func TestUserUsecase_GetUserByID(t *testing.T) {
 
 func TestUserUsecase_Register(t *testing.T) {
 	userRepo := user.NewMockRepository(gomock.NewController(t))
-	usecase := NewUserUsecase(userRepo, nil, nil)
+	usecase := NewUserUsecase(userRepo, nil, nil, nil)
 
 	email := "t@mail.ru"
 	password := test.Password
@@ -69,7 +69,7 @@ func TestUserUsecase_Login(t *testing.T) {
 	mockController := gomock.NewController(t)
 	userRepo := user.NewMockRepository(mockController)
 	sessionRepo := user.NewMockSessionRepository(mockController)
-	usecase := NewUserUsecase(userRepo, nil, sessionRepo)
+	usecase := NewUserUsecase(userRepo, nil, sessionRepo, nil)
 
 	userToLogin := model.User{ID: 2, Email: "t@mail.ru", PasswordHash: test.PasswordHash}
 	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
@@ -89,7 +89,7 @@ func TestUserUsecase_GetUserBySessionID(t *testing.T) {
 	mockController := gomock.NewController(t)
 	userRepo := user.NewMockRepository(mockController)
 	sessionRepo := user.NewMockSessionRepository(mockController)
-	usecase := NewUserUsecase(userRepo, nil, sessionRepo)
+	usecase := NewUserUsecase(userRepo, nil, sessionRepo, nil)
 
 	userToLogin := model.User{Email: "t@mail.ru", PasswordHash: test.PasswordHash}
 	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
@@ -108,21 +108,21 @@ func TestUserUsecase_GetUserBySessionID(t *testing.T) {
 
 func TestUserUsecase_Logout(t *testing.T) {
 	sessionRepo := user.NewMockSessionRepository(gomock.NewController(t))
-	usecase := NewUserUsecase(nil, nil, sessionRepo)
+	usecase := NewUserUsecase(nil, nil, sessionRepo, nil)
 	sessionRepo.EXPECT().DeleteSession(test.SessionID).Return(nil)
 	err := usecase.Logout(test.SessionID)
 	assert.Nil(t, err)
 }
 
 func TestUserUsecase_GetAvatarUrlByName(t *testing.T) {
-	usecase := NewUserUsecase(nil, nil, nil)
+	usecase := NewUserUsecase(nil, nil, nil, nil)
 	url := usecase.GetAvatarUrlByName("trump")
 	assert.Regexp(t, `^http`, url)
 }
 
 func TestUserUsecase_UpdateUser(t *testing.T) {
 	userRepo := user.NewMockRepository(gomock.NewController(t))
-	usecase := NewUserUsecase(userRepo, nil, nil)
+	usecase := NewUserUsecase(userRepo, nil, nil, nil)
 
 	oldUser := model.User{ID: 4, Name: "Old Name"}
 	userRepo.EXPECT().GetByID(oldUser.ID).Return(&oldUser, nil)
@@ -136,7 +136,7 @@ func TestUserUsecase_UpdateUserAvatar(t *testing.T) {
 	mockController := gomock.NewController(t)
 	userRepo := user.NewMockRepository(mockController)
 	userFileRepo := user.NewMockFileRepository(mockController)
-	usecase := NewUserUsecase(userRepo, userFileRepo, nil)
+	usecase := NewUserUsecase(userRepo, userFileRepo, nil, nil)
 
 	userToUpdate := model.User{ID: 2}
 	avatarFile := io.LimitedReader{}

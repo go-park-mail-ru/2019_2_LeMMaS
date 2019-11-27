@@ -15,7 +15,7 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.1.1
 	github.com/google/wire v0.3.0
-	github.com/gorilla/mux v1.7.3
+	github.com/gorilla/mux v1.7.3 // indirect
 	github.com/gorilla/websocket v1.4.1
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgx v3.6.0+incompatible
@@ -23,7 +23,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.2.0
-	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33
+	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33 // indirect
 	github.com/paulmach/go.geojson v1.4.0 // indirect
 	github.com/paulmach/orb v0.1.5
 	github.com/pkg/errors v0.8.1

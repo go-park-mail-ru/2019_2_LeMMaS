@@ -21,7 +21,7 @@ import (
 const passwordSaltLength = 8
 
 type AuthManager struct {
-	repository user.Repository
+	repository        user.Repository
 	sessionRepository user.SessionRepository
 }
 
@@ -64,16 +64,15 @@ func (sm *AuthManager) Login(ctx context.Context, userAuth *pb.UserAuth) (*pb.Se
 		errMes := "incorrect email"
 		return &pb.SessionIDAndError{&pb.SessionID{""}, &pb.Error{errMes}}, fmt.Errorf(errMes)
 	}
-	return &pb.SessionIDAndError{&pb.SessionID{""}, &pb.Error{"ok"}}, nil
+	return &pb.SessionIDAndError{&pb.SessionID{sessionID}, &pb.Error{"ok"}}, nil
 }
 
 func (sm *AuthManager) Logout(ctx context.Context, sessionID *pb.SessionID) (*pb.Error, error) {
 	err := sm.sessionRepository.DeleteSession(sessionID.ID)
 	if err != nil {
-		errMes := "error deleting session"
-		return &pb.Error{errMes}, errors.New(errMes)
+		return &pb.Error{""}, errors.New("error deleting session")
 	}
-	return &pb.Error{"ok"}, nil
+	return &pb.Error{""}, nil
 }
 
 func (sm *AuthManager) RegisterUser(ctx context.Context, userDataRegister *pb.UserDataRegister) (*pb.Error, error) {
