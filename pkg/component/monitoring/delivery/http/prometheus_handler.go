@@ -10,14 +10,14 @@ import (
 type PrometheusHandler struct {
 	delivery.Handler
 	e      *echo.Echo
-	logger      logger.Logger
+	logger logger.Logger
 }
 
 func NewPrometheusHandler(e *echo.Echo, logger logger.Logger) *PrometheusHandler {
 	handler := PrometheusHandler{
 		Handler: delivery.Handler{},
-		e: e,
-		logger: logger,
+		e:       e,
+		logger:  logger,
 	}
 	e.GET(delivery.ApiV1PrometheusPath, echo.WrapHandler(promhttp.Handler()))
 	return &handler

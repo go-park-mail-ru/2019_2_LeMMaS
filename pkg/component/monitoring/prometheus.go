@@ -1,4 +1,4 @@
-package prometheus
+package monitoring
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
@@ -6,14 +6,14 @@ import (
 )
 
 var (
-	normDomain        = 0.0002
-	normMean          = 0.00001
+	normDomain = 0.0002
+	normMean   = 0.00001
 )
 
 var (
 	usersRegistered = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name:		"count of users",
+			Name: "count of users",
 		})
 	rpcDurations = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
