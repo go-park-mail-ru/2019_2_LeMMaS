@@ -7,9 +7,6 @@
 ## Запуск
 
 ```sh
-git clone https://github.com/go-park-mail-ru/2019_2_LeMMaS
-cd 2019_2_LeMMaS
-
 ./docker/bin/start
 ```
 
