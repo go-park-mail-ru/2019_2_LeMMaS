@@ -2,8 +2,8 @@ package repository
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/game"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/game/model"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/quadtree"
 )

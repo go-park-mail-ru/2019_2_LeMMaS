@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/game"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/microservices/game/model"
 )
 
 var errNoEventListeners = errors.New("no event listeners")

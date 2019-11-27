@@ -23,6 +23,7 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.2.0
+	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/paulmach/go.geo v0.0.0-20180829195134-22b514266d33
 	github.com/paulmach/go.geojson v1.4.0 // indirect
 	github.com/paulmach/orb v0.1.5
