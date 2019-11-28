@@ -8,7 +8,7 @@ import (
 	accessUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	gameWS "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
 	gameUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
-	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/prometheus/delivery/http"
+	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/monitoring/delivery/http"
 	userHTTP "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	userRepo "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	userUsecase "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"

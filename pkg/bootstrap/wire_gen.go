@@ -10,7 +10,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
 	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/prometheus/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/monitoring/delivery/http"
 	http4 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	usecase3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
