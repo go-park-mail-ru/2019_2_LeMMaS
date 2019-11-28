@@ -10,7 +10,7 @@ import (
 type PrometheusHandler struct {
 	delivery.Handler
 	e      *echo.Echo
-	logger      logger.Logger
+	logger logger.Logger
 }
 
 func NewPrometheusHandler(e *echo.Echo, logger logger.Logger) *PrometheusHandler {

@@ -53,7 +53,7 @@ services:
     depends_on:
       - prometheus
     ports:
-      - 3030:3030
+      - 3030:3000
     restart:
       always
     volumes:
