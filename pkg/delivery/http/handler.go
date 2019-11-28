@@ -36,10 +36,10 @@ type errorResponseBody struct {
 }
 
 func (h *Handler) Error(c echo.Context, message string) error {
-	return h.ErrorWithStatus(c, message, http.StatusBadRequest)
+	return h.errorWithStatus(c, message, http.StatusBadRequest)
 }
 
-func (h *Handler) ErrorWithStatus(c echo.Context, message string, httpStatus int) error {
+func (h *Handler) errorWithStatus(c echo.Context, message string, httpStatus int) error {
 	response := Response{
 		Status: "error",
 		Body:   errorResponseBody{Message: message},

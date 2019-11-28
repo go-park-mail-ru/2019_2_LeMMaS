@@ -9,10 +9,11 @@ import (
 	http3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/access/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/repository"
 	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/monitoring/delivery/http"
 	http4 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
+	repository2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	usecase3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
 	http2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
@@ -57,22 +58,23 @@ func NewAccessHandler() (*http3.AccessHandler, error) {
 
 func NewGameHandler() (*ws.GameHandler, error) {
 	echo := NewEcho()
+	gameRepository := repository.NewRepository()
 	logger, err := NewLogger()
 	if err != nil {
 		return nil, err
 	}
-	gameUsecase := usecase2.NewGameUsecase(logger)
+	gameUsecase := usecase2.NewGameUsecase(gameRepository, logger)
 	db, err := NewDB()
 	if err != nil {
 		return nil, err
 	}
-	userRepository := repository.NewDatabaseRepository(db, logger)
-	fileRepository := repository.NewS3Repository(logger)
+	userRepository := repository2.NewDatabaseRepository(db, logger)
+	fileRepository := repository2.NewS3Repository(logger)
 	conn, err := NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	sessionRepository := repository.NewSessionRepository(conn, logger)
+	sessionRepository := repository2.NewSessionRepository(conn, logger)
 	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository)
 	gameHandler := ws.NewGameHandler(echo, gameUsecase, userUsecase, logger)
 	return gameHandler, nil
@@ -88,13 +90,13 @@ func NewUserHandler() (*http4.UserHandler, error) {
 	if err != nil {
 		return nil, err
 	}
-	userRepository := repository.NewDatabaseRepository(db, logger)
-	fileRepository := repository.NewS3Repository(logger)
+	userRepository := repository2.NewDatabaseRepository(db, logger)
+	fileRepository := repository2.NewS3Repository(logger)
 	conn, err := NewRedis()
 	if err != nil {
 		return nil, err
 	}
-	sessionRepository := repository.NewSessionRepository(conn, logger)
+	sessionRepository := repository2.NewSessionRepository(conn, logger)
 	userUsecase := usecase3.NewUserUsecase(userRepository, fileRepository, sessionRepository)
 	userHandler := http4.NewUserHandler(echo, userUsecase, logger)
 	return userHandler, nil

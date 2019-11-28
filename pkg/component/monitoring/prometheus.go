@@ -26,8 +26,8 @@ func InitMetrics() {
 	ApiMetrics.Hits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "hits"},
-			[]string{"status", "method", "path",
-			})
+		[]string{"status", "method", "path",
+		})
 	ApiMetrics.Times = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{Name: "times"},
 		[]string{"status", "method", "path",

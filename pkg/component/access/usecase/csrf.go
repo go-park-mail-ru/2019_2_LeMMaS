@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	CSRFTokenExpire = time.Minute * 30
-	CSRFTokenSecret = "09dJ2e4hcM5Tot984E9WQ5ur8Nty7RT2"
+	csrfTokenExpire = time.Minute * 30
+	csrfTokenSecret = "09dJ2e4hcM5Tot984E9WQ5ur8Nty7RT2"
 )
 
 type csrfUsecase struct {
@@ -24,13 +24,13 @@ func NewCSRFUsecase() access.CsrfUsecase {
 	return csrfUsecase{}
 }
 
-type TokenData struct {
+type tokenData struct {
 	Payload string
 	Expires int64
 }
 
 func (u csrfUsecase) CreateTokenBySession(sessionID string) (string, error) {
-	return u.createToken(sessionID, CSRFTokenExpire)
+	return u.createToken(sessionID, csrfTokenExpire)
 }
 
 func (u csrfUsecase) CheckTokenBySession(token string, sessionID string) (bool, error) {
@@ -38,7 +38,7 @@ func (u csrfUsecase) CheckTokenBySession(token string, sessionID string) (bool, 
 }
 
 func (u csrfUsecase) createToken(payload string, expire time.Duration) (string, error) {
-	block, err := aes.NewCipher([]byte(CSRFTokenSecret))
+	block, err := aes.NewCipher([]byte(csrfTokenSecret))
 	if err != nil {
 		return "", err
 	}
@@ -54,7 +54,7 @@ func (u csrfUsecase) createToken(payload string, expire time.Duration) (string, 
 	}
 
 	tokenExpTime := time.Now().Add(expire).Unix()
-	td := &TokenData{Payload: payload, Expires: tokenExpTime}
+	td := &tokenData{Payload: payload, Expires: tokenExpTime}
 	encodedData, _ := json.Marshal(td)
 	ciphertext := aesgcm.Seal(nil, nonce, encodedData, nil)
 
@@ -66,7 +66,7 @@ func (u csrfUsecase) createToken(payload string, expire time.Duration) (string, 
 }
 
 func (u csrfUsecase) checkToken(token string, payload string) (bool, error) {
-	block, err := aes.NewCipher([]byte(CSRFTokenSecret))
+	block, err := aes.NewCipher([]byte(csrfTokenSecret))
 	if err != nil {
 		return false, err
 	}
@@ -87,7 +87,7 @@ func (u csrfUsecase) checkToken(token string, payload string) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("decrypt fail: %v", err)
 	}
-	td := TokenData{}
+	td := tokenData{}
 	err = json.Unmarshal(plaintext, &td)
 	if err != nil {
 		return false, fmt.Errorf("bad json: %v", err)
@@ -95,7 +95,7 @@ func (u csrfUsecase) checkToken(token string, payload string) (bool, error) {
 	if td.Expires < time.Now().Unix() {
 		return false, fmt.Errorf("token expired (valid until %v)", time.Unix(td.Expires, 0).String())
 	}
-	expected := TokenData{Payload: payload}
+	expected := tokenData{Payload: payload}
 	td.Expires = 0
 	return td == expected, nil
 }

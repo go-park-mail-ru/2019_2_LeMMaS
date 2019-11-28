@@ -15,7 +15,7 @@ import (
 var s = NewAccessHandlerTestSuite()
 
 func TestAccessHandler_HandleGetCSRFToken(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	s.ExpectUsecase().CreateTokenBySession(test.SessionID).Return(test.CSRFToken, nil)
 
@@ -26,7 +26,7 @@ func TestAccessHandler_HandleGetCSRFToken(t *testing.T) {
 }
 
 func TestAccessHandler_CsrfMiddleware(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	next := func(c echo.Context) error {
 		return c.String(http.StatusOK, "middleware passed")
@@ -44,19 +44,19 @@ func TestAccessHandler_CsrfMiddleware(t *testing.T) {
 	s.ExpectUsecase().CheckTokenBySession(test.CSRFToken, test.SessionID).Return(true, nil)
 	s.AddCookie(delivery.SessionIDCookieName, test.SessionID)
 	s.SetupRequest(http.MethodPost, delivery.ApiV1UserLogoutPath, "")
-	s.Request.Header.Add(CSRFTokenHeader, test.CSRFToken)
+	s.Request.Header.Add(csrfTokenHeader, test.CSRFToken)
 	middleware(s.NewContext())
 	s.TestResponse("middleware passed", http.StatusOK)
 
 	s.ExpectUsecase().CheckTokenBySession(test.CSRFToken, test.SessionID).Return(false, nil)
 	s.SetupRequest(http.MethodPost, delivery.ApiV1UserLogoutPath, "")
-	s.Request.Header.Add(CSRFTokenHeader, test.CSRFToken)
+	s.Request.Header.Add(csrfTokenHeader, test.CSRFToken)
 	middleware(s.NewContext())
 	s.TestResponse(s.Error("incorrect CSRF token"), http.StatusBadRequest)
 }
 
 func TestCors(t *testing.T) {
-	s.SetTesting(t)
+	s.StartTest(t)
 
 	middleware := s.handler.corsMiddleware(func(c echo.Context) error {
 		return nil
@@ -97,10 +97,10 @@ func NewAccessHandlerTestSuite() *AccessHandlerTestSuite {
 	}
 }
 
-func (s *AccessHandlerTestSuite) SetTesting(t *testing.T) {
-	s.HandlerTestSuite.SetTesting(t)
+func (s *AccessHandlerTestSuite) StartTest(t *testing.T) {
+	s.HandlerTestSuite.StartTest(t)
 	s.usecase = access.NewMockCsrfUsecase(gomock.NewController(t))
-	logger := testMock.NewMockLogger()
+	logger := testMock.NewMockLogger(t)
 	s.handler = NewAccessHandler(s.E, s.usecase, logger)
 }
 
