@@ -19,6 +19,11 @@ func main() {
 		fatal(l, err)
 	}
 
+	_, err = bootstrap.NewPrometheusHandler()
+	if err != nil {
+		fatal(l, err)
+	}
+
 	_, err = bootstrap.NewAccessHandler()
 	if err != nil {
 		fatal(l, err)

@@ -17,7 +17,7 @@ var ApiMetrics Metrics
 func InitMetrics() {
 	ApiMetrics.RegisteredUsers = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name:		"count of users",
+			Name: "count_of_users",
 		})
 	ApiMetrics.HitsTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{
@@ -29,7 +29,8 @@ func InitMetrics() {
 		[]string{"status", "method", "path",
 		})
 	ApiMetrics.Times = prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{Name: "times"},
+		prometheus.HistogramOpts{
+			Name: "times"},
 		[]string{"status", "method", "path",
 		})
 }
@@ -50,9 +51,12 @@ func (m *Metrics) ObserveResponseTime(status int, method, path string, observeTi
 	m.Times.WithLabelValues(strconv.Itoa(status), method, path).Observe(observeTime)
 }
 
-func init() {
+func InitHandler() {
 	InitMetrics()
-	prometheus.MustRegister(ApiMetrics.HitsTotal, ApiMetrics.Hits, ApiMetrics.Times, ApiMetrics.RegisteredUsers)
+	prometheus.MustRegister(ApiMetrics.HitsTotal)
+	prometheus.MustRegister(ApiMetrics.Hits)
+	prometheus.MustRegister(ApiMetrics.Times)
+	prometheus.MustRegister(ApiMetrics.RegisteredUsers)
 	// Add Go module build info.
 	prometheus.MustRegister(prometheus.NewBuildInfoCollector())
 }
