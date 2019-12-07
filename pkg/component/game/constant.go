@@ -1,8 +1,8 @@
 package game
 
 const (
-	MaxPositionX = 1440
-	MaxPositionY = 900
+	MaxPositionX = 3000
+	MaxPositionY = 3000
 
 	EventStart     = "start"
 	EventStop      = "stop"
