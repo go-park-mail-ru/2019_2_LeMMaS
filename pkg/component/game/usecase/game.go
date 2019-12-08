@@ -23,7 +23,7 @@ const (
 	eatPlayerSizeKoeff = 5
 	eatFoodSizeKoeff   = 2
 
-	generatedFoodAmount = 20
+	generatedFoodAmount = 200
 
 	eventStreamRate = 50 * time.Millisecond
 	speedKoeff      = float64(eventStreamRate/time.Millisecond) / 150
