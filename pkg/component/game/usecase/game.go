@@ -17,16 +17,6 @@ const (
 
 	maxDirection = 359
 	minDirection = 0
-
-	maxPlayersInRoom   = 5
-	initialPlayerSize  = 40
-	eatPlayerSizeKoeff = 5
-	eatFoodSizeKoeff   = 2
-
-	generatedFoodAmount = 200
-
-	eventStreamRate = 50 * time.Millisecond
-	speedKoeff      = float64(eventStreamRate/time.Millisecond) / 150
 )
 
 var (
@@ -162,7 +152,7 @@ func (u *gameUsecase) StopListenEvents(userID int) error {
 
 func (u *gameUsecase) startEventsLoop(roomID int) {
 	go func() {
-		for range time.Tick(eventStreamRate) {
+		for range time.Tick(game.EventStreamRate) {
 			room := u.repository.GetRoomByID(roomID)
 			if room == nil {
 				return
@@ -194,7 +184,7 @@ func (u *gameUsecase) movePlayer(room *model.Room, player *model.Player, newPosi
 	if err != nil {
 		return err
 	}
-	newSize := player.Size + len(eatenPlayers)*eatPlayerSizeKoeff + len(eatenFood)*eatFoodSizeKoeff
+	newSize := player.Size + len(eatenPlayers)*game.EatPlayerBonus + len(eatenFood)*game.EatFoodBonus
 	if err := u.repository.SetPlayerSize(room.ID, player.UserID, newSize); err != nil {
 		return err
 	}
@@ -208,10 +198,10 @@ func (u *gameUsecase) movePlayer(room *model.Room, player *model.Player, newPosi
 func (u *gameUsecase) newPlayer(userID int) model.Player {
 	return model.Player{
 		UserID: userID,
-		Size:   initialPlayerSize,
+		Size:   game.InitialPlayerSize,
 		Position: model.Position{
-			X: game.MaxPositionX / 2,
-			Y: game.MaxPositionY / 2,
+			X: game.FieldSizeX / 2,
+			Y: game.FieldSizeY / 2,
 		},
 	}
 }
@@ -231,7 +221,7 @@ func (u *gameUsecase) setPlayerRoom(userID, roomID int) {
 func (u *gameUsecase) getAvailableRoom() *model.Room {
 	availableRooms := u.repository.GetAllRooms()
 	for _, room := range availableRooms {
-		if len(room.Players) < maxPlayersInRoom {
+		if len(room.Players) < game.MaxPlayersInRoom {
 			return room
 		}
 	}
@@ -240,7 +230,7 @@ func (u *gameUsecase) getAvailableRoom() *model.Room {
 
 func (u gameUsecase) getNewPosition(player *model.Player) model.Position {
 	directionRadians := float64(player.Direction) * math.Pi / 180
-	distance := float64(player.Speed) * speedKoeff
+	distance := float64(player.Speed) * float64(game.EventStreamRate/time.Millisecond) * game.Speed
 	deltaX := distance * math.Sin(directionRadians)
 	deltaY := -distance * math.Cos(directionRadians)
 	oldPosition := player.Position
@@ -248,11 +238,11 @@ func (u gameUsecase) getNewPosition(player *model.Player) model.Position {
 		X: int(math.Round(float64(oldPosition.X) + deltaX)),
 		Y: int(math.Round(float64(oldPosition.Y) + deltaY)),
 	}
-	if newPosition.X > game.MaxPositionX {
-		newPosition.X = game.MaxPositionX
+	if newPosition.X > game.FieldSizeX {
+		newPosition.X = game.FieldSizeX
 	}
-	if newPosition.Y > game.MaxPositionY {
-		newPosition.Y = game.MaxPositionY
+	if newPosition.Y > game.FieldSizeY {
+		newPosition.Y = game.FieldSizeY
 	}
 	if newPosition.X < 0 {
 		newPosition.X = 0
@@ -266,12 +256,12 @@ func (u gameUsecase) getNewPosition(player *model.Player) model.Position {
 var foodIDCounter = 0
 
 func (u gameUsecase) generateFood() []model.Food {
-	foods := make([]model.Food, 0, generatedFoodAmount)
-	for i := 0; i < generatedFoodAmount; i++ {
+	foods := make([]model.Food, 0, game.FoodAmount)
+	for i := 0; i < game.FoodAmount; i++ {
 		foodIDCounter++
 		foods = append(foods, model.Food{
 			ID:       foodIDCounter,
-			Position: model.Position{X: rand.Intn(game.MaxPositionX), Y: rand.Intn(game.MaxPositionY)},
+			Position: model.Position{X: rand.Intn(game.FieldSizeX), Y: rand.Intn(game.FieldSizeY)},
 		})
 	}
 	return foods

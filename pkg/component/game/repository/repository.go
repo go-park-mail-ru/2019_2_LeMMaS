@@ -57,7 +57,7 @@ func (r *repository) CreateRoom() *model.Room {
 func (r *repository) initRoomIndexes(roomID int) {
 	bound := orb.Bound{
 		Min: orb.Point{0, 0},
-		Max: orb.Point{game.MaxPositionX, game.MaxPositionY},
+		Max: orb.Point{game.FieldSizeX, game.FieldSizeY},
 	}
 	r.foodIndex[roomID] = quadtree.New(bound)
 	r.playersIndex[roomID] = quadtree.New(bound)
