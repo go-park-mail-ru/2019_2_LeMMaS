@@ -39,8 +39,8 @@ services:
     depends_on:
       - web
     volumes:
-      - ./prometheus/conf:/etc/prometheus/
-      - ./prometheus/data:/prometheus
+      - ./images/prometheus/conf:/etc/prometheus/
+      - ./images/prometheus/data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -60,9 +60,10 @@ services:
     restart:
       always
     volumes:
-      - ./grafana/data:/var/lib/grafana
+      - ./images/grafana/data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMAIN_PASSWORD=temppasword
+      - GF_SECURITY_ADMIN_USER=root
+      - GF_SECURITY_ADMIN_PASSWORD=temppassword
     labels:
       org.label-schema.group: "monitoring"
 

@@ -19,7 +19,7 @@ func main() {
 		fatal(l, err)
 	}
 
-	_, err = bootstrap.NewPrometheusHandler()
+	_, err = bootstrap.NewMetricsHandler()
 	if err != nil {
 		fatal(l, err)
 	}

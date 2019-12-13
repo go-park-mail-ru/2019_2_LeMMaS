@@ -1,7 +1,7 @@
 package http
 
 import (
-	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/monitoring"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/metrics"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/labstack/echo"
 	"net/http"
@@ -17,7 +17,7 @@ type CommonMiddlewaresHandler struct {
 func NewCommonMiddlewaresHandler(e *echo.Echo, logger logger.Logger) CommonMiddlewaresHandler {
 	handler := CommonMiddlewaresHandler{Handler{}, e, logger}
 	e.Use(handler.panicMiddleware)
-	e.Use(handler.prometheusMiddleware)
+	e.Use(handler.metricsMiddleware)
 	return handler
 }
 
@@ -33,7 +33,7 @@ func (h CommonMiddlewaresHandler) panicMiddleware(next echo.HandlerFunc) echo.Ha
 	}
 }
 
-func (h CommonMiddlewaresHandler) prometheusMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (h CommonMiddlewaresHandler) metricsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		start := time.Now()
 		err := next(c)
@@ -41,12 +41,8 @@ func (h CommonMiddlewaresHandler) prometheusMiddleware(next echo.HandlerFunc) ec
 		if err != nil {
 			status = err.(*echo.HTTPError).Code
 		}
-		prometheus.ApiMetrics.ObserveResponseTime(status, c.Request().Method, c.Path(), time.Since(start).Seconds())
-		prometheus.ApiMetrics.IncHitOfResponse(status, c.Request().Method, c.Path())
-
-		if c.Path() == ApiV1UserRegisterPath && status == 200 {
-			prometheus.ApiMetrics.IncRegisteredUsers()
-		}
+		metrics.API.ObserveResponseTime(status, c.Request().Method, c.Path(), time.Since(start).Seconds())
+		metrics.API.IncHitOfResponse(status, c.Request().Method, c.Path())
 		return nil
 	}
 }

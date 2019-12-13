@@ -11,7 +11,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/delivery/ws"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/repository"
 	usecase2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game/usecase"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/monitoring/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/metrics/delivery/http"
 	http4 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/delivery/http"
 	repository2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/repository"
 	usecase3 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user/usecase"
@@ -25,14 +25,10 @@ import (
 
 // Injectors from wire.go:
 
-func NewPrometheusHandler() (*http.PrometheusHandler, error) {
+func NewMetricsHandler() (*http.MetricsHandler, error) {
 	echo := NewEcho()
-	logger, err := NewLogger()
-	if err != nil {
-		return nil, err
-	}
-	prometheusHandler := http.NewPrometheusHandler(echo, logger)
-	return prometheusHandler, nil
+	metricsHandler := http.NewMetricsHandler(echo)
+	return metricsHandler, nil
 }
 
 func NewMiddleware() (http2.CommonMiddlewaresHandler, error) {

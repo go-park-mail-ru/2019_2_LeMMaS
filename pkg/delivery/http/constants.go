@@ -6,24 +6,26 @@ import (
 )
 
 const (
-	publicPrefix  = "/api/v1/public"
-	privatePrefix = "/api/v1/private"
+	// API
+	apiPublic  = "/api/v1/public"
+	apiPrivate = "/api/v1/private"
 
-	ApiV1AccessCSRFPath = publicPrefix + "/access/csrf"
+	ApiV1AccessCSRFPath = apiPublic + "/access/csrf"
 
-	ApiV1GamePath = privatePrefix + "/game"
+	ApiV1GamePath = apiPrivate + "/game"
 
-	ApiV1PrometheusPath = publicPrefix + "/metrics"
+	ApiV1UserListPath            = apiPublic + "/user/list"
+	ApiV1UserByIDPath            = apiPublic + "/user/:id"
+	ApiV1UserRegisterPath        = apiPublic + "/user/register"
+	ApiV1UserLoginPath           = apiPublic + "/user/login"
+	ApiV1UserLogoutPath          = apiPrivate + "/user/logout"
+	ApiV1UserProfilePath         = apiPrivate + "/user/me"
+	ApiV1UserUpdatePath          = apiPrivate + "/user/update"
+	ApiV1UserAvatarUploadPath    = apiPrivate + "/user/avatar/upload"
+	ApiV1UserGetAvatarByNamePath = apiPrivate + "/user/avatar/getByName"
 
-	ApiV1UserListPath            = publicPrefix + "/user/list"
-	ApiV1UserByIDPath            = publicPrefix + "/user/:id"
-	ApiV1UserRegisterPath        = publicPrefix + "/user/register"
-	ApiV1UserLoginPath           = publicPrefix + "/user/login"
-	ApiV1UserLogoutPath          = privatePrefix + "/user/logout"
-	ApiV1UserProfilePath         = privatePrefix + "/user/me"
-	ApiV1UserUpdatePath          = privatePrefix + "/user/update"
-	ApiV1UserAvatarUploadPath    = privatePrefix + "/user/avatar/upload"
-	ApiV1UserGetAvatarByNamePath = privatePrefix + "/user/avatar/getByName"
+	// Support
+	MetricsPath = "/metrics"
 )
 
 const (
@@ -32,5 +34,5 @@ const (
 )
 
 func IsPrivatePath(path string) bool {
-	return strings.HasPrefix(path, privatePrefix)
+	return strings.HasPrefix(path, apiPrivate)
 }
