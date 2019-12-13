@@ -3,7 +3,7 @@ package test
 import (
 	"encoding/json"
 	"fmt"
-	httpDelivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -84,7 +84,7 @@ func (s HandlerTestSuite) TestCookieNotPresent(cookieName string) {
 }
 
 func (s *HandlerTestSuite) Ok() string {
-	response := httpDelivery.Response{
+	response := delivery.Response{
 		Status: "ok",
 	}
 	result, _ := json.Marshal(response)
@@ -92,7 +92,7 @@ func (s *HandlerTestSuite) Ok() string {
 }
 
 func (s *HandlerTestSuite) Error(message string) string {
-	response := httpDelivery.Response{
+	response := delivery.Response{
 		Status: "error",
 		Body: map[string]interface{}{
 			"message": message,

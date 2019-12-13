@@ -30,7 +30,7 @@ services:
 
   auth_ms:
     build: images/auth_ms
-    working_dir: /home/app/microservices/auth/server
+    working_dir: /home/app/microservice/auth/delivery
     volumes:
       - ../.:/home/app
     env_file:
