@@ -1,7 +1,7 @@
 //+build wireinject
 //go:generate wire
 
-package init
+package factory
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
@@ -12,6 +12,7 @@ import (
 	"github.com/google/wire"
 	"github.com/labstack/echo"
 	"google.golang.org/grpc"
+	"os"
 )
 
 func NewMiddleware() (http.Middleware, error) {
@@ -85,7 +86,7 @@ func NewLogger() (logger.Logger, error) {
 
 func NewAuthGRPC() (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial(
-		"auth:8081",
+		os.Getenv("AUTH_URL"),
 		grpc.WithInsecure(),
 	)
 	if err != nil {

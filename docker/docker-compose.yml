@@ -1,42 +1,59 @@
 version: '2.4'
 services:
-  web:
-    build: images/web
-    env_file: ../.env
-    working_dir: /home/app/cmd/web
-    restart: on-failure
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - ../.:/home/app
-    ports:
-      - 8080:8080
+  #  api:
+  #    build: images/api
+  #    environment:
+  #      AUTH_URL: auth:8081
+  #      PORT: 8080
+  #    env_file: images/api/.env
+  #    working_dir: /app/cmd/api
+  ##    depends_on:
+  ##      - auth
+  #    volumes:
+  #      - ../.:/app
+  #    ports:
+  #      - 8080:8080
 
-  postgres:
-    image: postgres:11.5
-    restart: always
+  auth:
+    build: images/auth
+    working_dir: /app/cmd/auth
+    volumes:
+      - ../.:/app
     environment:
-      POSTGRES_DB: lemmas
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: temppassword
+      PORT: 8081
+    env_file: images/auth/.env
     ports:
-      - 5432:5432
+      - 8081:8081
+
+  #  game:
+  #    build: images/game
+  #    working_dir: /app/cmd/game
+  #    volumes:
+  #      - ../.:/app
+  #    env_file: images/game/.env
+  #    ports:
+  #      - 8080
+  #
+  #  user:
+  #    build: images/user
+  #    working_dir: /app/cmd/user
+  #    volumes:
+  #      - ../.:/app
+  #    env_file: images/user/.env
+  #    ports:
+  #      - 8080
+
+  #  postgres:
+  #    image: postgres:11.5
+  #    restart: always
+  #    environment:
+  #      POSTGRES_DB: lemmas
+  #      POSTGRES_USER: root
+  #      POSTGRES_PASSWORD: temppassword
+  #    ports:
+  #      - 5432:5432
 
   redis:
     build: images/redis
     expose:
-    - 6379
-
-  auth_ms:
-    build: images/auth_ms
-    working_dir: /home/app/microservice/auth/delivery
-    volumes:
-      - ../.:/home/app
-    env_file:
-      - ../.env
-    restart: on-failure
-    depends_on:
-      - web
-    ports:
-      - 8081:8081
+      - 6379

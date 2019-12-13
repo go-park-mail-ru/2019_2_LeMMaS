@@ -1,14 +1,16 @@
 //+build wireinject
 //go:generate wire
 
-package auth
+package factory
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/delivery/grpc"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/repository"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/server"
+	"github.com/gomodule/redigo/redis"
 	"github.com/google/wire"
+	"os"
 )
 
 func NewAuthHandler() (*grpc.AuthHandler, error) {
@@ -17,13 +19,17 @@ func NewAuthHandler() (*grpc.AuthHandler, error) {
 		server.NewAuthServer,
 		repository.NewUserRepository,
 		repository.NewSessionRepository,
-		NewRedis,
-		logger.NewSentryLogger,
+		newRedis,
+		NewLogger,
 	)
 	return &grpc.AuthHandler{}, nil
 }
 
-func NewRedis() (redis.Conn, error) {
+func NewLogger() (logger.Logger, error) {
+	return logger.NewSentryLogger()
+}
+
+func newRedis() (redis.Conn, error) {
 	connection, err := redis.DialURL(os.Getenv("REDIS_DSN"))
 	if err != nil {
 		return nil, err

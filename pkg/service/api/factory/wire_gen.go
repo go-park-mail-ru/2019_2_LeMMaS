@@ -3,7 +3,7 @@
 //go:generate wire
 //+build !wireinject
 
-package init
+package factory
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
@@ -100,7 +100,7 @@ func NewLogger() (logger.Logger, error) {
 
 func NewAuthGRPC() (*grpc.ClientConn, error) {
 	conn, err := grpc.Dial(
-		"auth:8081", grpc.WithInsecure(),
+		"auth:8080", grpc.WithInsecure(),
 	)
 	if err != nil {
 		return nil, err

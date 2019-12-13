@@ -2,38 +2,39 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/cmd"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/init"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/factory"
 	_ "github.com/jackc/pgx/stdlib"
 	"log"
+	"os"
 )
 
 func main() {
-	l, err := init.NewLogger()
+	l, err := factory.NewLogger()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = init.NewMiddleware()
+	_, err = factory.NewMiddleware()
 	if err != nil {
 		cmd.Fatal(l, err)
 	}
 
-	_, err = init.NewAccessHandler()
+	_, err = factory.NewAccessHandler()
 	if err != nil {
 		cmd.Fatal(l, err)
 	}
 
-	_, err = init.NewGameHandler()
+	_, err = factory.NewGameHandler()
 	if err != nil {
 		cmd.Fatal(l, err)
 	}
 
-	_, err = init.NewUserHandler()
+	_, err = factory.NewUserHandler()
 	if err != nil {
 		cmd.Fatal(l, err)
 	}
 
-	err = init.NewEcho().Start(":" + cmd.GetPort())
+	err = factory.NewEcho().Start(":" + os.Getenv("PORT"))
 	if err != nil {
 		cmd.Fatal(l, err)
 	}

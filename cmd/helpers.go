@@ -5,14 +5,6 @@ import (
 	"os"
 )
 
-func GetPort() string {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	return port
-}
-
 func Fatal(logger logger.Logger, err error) {
 	logger.Error(err)
 	os.Exit(1)
