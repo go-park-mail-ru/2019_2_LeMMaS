@@ -2,5 +2,10 @@
 
 source `dirname $0`/env.sh
 
+if [ $# -lt 2 ]; then
+  echo 1>&2 "usage: $0 CONTAINER"
+  exit 2
+fi
+
 ${COMPOSE} stop $1
 ${COMPOSE} start $1
