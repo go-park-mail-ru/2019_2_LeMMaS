@@ -5,6 +5,7 @@ syntax = "proto3";
 package user;
 
 service User {
+    rpc GetAll(GetAllParams) returns (GetAllResult) {}
     rpc GetByID(GetByIDParams) returns (GetByIDResult) {}
     rpc GetBySession(GetBySessionParams) returns (GetBySessionResult) {}
     rpc Update(UpdateParams) returns (UpdateResult) {}
@@ -16,6 +17,15 @@ message UserData {
     string email = 1;
     string password = 2;
     string name = 3;
+}
+
+message GetAllParams {
+    bool nothing = 1;
+}
+
+message GetAllResult {
+    repeated UserData users = 1;
+    string error = 2;
 }
 
 message GetByIDParams {
