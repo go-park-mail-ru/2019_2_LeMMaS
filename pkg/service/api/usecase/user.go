@@ -47,7 +47,19 @@ func (u *userUsecase) GetByID(id int) (*model.User, error) {
 	return u.convertUser(res.User), nil
 }
 
-func (u *userUsecase) Update(userID int, password, name string) error {
+func (u *userUsecase) Update(id int, password, name string) error {
+	params := user.UpdateParams{
+		UserId:   int32(id),
+		Password: password,
+		Name:     name,
+	}
+	res, err := u.user.Update(u.ctx, &params)
+	if err != nil {
+		return err
+	}
+	if res.Error != "" {
+		return errors.New(res.Error)
+	}
 	return nil
 }
 
@@ -70,8 +82,13 @@ func (u *userUsecase) UpdateAvatar(id int, avatar io.Reader) error {
 	return nil
 }
 
-func (u *userUsecase) GetSpecialAvatar(name string) string {
-	return ""
+func (u *userUsecase) GetSpecialAvatar(name string) (string, error) {
+	params := user.GetSpecialAvatarParams{Name: name}
+	res, err := u.user.GetSpecialAvatar(u.ctx, &params)
+	if err != nil {
+		return "", err
+	}
+	return res.AvatarUrl, nil
 }
 
 func (u *userUsecase) convertUsers(users []*user.UserData) []*model.User {

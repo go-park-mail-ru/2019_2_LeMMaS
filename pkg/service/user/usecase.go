@@ -6,8 +6,9 @@ import (
 
 type UserUsecase interface {
 	GetAll() ([]*model.User, error)
-	GetByID(userID int) (*model.User, error)
-	Update(userID int, password, name string) error
-	UpdateAvatar(userID int, avatarPath string) error
+	GetByID(id int) (*model.User, error)
+	GetByEmail(email string) (*model.User, error)
+	Update(id int, password, name string) error
+	UpdateAvatar(id int, avatarPath string) error
 	GetSpecialAvatar(name string) string
 }

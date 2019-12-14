@@ -44,7 +44,7 @@ func NewAccessHandler() (*http.AccessHandler, error) {
 func NewGameHandler() (*ws.GameHandler, error) {
 	echo := NewEcho()
 	gameUsecase := usecase.NewGameUsecase()
-	authClient, err := NewAuthClient()
+	authClient, err := newAuthClient()
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func NewGameHandler() (*ws.GameHandler, error) {
 
 func NewUserHandler() (*http.UserHandler, error) {
 	echo := NewEcho()
-	userClient, err := NewUserClient()
+	userClient, err := newUserClient()
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func NewUserHandler() (*http.UserHandler, error) {
 	}
 	fileRepository := repository.NewS3Repository(logger)
 	userUsecase := usecase.NewUserUsecase(userClient, fileRepository)
-	authClient, err := NewAuthClient()
+	authClient, err := newAuthClient()
 	if err != nil {
 		return nil, err
 	}
@@ -104,13 +104,13 @@ func NewLogger() (logger.Logger, error) {
 	return *loggerInstance, nil
 }
 
-func NewAuthClient() (auth.AuthClient, error) {
-	conn, err := newGRPC(os.Getenv("AUTH_URL"))
+func newAuthClient() (auth.AuthClient, error) {
+	conn, err := newGRPC("auth:" + os.Getenv("PORT"))
 	return auth.NewAuthClient(conn), err
 }
 
-func NewUserClient() (user.UserClient, error) {
-	conn, err := newGRPC(os.Getenv("USER_URL"))
+func newUserClient() (user.UserClient, error) {
+	conn, err := newGRPC("user:" + os.Getenv("PORT"))
 	return user.NewUserClient(conn), err
 }
 

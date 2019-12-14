@@ -58,6 +58,17 @@ func (h *UserHandler) GetByID(ctx context.Context, params *user.GetByIDParams) (
 	return
 }
 
+func (h *UserHandler) GetByEmail(ctx context.Context, params *user.GetByEmailParams) (result *user.GetByEmailResult, grpcErr error) {
+	result = &user.GetByEmailResult{}
+	u, err := h.usecase.GetByEmail(params.Email)
+	if err != nil {
+		result.Error = err.Error()
+		return
+	}
+	result.User = h.convertUser(u)
+	return
+}
+
 func (h *UserHandler) Update(context.Context, *user.UpdateParams) (*user.UpdateResult, error) {
 	return nil, nil
 }

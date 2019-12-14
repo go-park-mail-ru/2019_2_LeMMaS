@@ -56,7 +56,7 @@ func (u *authUsecase) Register(email, password, name string) error {
 	if userWithSameEmail != nil {
 		return errors.New("user with this email already registered")
 	}
-	return u.userRepo.Create(email, u.getPasswordHash(password), name)
+	return u.userRepo.Register(email, u.getPasswordHash(password), name)
 }
 
 func (u *authUsecase) getPasswordHash(password string) string {

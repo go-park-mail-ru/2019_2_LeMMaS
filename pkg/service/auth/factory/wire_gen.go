@@ -10,19 +10,25 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/delivery/grpc"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/repository"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/usecase"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user"
 	"github.com/gomodule/redigo/redis"
+	grpc2 "google.golang.org/grpc"
 	"os"
 )
 
 // Injectors from wire.go:
 
 func NewAuthHandler() (*grpc.AuthHandler, error) {
-	userRepository := repository.NewUserRepository()
-	conn, err := newRedis()
+	userClient, err := newUserClient()
 	if err != nil {
 		return nil, err
 	}
 	logger, err := NewLogger()
+	if err != nil {
+		return nil, err
+	}
+	userRepository := repository.NewUserRepository(userClient, logger)
+	conn, err := newRedis()
 	if err != nil {
 		return nil, err
 	}
@@ -52,4 +58,17 @@ func newRedis() (redis.Conn, error) {
 		return nil, err
 	}
 	return connection, nil
+}
+
+func newUserClient() (user.UserClient, error) {
+	conn, err := newGRPC("user:" + os.Getenv("PORT"))
+	return user.NewUserClient(conn), err
+}
+
+func newGRPC(url string) (*grpc2.ClientConn, error) {
+	conn, err := grpc2.Dial(url, grpc2.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }

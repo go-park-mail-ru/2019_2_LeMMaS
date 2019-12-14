@@ -100,7 +100,10 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 
 func (h *UserHandler) handleGetAvatarByName(c echo.Context) error {
 	name := c.FormValue("name")
-	avatarUrl := h.user.GetSpecialAvatar(name)
+	avatarUrl, err := h.user.GetSpecialAvatar(name)
+	if err != nil {
+		return h.Error(c, err.Error())
+	}
 	return h.OkWithBody(c, map[string]string{
 		"avatar_url": avatarUrl,
 	})

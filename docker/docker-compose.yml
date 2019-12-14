@@ -2,32 +2,34 @@ version: '2.4'
 services:
   api:
     build: images/api
-    env_file: images/api/.env
     working_dir: /app/cmd/api
-    depends_on:
-      - auth
     volumes:
       - ../.:/app
+    env_file: .env
     ports:
-      - 8080:8080
+      - ${PORT}:${PORT}
 
   auth:
     build: images/auth
     working_dir: /app/cmd/auth
-    env_file: images/auth/.env
     volumes:
       - ../.:/app
+    env_file: .env
+    environment:
+      REDIS_DSN: redis://redis:6379
     expose:
-      - 8080
+      - ${PORT}
 
   user:
     build: images/user
     working_dir: /app/cmd/user
-    env_file: images/user/.env
     volumes:
       - ../.:/app
+    env_file: .env
+    environment:
+      POSTGRES_DSN: host=postgres port=5432 dbname=lemmas user=root password=temppassword
     expose:
-      - 8080
+      - ${PORT}
 
   postgres:
     image: postgres:11.5

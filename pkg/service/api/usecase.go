@@ -19,7 +19,7 @@ type UserUsecase interface {
 	GetByID(id int) (*model.User, error)
 	Update(id int, password, name string) error
 	UpdateAvatar(id int, avatar io.Reader) error
-	GetSpecialAvatar(name string) string
+	GetSpecialAvatar(name string) (string, error)
 }
 
 type CsrfUsecase interface {

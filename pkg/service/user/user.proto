@@ -1,12 +1,13 @@
 syntax = "proto3";
 
-// protoc --go_out=plugins=grpc:. *.proto
+//protoc --go_out=plugins=grpc:. *.proto
 
 package user;
 
 service User {
     rpc GetAll(GetAllParams) returns (GetAllResult) {}
     rpc GetByID(GetByIDParams) returns (GetByIDResult) {}
+    rpc GetByEmail(GetByEmailParams) returns (GetByEmailResult) {}
     rpc Update(UpdateParams) returns (UpdateResult) {}
     rpc UpdateAvatar(UpdateAvatarParams) returns (UpdateAvatarResult) {}
     rpc GetSpecialAvatar(GetSpecialAvatarParams) returns (GetSpecialAvatarResult) {}
@@ -34,6 +35,15 @@ message GetByIDParams {
 }
 
 message GetByIDResult {
+    UserData user = 1;
+    string error = 2;
+}
+
+message GetByEmailParams {
+    string email = 1;
+}
+
+message GetByEmailResult {
     UserData user = 1;
     string error = 2;
 }

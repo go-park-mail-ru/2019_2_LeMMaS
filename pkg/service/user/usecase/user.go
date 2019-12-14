@@ -24,6 +24,10 @@ func (u *userUsecase) GetByID(id int) (*model.User, error) {
 	return u.repo.GetByID(id)
 }
 
+func (u *userUsecase) GetByEmail(email string) (*model.User, error) {
+	return u.repo.GetByEmail(email)
+}
+
 func (u *userUsecase) Update(userID int, password, name string) error {
 	return nil
 	//userToUpdate, err := u.repository.GetByID(int(pbUserToUpdate.UserID))

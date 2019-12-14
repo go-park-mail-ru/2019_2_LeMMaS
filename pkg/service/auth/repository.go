@@ -11,6 +11,6 @@ type SessionRepository interface {
 }
 
 type UserRepository interface {
-	Create(email string, passwordHash string, name string) error
+	Register(email string, passwordHash string, name string) error
 	GetByEmail(email string) (*model.User, error)
 }
