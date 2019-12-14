@@ -7,8 +7,10 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/ws"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/repository"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user"
 	"github.com/google/wire"
 	"github.com/labstack/echo"
 	"google.golang.org/grpc"
@@ -39,8 +41,7 @@ func NewGameHandler() (*ws.GameHandler, error) {
 		ws.NewGameHandler,
 		usecase.NewGameUsecase,
 		usecase.NewAuthUsecase,
-		auth.NewAuthClient,
-		NewAuthGRPC,
+		NewAuthClient,
 		NewEcho,
 		NewLogger,
 	)
@@ -52,8 +53,9 @@ func NewUserHandler() (*http.UserHandler, error) {
 		http.NewUserHandler,
 		usecase.NewUserUsecase,
 		usecase.NewAuthUsecase,
-		auth.NewAuthClient,
-		NewAuthGRPC,
+		repository.NewS3Repository,
+		NewUserClient,
+		NewAuthClient,
 		NewEcho,
 		NewLogger,
 	)
@@ -84,11 +86,18 @@ func NewLogger() (logger.Logger, error) {
 	return *loggerInstance, nil
 }
 
-func NewAuthGRPC() (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(
-		os.Getenv("AUTH_URL"),
-		grpc.WithInsecure(),
-	)
+func NewAuthClient() (auth.AuthClient, error) {
+	conn, err := newGRPC(os.Getenv("AUTH_URL"))
+	return auth.NewAuthClient(conn), err
+}
+
+func NewUserClient() (user.UserClient, error) {
+	conn, err := newGRPC(os.Getenv("USER_URL"))
+	return user.NewUserClient(conn), err
+}
+
+func newGRPC(url string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(url, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}

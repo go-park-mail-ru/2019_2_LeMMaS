@@ -18,7 +18,7 @@ package http
 //func TestUserHandler_HandleUserList(t *testing.T) {
 //	s.StartTest(t)
 //
-//	s.ExpectUsecase().GetAllUsers().Return([]model.User{{Name: "Ivan"}}, nil)
+//	s.ExpectUsecase().GetAll().Return([]model.User{{Name: "Ivan"}}, nil)
 //	s.TestUserList(`{"status":"ok","body":{"users":[{"id":0,"email":"","name":"Ivan","avatar_path":""}]}}`)
 //}
 //
@@ -27,7 +27,7 @@ package http
 //
 //	user1 := model.User{ID: 1, Email: "testik1@mail.ru", Name: "Test The Best 1"}
 //	s.ExpectUsecase().Register(user1.Email, test.Password, user1.Name).Return(nil)
-//	s.ExpectUsecase().GetAllUsers().Return([]model.User{user1}, nil)
+//	s.ExpectUsecase().GetAll().Return([]model.User{user1}, nil)
 //
 //	s.TestUserRegister(
 //		`{"email": "testik1@mail.ru","name": "Test The Best 1","password": "ssc-tuatara"}`,
@@ -55,7 +55,7 @@ package http
 //
 //	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(test.SessionID, nil)
 //	s.ExpectUsecase().GetUserBySession(test.SessionID).Return(&model.User{ID: 1}, nil)
-//	s.ExpectUsecase().UpdateUser(1, "", "New Name").Return(nil)
+//	s.ExpectUsecase().Update(1, "", "New Name").Return(nil)
 //
 //	s.TestUserLogin(
 //		`{"email":"testik1@mail.ru","password":"ssc-tuatara"}`,

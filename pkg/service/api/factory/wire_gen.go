@@ -9,8 +9,10 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/ws"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/repository"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user"
 	"github.com/labstack/echo"
 	"google.golang.org/grpc"
 	"os"
@@ -42,11 +44,10 @@ func NewAccessHandler() (*http.AccessHandler, error) {
 func NewGameHandler() (*ws.GameHandler, error) {
 	echo := NewEcho()
 	gameUsecase := usecase.NewGameUsecase()
-	clientConn, err := NewAuthGRPC()
+	authClient, err := NewAuthClient()
 	if err != nil {
 		return nil, err
 	}
-	authClient := auth.NewAuthClient(clientConn)
 	authUsecase := usecase.NewAuthUsecase(authClient)
 	logger, err := NewLogger()
 	if err != nil {
@@ -58,17 +59,21 @@ func NewGameHandler() (*ws.GameHandler, error) {
 
 func NewUserHandler() (*http.UserHandler, error) {
 	echo := NewEcho()
-	userUsecase := usecase.NewUserUsecase()
-	clientConn, err := NewAuthGRPC()
+	userClient, err := NewUserClient()
 	if err != nil {
 		return nil, err
 	}
-	authClient := auth.NewAuthClient(clientConn)
-	authUsecase := usecase.NewAuthUsecase(authClient)
 	logger, err := NewLogger()
 	if err != nil {
 		return nil, err
 	}
+	fileRepository := repository.NewS3Repository(logger)
+	userUsecase := usecase.NewUserUsecase(userClient, fileRepository)
+	authClient, err := NewAuthClient()
+	if err != nil {
+		return nil, err
+	}
+	authUsecase := usecase.NewAuthUsecase(authClient)
 	userHandler := http.NewUserHandler(echo, userUsecase, authUsecase, logger)
 	return userHandler, nil
 }
@@ -99,8 +104,18 @@ func NewLogger() (logger.Logger, error) {
 	return *loggerInstance, nil
 }
 
-func NewAuthGRPC() (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(os.Getenv("AUTH_URL"), grpc.WithInsecure())
+func NewAuthClient() (auth.AuthClient, error) {
+	conn, err := newGRPC(os.Getenv("AUTH_URL"))
+	return auth.NewAuthClient(conn), err
+}
+
+func NewUserClient() (user.UserClient, error) {
+	conn, err := newGRPC(os.Getenv("USER_URL"))
+	return user.NewUserClient(conn), err
+}
+
+func newGRPC(url string) (*grpc.ClientConn, error) {
+	conn, err := grpc.Dial(url, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}

@@ -15,10 +15,10 @@ type AuthUsecase interface {
 }
 
 type UserUsecase interface {
-	GetAllUsers() ([]model.User, error)
-	GetUserByID(userID int) (*model.User, error)
-	UpdateUser(userID int, password, name string) error
-	UpdateUserAvatar(userID int, avatarFile io.Reader) error
+	GetAll() ([]model.User, error)
+	GetByID(userID int) (*model.User, error)
+	Update(userID int, password, name string) error
+	UpdateAvatar(userID int, avatarFile io.Reader) error
 	GetSpecialAvatar(name string) string
 }
 

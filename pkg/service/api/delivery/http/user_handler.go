@@ -33,7 +33,7 @@ func NewUserHandler(e *echo.Echo, user api.UserUsecase, auth api.AuthUsecase, lo
 }
 
 func (h *UserHandler) handleUserList(c echo.Context) error {
-	users, err := h.user.GetAllUsers()
+	users, err := h.user.GetAll()
 	if err != nil {
 		return h.Error(c, "error loading users")
 	}
@@ -47,7 +47,7 @@ func (h *UserHandler) handleUserByID(c echo.Context) error {
 	if err != nil {
 		return h.Error(c, "user id must be an integer")
 	}
-	userByID, err := h.user.GetUserByID(userID)
+	userByID, err := h.user.GetByID(userID)
 	if err != nil {
 		return h.Error(c, "error loading user")
 	}
@@ -68,7 +68,7 @@ func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return h.Error(c, "unknown error")
 	}
-	err = h.user.UpdateUser(currentUser.ID, u.Password, u.Name)
+	err = h.user.Update(currentUser.ID, u.Password, u.Name)
 	if err != nil {
 		return h.Error(c, "error updating user")
 	}
@@ -91,7 +91,7 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()
-	err = h.user.UpdateUserAvatar(currentUser.ID, avatarFile)
+	err = h.user.UpdateAvatar(currentUser.ID, avatarFile)
 	if err != nil {
 		return h.Error(c, "error updating avatar")
 	}

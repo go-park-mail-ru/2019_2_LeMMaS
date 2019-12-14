@@ -14,6 +14,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	defer func() {
+		cmd.Recover(l)
+	}()
+
 	_, err = factory.NewMiddleware()
 	if err != nil {
 		cmd.Fatal(l, err)

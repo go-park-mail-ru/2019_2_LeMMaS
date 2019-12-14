@@ -9,3 +9,10 @@ func Fatal(logger logger.Logger, err error) {
 	logger.Error(err)
 	os.Exit(1)
 }
+
+func Recover(logger logger.Logger) {
+	if err := recover(); err != nil {
+		logger.Errorf("%v", err)
+		panic(err)
+	}
+}

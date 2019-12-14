@@ -13,6 +13,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	defer func() {
+		cmd.Recover(l)
+	}()
+
 	h, err := factory.NewAuthHandler()
 	if err != nil {
 		cmd.Fatal(l, err)

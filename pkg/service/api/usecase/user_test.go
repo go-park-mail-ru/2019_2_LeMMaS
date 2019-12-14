@@ -21,12 +21,12 @@ package usecase
 //		{ID: 5, Email: "test5@mail.ru", Name: "Testik 5"},
 //	}
 //	userRepo.EXPECT().GetAll().Return(expectedUsers, nil)
-//	users, err := server.GetAllUsers()
+//	users, err := server.GetAll()
 //	assert.Nil(t, err, "unexpected error")
 //	assert.Equal(t, users, expectedUsers)
 //
 //	userRepo.EXPECT().GetAll().Return(nil, fmt.Errorf("error"))
-//	users, err = server.GetAllUsers()
+//	users, err = server.GetAll()
 //	assert.EqualError(t, err, "error")
 //	assert.Nil(t, users)
 //}
@@ -37,12 +37,12 @@ package usecase
 //
 //	expectedUser := &model.User{ID: 4, Email: "test4@mail.ru", Name: "Testik 4"}
 //	userRepo.EXPECT().GetByID(expectedUser.ID).Return(expectedUser, nil)
-//	users, err := server.GetUserByID(expectedUser.ID)
+//	users, err := server.GetByID(expectedUser.ID)
 //	assert.Nil(t, err, "unexpected error")
 //	assert.Equal(t, users, expectedUser)
 //
 //	userRepo.EXPECT().GetByID(expectedUser.ID).Return(nil, fmt.Errorf("error"))
-//	users, err = server.GetUserByID(expectedUser.ID)
+//	users, err = server.GetByID(expectedUser.ID)
 //	assert.EqualError(t, err, "error")
 //	assert.Nil(t, users)
 //}
@@ -129,7 +129,7 @@ package usecase
 //	userRepo.EXPECT().GetByID(oldUser.ID).Return(&oldUser, nil)
 //	newUser := model.User{ID: 4, Name: "New Name"}
 //	userRepo.EXPECT().Update(newUser).Return(nil)
-//	err := server.UpdateUser(oldUser.ID, "", newUser.Name)
+//	err := server.Update(oldUser.ID, "", newUser.Name)
 //	assert.Nil(t, err)
 //}
 //
@@ -144,7 +144,7 @@ package usecase
 //	avatarFileLocation := "2ad2.jpg"
 //	userFileRepo.EXPECT().Store(&avatarFile).Return(avatarFileLocation, nil)
 //	userRepo.EXPECT().UpdateAvatarPath(userToUpdate.ID, avatarFileLocation)
-//	err := server.UpdateUserAvatar(&userToUpdate, &avatarFile)
+//	err := server.UpdateAvatar(&userToUpdate, &avatarFile)
 //	assert.Nil(t, err)
 //}
 //

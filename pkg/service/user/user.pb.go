@@ -25,9 +25,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type UserData struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Id                   int32    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Email                string   `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	PasswordHash         string   `protobuf:"bytes,3,opt,name=password_hash,json=passwordHash,proto3" json:"password_hash,omitempty"`
+	Name                 string   `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	AvatarPath           string   `protobuf:"bytes,5,opt,name=avatar_path,json=avatarPath,proto3" json:"avatar_path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -58,6 +60,13 @@ func (m *UserData) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UserData proto.InternalMessageInfo
 
+func (m *UserData) GetId() int32 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
 func (m *UserData) GetEmail() string {
 	if m != nil {
 		return m.Email
@@ -65,9 +74,9 @@ func (m *UserData) GetEmail() string {
 	return ""
 }
 
-func (m *UserData) GetPassword() string {
+func (m *UserData) GetPasswordHash() string {
 	if m != nil {
-		return m.Password
+		return m.PasswordHash
 	}
 	return ""
 }
@@ -75,6 +84,13 @@ func (m *UserData) GetPassword() string {
 func (m *UserData) GetName() string {
 	if m != nil {
 		return m.Name
+	}
+	return ""
+}
+
+func (m *UserData) GetAvatarPath() string {
+	if m != nil {
+		return m.AvatarPath
 	}
 	return ""
 }
@@ -251,92 +267,6 @@ func (m *GetByIDResult) GetError() string {
 	return ""
 }
 
-type GetBySessionParams struct {
-	SessionId            string   `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *GetBySessionParams) Reset()         { *m = GetBySessionParams{} }
-func (m *GetBySessionParams) String() string { return proto.CompactTextString(m) }
-func (*GetBySessionParams) ProtoMessage()    {}
-func (*GetBySessionParams) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{5}
-}
-
-func (m *GetBySessionParams) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetBySessionParams.Unmarshal(m, b)
-}
-func (m *GetBySessionParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetBySessionParams.Marshal(b, m, deterministic)
-}
-func (m *GetBySessionParams) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetBySessionParams.Merge(m, src)
-}
-func (m *GetBySessionParams) XXX_Size() int {
-	return xxx_messageInfo_GetBySessionParams.Size(m)
-}
-func (m *GetBySessionParams) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetBySessionParams.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetBySessionParams proto.InternalMessageInfo
-
-func (m *GetBySessionParams) GetSessionId() string {
-	if m != nil {
-		return m.SessionId
-	}
-	return ""
-}
-
-type GetBySessionResult struct {
-	User                 *UserData `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	Error                string    `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
-}
-
-func (m *GetBySessionResult) Reset()         { *m = GetBySessionResult{} }
-func (m *GetBySessionResult) String() string { return proto.CompactTextString(m) }
-func (*GetBySessionResult) ProtoMessage()    {}
-func (*GetBySessionResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{6}
-}
-
-func (m *GetBySessionResult) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetBySessionResult.Unmarshal(m, b)
-}
-func (m *GetBySessionResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetBySessionResult.Marshal(b, m, deterministic)
-}
-func (m *GetBySessionResult) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetBySessionResult.Merge(m, src)
-}
-func (m *GetBySessionResult) XXX_Size() int {
-	return xxx_messageInfo_GetBySessionResult.Size(m)
-}
-func (m *GetBySessionResult) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetBySessionResult.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetBySessionResult proto.InternalMessageInfo
-
-func (m *GetBySessionResult) GetUser() *UserData {
-	if m != nil {
-		return m.User
-	}
-	return nil
-}
-
-func (m *GetBySessionResult) GetError() string {
-	if m != nil {
-		return m.Error
-	}
-	return ""
-}
-
 type UpdateParams struct {
 	UserId               int32    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
@@ -350,7 +280,7 @@ func (m *UpdateParams) Reset()         { *m = UpdateParams{} }
 func (m *UpdateParams) String() string { return proto.CompactTextString(m) }
 func (*UpdateParams) ProtoMessage()    {}
 func (*UpdateParams) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{7}
+	return fileDescriptor_116e343673f7ffaf, []int{5}
 }
 
 func (m *UpdateParams) XXX_Unmarshal(b []byte) error {
@@ -403,7 +333,7 @@ func (m *UpdateResult) Reset()         { *m = UpdateResult{} }
 func (m *UpdateResult) String() string { return proto.CompactTextString(m) }
 func (*UpdateResult) ProtoMessage()    {}
 func (*UpdateResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{8}
+	return fileDescriptor_116e343673f7ffaf, []int{6}
 }
 
 func (m *UpdateResult) XXX_Unmarshal(b []byte) error {
@@ -432,7 +362,7 @@ func (m *UpdateResult) GetError() string {
 }
 
 type UpdateAvatarParams struct {
-	UserId               string   `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserId               int32    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	AvatarPath           string   `protobuf:"bytes,2,opt,name=avatar_path,json=avatarPath,proto3" json:"avatar_path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -443,7 +373,7 @@ func (m *UpdateAvatarParams) Reset()         { *m = UpdateAvatarParams{} }
 func (m *UpdateAvatarParams) String() string { return proto.CompactTextString(m) }
 func (*UpdateAvatarParams) ProtoMessage()    {}
 func (*UpdateAvatarParams) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{9}
+	return fileDescriptor_116e343673f7ffaf, []int{7}
 }
 
 func (m *UpdateAvatarParams) XXX_Unmarshal(b []byte) error {
@@ -464,11 +394,11 @@ func (m *UpdateAvatarParams) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UpdateAvatarParams proto.InternalMessageInfo
 
-func (m *UpdateAvatarParams) GetUserId() string {
+func (m *UpdateAvatarParams) GetUserId() int32 {
 	if m != nil {
 		return m.UserId
 	}
-	return ""
+	return 0
 }
 
 func (m *UpdateAvatarParams) GetAvatarPath() string {
@@ -489,7 +419,7 @@ func (m *UpdateAvatarResult) Reset()         { *m = UpdateAvatarResult{} }
 func (m *UpdateAvatarResult) String() string { return proto.CompactTextString(m) }
 func (*UpdateAvatarResult) ProtoMessage()    {}
 func (*UpdateAvatarResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{10}
+	return fileDescriptor_116e343673f7ffaf, []int{8}
 }
 
 func (m *UpdateAvatarResult) XXX_Unmarshal(b []byte) error {
@@ -528,7 +458,7 @@ func (m *GetSpecialAvatarParams) Reset()         { *m = GetSpecialAvatarParams{}
 func (m *GetSpecialAvatarParams) String() string { return proto.CompactTextString(m) }
 func (*GetSpecialAvatarParams) ProtoMessage()    {}
 func (*GetSpecialAvatarParams) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{11}
+	return fileDescriptor_116e343673f7ffaf, []int{9}
 }
 
 func (m *GetSpecialAvatarParams) XXX_Unmarshal(b []byte) error {
@@ -567,7 +497,7 @@ func (m *GetSpecialAvatarResult) Reset()         { *m = GetSpecialAvatarResult{}
 func (m *GetSpecialAvatarResult) String() string { return proto.CompactTextString(m) }
 func (*GetSpecialAvatarResult) ProtoMessage()    {}
 func (*GetSpecialAvatarResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_116e343673f7ffaf, []int{12}
+	return fileDescriptor_116e343673f7ffaf, []int{10}
 }
 
 func (m *GetSpecialAvatarResult) XXX_Unmarshal(b []byte) error {
@@ -601,8 +531,6 @@ func init() {
 	proto.RegisterType((*GetAllResult)(nil), "user.GetAllResult")
 	proto.RegisterType((*GetByIDParams)(nil), "user.GetByIDParams")
 	proto.RegisterType((*GetByIDResult)(nil), "user.GetByIDResult")
-	proto.RegisterType((*GetBySessionParams)(nil), "user.GetBySessionParams")
-	proto.RegisterType((*GetBySessionResult)(nil), "user.GetBySessionResult")
 	proto.RegisterType((*UpdateParams)(nil), "user.UpdateParams")
 	proto.RegisterType((*UpdateResult)(nil), "user.UpdateResult")
 	proto.RegisterType((*UpdateAvatarParams)(nil), "user.UpdateAvatarParams")
@@ -614,36 +542,36 @@ func init() {
 func init() { proto.RegisterFile("user.proto", fileDescriptor_116e343673f7ffaf) }
 
 var fileDescriptor_116e343673f7ffaf = []byte{
-	// 459 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x54, 0x5d, 0x8b, 0xd3, 0x40,
-	0x14, 0x35, 0xfd, 0x48, 0x9b, 0xbb, 0xeb, 0x22, 0x57, 0xd1, 0x10, 0x5c, 0x76, 0x19, 0xf6, 0xa1,
-	0x88, 0xec, 0x43, 0x16, 0xf1, 0x79, 0xa5, 0x50, 0xe2, 0x43, 0x29, 0x29, 0xc5, 0xc7, 0x30, 0x9a,
-	0xc1, 0x06, 0xd2, 0x24, 0xcc, 0x4c, 0x15, 0x9f, 0xfd, 0xe3, 0x92, 0xf9, 0x32, 0xb1, 0xa9, 0x20,
-	0xbe, 0xe5, 0xde, 0x7b, 0xe6, 0x9c, 0x33, 0x73, 0x4f, 0x0b, 0x70, 0x14, 0x8c, 0xdf, 0x37, 0xbc,
-	0x96, 0x35, 0x4e, 0xda, 0x6f, 0xb2, 0x81, 0xf9, 0x4e, 0x30, 0xbe, 0xa4, 0x92, 0xe2, 0x0b, 0x98,
-	0xb2, 0x03, 0x2d, 0xca, 0xd0, 0xbb, 0xf5, 0x16, 0x41, 0xaa, 0x0b, 0x8c, 0x60, 0xde, 0x50, 0x21,
-	0xbe, 0xd7, 0x3c, 0x0f, 0x47, 0x6a, 0xe0, 0x6a, 0x44, 0x98, 0x54, 0xf4, 0xc0, 0xc2, 0xb1, 0xea,
-	0xab, 0x6f, 0xb2, 0x80, 0xcb, 0x15, 0x93, 0x8f, 0x65, 0xb9, 0xa1, 0x9c, 0x1e, 0x04, 0x86, 0x30,
-	0xab, 0x6a, 0xb9, 0x2f, 0xaa, 0xaf, 0x8a, 0x77, 0x9e, 0xda, 0x92, 0x7c, 0xb4, 0xc8, 0x94, 0x89,
-	0x63, 0x29, 0xf1, 0x0e, 0xa6, 0xad, 0x27, 0x11, 0x7a, 0xb7, 0xe3, 0xc5, 0x45, 0x7c, 0x75, 0xaf,
-	0xdc, 0x5a, 0x7b, 0xa9, 0x1e, 0x2a, 0x97, 0x9c, 0xd7, 0xdc, 0x98, 0xd1, 0x05, 0xb9, 0x81, 0xa7,
-	0x2b, 0x26, 0x3f, 0xfc, 0x48, 0x96, 0x46, 0xf6, 0x0a, 0x46, 0x45, 0xae, 0x14, 0xa7, 0xe9, 0xa8,
-	0xc8, 0x49, 0xe2, 0x00, 0x46, 0x8d, 0x80, 0x7a, 0x01, 0x05, 0x39, 0x15, 0x53, 0xb3, 0x33, 0x5a,
-	0x0f, 0x80, 0x8a, 0x6a, 0xcb, 0x84, 0x28, 0xea, 0xca, 0x08, 0x5e, 0x03, 0x08, 0xdd, 0xc8, 0x8c,
-	0x70, 0x90, 0x06, 0xa6, 0x93, 0xe4, 0x64, 0xdd, 0x3f, 0xf4, 0xdf, 0x26, 0x3e, 0xc1, 0xe5, 0xae,
-	0xc9, 0xa9, 0x64, 0x46, 0xfe, 0x15, 0xcc, 0x5a, 0x74, 0xe6, 0x2e, 0xed, 0xb7, 0x65, 0x92, 0xff,
-	0xf3, 0xfe, 0xee, 0x2c, 0xb1, 0xb1, 0xe8, 0xe4, 0xbd, 0xae, 0xfc, 0x1a, 0x50, 0xa3, 0x1e, 0xbf,
-	0x51, 0x49, 0xf9, 0xb0, 0x89, 0xc0, 0x99, 0xb8, 0x81, 0x0b, 0xaa, 0x80, 0x59, 0x43, 0xe5, 0xde,
-	0xf8, 0x00, 0x6a, 0xce, 0xca, 0x3d, 0x79, 0xd3, 0xe7, 0xfb, 0xab, 0xf6, 0x5b, 0x78, 0xb9, 0x62,
-	0x72, 0xdb, 0xb0, 0x2f, 0x05, 0x2d, 0x7b, 0xfa, 0xf6, 0x3e, 0x5e, 0xe7, 0x3e, 0xef, 0x4f, 0xd1,
-	0x86, 0xfd, 0x1a, 0x8c, 0x83, 0xec, 0xc8, 0x6d, 0xe8, 0x03, 0xdd, 0xd9, 0xf1, 0x32, 0xfe, 0x39,
-	0x86, 0x49, 0xbb, 0x0a, 0x8c, 0xc1, 0xd7, 0x39, 0x45, 0xd4, 0x0b, 0xea, 0xe6, 0x3b, 0xea, 0xf5,
-	0x34, 0x33, 0x79, 0x82, 0xef, 0x60, 0x66, 0xe2, 0x86, 0xcf, 0x1d, 0xe0, 0x77, 0x3c, 0xa3, 0x7e,
-	0xd3, 0x1d, 0x5b, 0xaa, 0x9f, 0x84, 0x4b, 0x09, 0x86, 0x1d, 0x58, 0x2f, 0x6e, 0xd1, 0xc0, 0xc4,
-	0xb1, 0xc4, 0xe0, 0xeb, 0xc7, 0xb4, 0x86, 0xbb, 0x49, 0x89, 0x7a, 0xbd, 0xae, 0x72, 0x77, 0x01,
-	0x56, 0xf9, 0x74, 0xc9, 0xd1, 0xc0, 0xc4, 0xb1, 0x6c, 0xe0, 0xd9, 0x9f, 0x8f, 0x8d, 0xaf, 0x9d,
-	0xd3, 0x81, 0x95, 0x45, 0x67, 0xa6, 0x96, 0xf1, 0xb3, 0xaf, 0xfe, 0xad, 0x1e, 0x7e, 0x05, 0x00,
-	0x00, 0xff, 0xff, 0xca, 0xc7, 0x48, 0xde, 0xbb, 0x04, 0x00, 0x00,
+	// 450 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x54, 0x5d, 0x8b, 0xd3, 0x50,
+	0x10, 0x35, 0xe9, 0xe7, 0xce, 0x76, 0x17, 0x19, 0x45, 0x43, 0x50, 0xb6, 0x5c, 0xf7, 0xa1, 0x88,
+	0xec, 0x43, 0x45, 0x7c, 0x5e, 0x29, 0xd4, 0xfa, 0x20, 0x25, 0x52, 0x7c, 0x0c, 0xa3, 0xb9, 0x98,
+	0x40, 0xda, 0x84, 0x7b, 0x6f, 0x15, 0xff, 0x82, 0xff, 0xc9, 0xff, 0xb6, 0xe4, 0x7e, 0x6d, 0xd2,
+	0xee, 0xf6, 0x2d, 0x33, 0x73, 0xee, 0x9c, 0x39, 0x67, 0x86, 0x00, 0xec, 0x25, 0x17, 0x37, 0xb5,
+	0xa8, 0x54, 0x85, 0xfd, 0xe6, 0x9b, 0xfd, 0x0b, 0x60, 0xbc, 0x91, 0x5c, 0x2c, 0x48, 0x11, 0x5e,
+	0x42, 0x58, 0x64, 0x51, 0x30, 0x0d, 0x66, 0x83, 0x24, 0x2c, 0x32, 0x7c, 0x0e, 0x03, 0xbe, 0xa5,
+	0xa2, 0x8c, 0xc2, 0x69, 0x30, 0x3b, 0x4b, 0x4c, 0x80, 0x6f, 0xe0, 0xa2, 0x26, 0x29, 0xff, 0x54,
+	0x22, 0x4b, 0x73, 0x92, 0x79, 0xd4, 0xd3, 0xd5, 0x89, 0x4b, 0x7e, 0x26, 0x99, 0x23, 0x42, 0x7f,
+	0x47, 0x5b, 0x1e, 0xf5, 0x75, 0x4d, 0x7f, 0xe3, 0x15, 0x9c, 0xd3, 0x6f, 0x52, 0x24, 0xd2, 0x9a,
+	0x54, 0x1e, 0x0d, 0x74, 0x09, 0x4c, 0x6a, 0x4d, 0x2a, 0x67, 0x33, 0x98, 0x2c, 0xb9, 0xba, 0x2d,
+	0xcb, 0x35, 0x09, 0xda, 0x4a, 0x8c, 0x60, 0xb4, 0xab, 0x54, 0x5e, 0xec, 0x7e, 0xe9, 0xa1, 0xc6,
+	0x89, 0x0b, 0xd9, 0x17, 0x87, 0x4c, 0xb8, 0xdc, 0x97, 0x0a, 0xaf, 0x61, 0xd0, 0xc8, 0x91, 0x51,
+	0x30, 0xed, 0xcd, 0xce, 0xe7, 0x97, 0x37, 0x5a, 0xa8, 0x13, 0x96, 0x98, 0xa2, 0xd6, 0x23, 0x44,
+	0x25, 0xbc, 0x9e, 0x26, 0x60, 0x57, 0x70, 0xb1, 0xe4, 0xea, 0xd3, 0xdf, 0xd5, 0xc2, 0xd2, 0x1e,
+	0xd8, 0xc0, 0x56, 0x1e, 0x60, 0xd9, 0x18, 0x68, 0xf3, 0x34, 0xe4, 0x98, 0x4c, 0xd7, 0x1e, 0xe1,
+	0xfa, 0x0e, 0x93, 0x4d, 0x9d, 0x91, 0xe2, 0x96, 0xea, 0x25, 0x8c, 0x1a, 0x74, 0xea, 0xf9, 0x86,
+	0x4d, 0xb8, 0xca, 0x30, 0x86, 0xb1, 0xf3, 0xd3, 0x76, 0xf0, 0xb1, 0xf7, 0xb6, 0x77, 0xef, 0x2d,
+	0xbb, 0x76, 0x8d, 0xed, 0x88, 0x9e, 0x3e, 0x68, 0xd3, 0x7f, 0x05, 0x34, 0xa8, 0x5b, 0x6b, 0xfa,
+	0xe9, 0x21, 0x0e, 0x16, 0x16, 0x1e, 0x2d, 0xec, 0x6d, 0xb7, 0xdf, 0x49, 0xee, 0x77, 0xf0, 0x62,
+	0xc9, 0xd5, 0xb7, 0x9a, 0xff, 0x2c, 0xa8, 0xec, 0xf0, 0x3b, 0x3d, 0x41, 0x4b, 0xcf, 0xc7, 0x63,
+	0xb4, 0xed, 0xfe, 0x1a, 0xec, 0x04, 0xe9, 0x5e, 0x94, 0xf6, 0xcd, 0x99, 0xc9, 0x6c, 0x44, 0x39,
+	0xff, 0x1f, 0x42, 0xbf, 0x59, 0x05, 0xce, 0x61, 0x68, 0x4e, 0x04, 0xd1, 0x2c, 0xa8, 0x7d, 0x5a,
+	0x71, 0x27, 0x67, 0x3a, 0xb3, 0x27, 0xf8, 0x01, 0x46, 0x76, 0xd3, 0xf8, 0xcc, 0x03, 0xee, 0x2f,
+	0x23, 0xee, 0x26, 0xfd, 0xb3, 0x39, 0x0c, 0x8d, 0x0d, 0x8e, 0xaa, 0xbd, 0xe3, 0xb8, 0x93, 0xf3,
+	0x6f, 0x16, 0x6e, 0x61, 0x46, 0x1c, 0x46, 0x6d, 0x54, 0xdb, 0x9e, 0xf8, 0x81, 0x8a, 0xef, 0xb2,
+	0x86, 0xa7, 0x87, 0x36, 0xe1, 0x2b, 0x3f, 0xe4, 0x03, 0x66, 0xc7, 0x8f, 0x54, 0x5d, 0xc7, 0x1f,
+	0x43, 0xfd, 0x77, 0x78, 0x7f, 0x17, 0x00, 0x00, 0xff, 0xff, 0x79, 0x05, 0x04, 0xf2, 0x2b, 0x04,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -660,7 +588,6 @@ const _ = grpc.SupportPackageIsVersion4
 type UserClient interface {
 	GetAll(ctx context.Context, in *GetAllParams, opts ...grpc.CallOption) (*GetAllResult, error)
 	GetByID(ctx context.Context, in *GetByIDParams, opts ...grpc.CallOption) (*GetByIDResult, error)
-	GetBySession(ctx context.Context, in *GetBySessionParams, opts ...grpc.CallOption) (*GetBySessionResult, error)
 	Update(ctx context.Context, in *UpdateParams, opts ...grpc.CallOption) (*UpdateResult, error)
 	UpdateAvatar(ctx context.Context, in *UpdateAvatarParams, opts ...grpc.CallOption) (*UpdateAvatarResult, error)
 	GetSpecialAvatar(ctx context.Context, in *GetSpecialAvatarParams, opts ...grpc.CallOption) (*GetSpecialAvatarResult, error)
@@ -686,15 +613,6 @@ func (c *userClient) GetAll(ctx context.Context, in *GetAllParams, opts ...grpc.
 func (c *userClient) GetByID(ctx context.Context, in *GetByIDParams, opts ...grpc.CallOption) (*GetByIDResult, error) {
 	out := new(GetByIDResult)
 	err := c.cc.Invoke(ctx, "/user.User/GetByID", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) GetBySession(ctx context.Context, in *GetBySessionParams, opts ...grpc.CallOption) (*GetBySessionResult, error) {
-	out := new(GetBySessionResult)
-	err := c.cc.Invoke(ctx, "/user.User/GetBySession", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -732,7 +650,6 @@ func (c *userClient) GetSpecialAvatar(ctx context.Context, in *GetSpecialAvatarP
 type UserServer interface {
 	GetAll(context.Context, *GetAllParams) (*GetAllResult, error)
 	GetByID(context.Context, *GetByIDParams) (*GetByIDResult, error)
-	GetBySession(context.Context, *GetBySessionParams) (*GetBySessionResult, error)
 	Update(context.Context, *UpdateParams) (*UpdateResult, error)
 	UpdateAvatar(context.Context, *UpdateAvatarParams) (*UpdateAvatarResult, error)
 	GetSpecialAvatar(context.Context, *GetSpecialAvatarParams) (*GetSpecialAvatarResult, error)
@@ -747,9 +664,6 @@ func (*UnimplementedUserServer) GetAll(ctx context.Context, req *GetAllParams) (
 }
 func (*UnimplementedUserServer) GetByID(ctx context.Context, req *GetByIDParams) (*GetByIDResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByID not implemented")
-}
-func (*UnimplementedUserServer) GetBySession(ctx context.Context, req *GetBySessionParams) (*GetBySessionResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBySession not implemented")
 }
 func (*UnimplementedUserServer) Update(ctx context.Context, req *UpdateParams) (*UpdateResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
@@ -797,24 +711,6 @@ func _User_GetByID_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).GetByID(ctx, req.(*GetByIDParams))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_GetBySession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBySessionParams)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).GetBySession(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/user.User/GetBySession",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetBySession(ctx, req.(*GetBySessionParams))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -884,10 +780,6 @@ var _User_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByID",
 			Handler:    _User_GetByID_Handler,
-		},
-		{
-			MethodName: "GetBySession",
-			Handler:    _User_GetBySession_Handler,
 		},
 		{
 			MethodName: "Update",
