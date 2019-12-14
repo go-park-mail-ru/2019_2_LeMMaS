@@ -55,7 +55,7 @@ func (h *UserHandler) handleUserByID(c echo.Context) error {
 		return h.Error(c, "user with this id not found")
 	}
 	return h.OkWithBody(c, map[string]interface{}{
-		"user": delivery.OutputUser(*userByID),
+		"user": delivery.OutputUser(userByID),
 	})
 }
 
@@ -114,7 +114,7 @@ func (h *UserHandler) handleUserProfile(c echo.Context) error {
 		})
 	}
 	return h.OkWithBody(c, map[string]interface{}{
-		"user": delivery.OutputUser(*currentUser),
+		"user": delivery.OutputUser(currentUser),
 	})
 }
 

@@ -54,7 +54,7 @@ func (h *UserHandler) GetByID(ctx context.Context, params *user.GetByIDParams) (
 		result.Error = err.Error()
 		return
 	}
-	result.User = h.convertUser(*u)
+	result.User = h.convertUser(u)
 	return
 }
 
@@ -70,7 +70,7 @@ func (h *UserHandler) GetSpecialAvatar(context.Context, *user.GetSpecialAvatarPa
 	return nil, nil
 }
 
-func (h *UserHandler) convertUsers(users []model.User) []*user.UserData {
+func (h *UserHandler) convertUsers(users []*model.User) []*user.UserData {
 	result := make([]*user.UserData, 0)
 	for _, usr := range users {
 		result = append(result, h.convertUser(usr))
@@ -78,7 +78,7 @@ func (h *UserHandler) convertUsers(users []model.User) []*user.UserData {
 	return result
 }
 
-func (h *UserHandler) convertUser(usr model.User) *user.UserData {
+func (h *UserHandler) convertUser(usr *model.User) *user.UserData {
 	return &user.UserData{
 		Id:           int32(usr.ID),
 		Email:        usr.Email,

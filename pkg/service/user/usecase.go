@@ -5,7 +5,7 @@ import (
 )
 
 type UserUsecase interface {
-	GetAll() ([]model.User, error)
+	GetAll() ([]*model.User, error)
 	GetByID(userID int) (*model.User, error)
 	Update(userID int, password, name string) error
 	UpdateAvatar(userID int, avatarPath string) error

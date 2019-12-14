@@ -27,7 +27,7 @@ type UserLogin struct {
 	Password string `json:"password" valid:"required"`
 }
 
-func OutputUsers(users []model.User) []userOutput {
+func OutputUsers(users []*model.User) []userOutput {
 	res := make([]userOutput, 0, len(users))
 	for _, u := range users {
 		res = append(res, OutputUser(u))
@@ -35,7 +35,7 @@ func OutputUsers(users []model.User) []userOutput {
 	return res
 }
 
-func OutputUser(user model.User) userOutput {
+func OutputUser(user *model.User) userOutput {
 	return userOutput{
 		ID:         user.ID,
 		Email:      user.Email,

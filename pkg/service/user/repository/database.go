@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	user2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user"
@@ -52,8 +53,8 @@ func (r *databaseRepository) UpdateAvatarPath(id int, avatarPath string) error {
 	return err
 }
 
-func (r *databaseRepository) GetAll() ([]model.User, error) {
-	var users []model.User
+func (r *databaseRepository) GetAll() ([]*model.User, error) {
+	var users []*model.User
 	err := r.db.Select(&users, `select * from "`+userTable+`" order by id`)
 	if err != nil {
 		r.logger.Error(err)
@@ -66,7 +67,7 @@ func (r *databaseRepository) GetByID(id int) (*model.User, error) {
 	userByID := model.User{}
 	err := r.db.Get(&userByID, `select * from "`+userTable+`" where id=$1`, id)
 	if err == sql.ErrNoRows {
-		return nil, nil
+		return nil, consts.ErrNotFound
 	}
 	if err != nil {
 		r.logger.Error(err)
@@ -79,7 +80,7 @@ func (r *databaseRepository) GetByEmail(email string) (*model.User, error) {
 	userByEmail := model.User{}
 	err := r.db.Get(&userByEmail, `select * from "`+userTable+`" where email=$1`, email)
 	if err == sql.ErrNoRows {
-		return nil, nil
+		return nil, consts.ErrNotFound
 	}
 	if err != nil {
 		r.logger.Error(err)

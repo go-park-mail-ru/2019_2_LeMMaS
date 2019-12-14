@@ -16,7 +16,7 @@ func NewUserUsecase(repo user.Repository) user.UserUsecase {
 	}
 }
 
-func (u *userUsecase) GetAll() ([]model.User, error) {
+func (u *userUsecase) GetAll() ([]*model.User, error) {
 	return u.repo.GetAll()
 }
 
