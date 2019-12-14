@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery"
 	"github.com/gorilla/websocket"
@@ -33,7 +32,7 @@ func NewGameHandler(e *echo.Echo, game api.GameUsecase, auth api.AuthUsecase, lo
 	return &handler
 }
 
-func (h GameHandler) sendError(c *websocket.Conn, err error) error {
+func (h *GameHandler) sendError(c *websocket.Conn, err error) error {
 	body := map[string]interface{}{
 		"type":    "error",
 		"message": err.Error(),
@@ -41,7 +40,7 @@ func (h GameHandler) sendError(c *websocket.Conn, err error) error {
 	return c.WriteJSON(body)
 }
 
-func (h GameHandler) handleGame(c echo.Context) error {
+func (h *GameHandler) handleGame(c echo.Context) error {
 	upgrader := websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
 		return true
 	}}
@@ -52,13 +51,11 @@ func (h GameHandler) handleGame(c echo.Context) error {
 	}
 	defer conn.Close()
 
-	pCurrentUser, err := h.currentUser(c)
+	userID, err := h.currentUserID(c)
 	if err != nil {
 		h.sendError(conn, err)
 		return nil
 	}
-	currentUser := *pCurrentUser
-	userID := currentUser.ID
 
 	for {
 		err := h.processRequest(userID, conn)
@@ -73,7 +70,7 @@ type request struct {
 	Type string `json:"type"`
 }
 
-func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
+func (h *GameHandler) processRequest(userID int, c *websocket.Conn) error {
 	_, requestReader, _ := c.NextReader()
 	if requestReader == nil {
 		return errors.New("no content")
@@ -100,7 +97,7 @@ func (h GameHandler) processRequest(userID int, c *websocket.Conn) error {
 	}
 }
 
-func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
+func (h *GameHandler) processGameStart(userID int, c *websocket.Conn) error {
 	if err := h.game.StartGame(userID); err != nil {
 		return h.sendError(c, err)
 	}
@@ -125,7 +122,7 @@ func (h GameHandler) processGameStart(userID int, c *websocket.Conn) error {
 	})
 }
 
-func (h GameHandler) processGameStop(userID int, c *websocket.Conn) error {
+func (h *GameHandler) processGameStop(userID int, c *websocket.Conn) error {
 	err := h.game.StopGame(userID)
 	if err != nil {
 		return h.sendError(c, err)
@@ -137,7 +134,7 @@ type directionRequest struct {
 	Direction int `json:"direction"`
 }
 
-func (h GameHandler) processSetDirection(userID int, c *websocket.Conn, data []byte) error {
+func (h *GameHandler) processSetDirection(userID int, c *websocket.Conn, data []byte) error {
 	request := directionRequest{}
 	if err := json.Unmarshal(data, &request); err != nil {
 		return h.sendError(c, errInvalidJSON)
@@ -153,7 +150,7 @@ type speedRequest struct {
 	Speed int `json:"speed"`
 }
 
-func (h GameHandler) processSetSpeed(userID int, c *websocket.Conn, data []byte) error {
+func (h *GameHandler) processSetSpeed(userID int, c *websocket.Conn, data []byte) error {
 	request := speedRequest{}
 	if err := json.Unmarshal(data, &request); err != nil {
 		return h.sendError(c, errInvalidJSON)
@@ -165,14 +162,10 @@ func (h GameHandler) processSetSpeed(userID int, c *websocket.Conn, data []byte)
 	return nil
 }
 
-func (h *GameHandler) currentUser(c echo.Context) (*model.User, error) {
-	sessionIDCookie, err := c.Cookie(delivery.SessionIDCookieName)
+func (h *GameHandler) currentUserID(c echo.Context) (int, error) {
+	cookie, err := c.Cookie(delivery.SessionCookieName)
 	if err != nil {
-		return nil, errors.New("no session cookie")
+		return 0, errors.New("no session cookie")
 	}
-	currentUser, _ := h.auth.GetUserBySession(sessionIDCookie.Value)
-	if currentUser == nil {
-		return nil, errors.New("invalid session id")
-	}
-	return currentUser, nil
+	return h.auth.GetUserID(cookie.Value)
 }

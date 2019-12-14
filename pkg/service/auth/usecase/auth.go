@@ -26,7 +26,7 @@ func NewAuthUsecase(userRepo auth.UserRepository, sessionRepo auth.SessionReposi
 	}
 }
 
-func (u *authUsecase) Login(email, password string) (sessionID string, err error) {
+func (u *authUsecase) Login(email, password string) (session string, err error) {
 	userToLogin, err := u.userRepo.GetByEmail(email)
 	if err != nil {
 		return
@@ -39,13 +39,13 @@ func (u *authUsecase) Login(email, password string) (sessionID string, err error
 		err = errors.New("incorrect password")
 		return
 	}
-	sessionID = u.newSessionID()
-	err = u.sessionRepo.Add(sessionID, userToLogin.ID)
+	session = u.newSessionID()
+	err = u.sessionRepo.Add(session, userToLogin.ID)
 	return
 }
 
-func (u *authUsecase) Logout(sessionID string) error {
-	return u.sessionRepo.Delete(sessionID)
+func (u *authUsecase) Logout(session string) error {
+	return u.sessionRepo.Delete(session)
 }
 
 func (u *authUsecase) Register(email, password, name string) error {
@@ -57,6 +57,10 @@ func (u *authUsecase) Register(email, password, name string) error {
 		return errors.New("user with this email already registered")
 	}
 	return u.userRepo.Register(email, u.getPasswordHash(password), name)
+}
+
+func (u *authUsecase) GetUser(session string) (int, bool) {
+	return u.sessionRepo.Get(session)
 }
 
 func (u *authUsecase) getPasswordHash(password string) string {

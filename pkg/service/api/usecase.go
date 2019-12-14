@@ -8,10 +8,10 @@ import (
 )
 
 type AuthUsecase interface {
-	Login(email, password string) (sessionID string, err error)
-	Logout(sessionID string) error
+	Login(email, password string) (session string, err error)
+	Logout(session string) error
 	Register(email, password, name string) error
-	GetUserBySession(sessionID string) (*model.User, error)
+	GetUserID(session string) (int, error)
 }
 
 type UserUsecase interface {
@@ -23,8 +23,8 @@ type UserUsecase interface {
 }
 
 type CsrfUsecase interface {
-	CreateTokenBySession(sessionID string) (string, error)
-	CheckTokenBySession(token string, sessionID string) (bool, error)
+	CreateTokenBySession(session string) (string, error)
+	CheckTokenBySession(token string, session string) (bool, error)
 }
 
 type GameUsecase interface {

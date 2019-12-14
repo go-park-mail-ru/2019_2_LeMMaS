@@ -41,13 +41,13 @@ func (h *AccessHandler) csrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if csrfToken == "" {
 			return h.Error(c, "csrf token required")
 		}
-		sessionID, err := c.Cookie(delivery.SessionIDCookieName)
+		session, err := c.Cookie(delivery.SessionCookieName)
 		if err != nil {
 			return h.Error(c, "no session cookie")
 		}
-		ok, err := h.csrf.CheckTokenBySession(csrfToken, sessionID.Value)
+		ok, err := h.csrf.CheckTokenBySession(csrfToken, session.Value)
 		if !ok {
-			message := fmt.Sprintf("recieved incorrect CSRF token %v, session id %v", csrfToken, sessionID.Value)
+			message := fmt.Sprintf("recieved incorrect CSRF token %v, session id %v", csrfToken, session.Value)
 			if err != nil {
 				message += "\n" + err.Error()
 			}
@@ -91,11 +91,11 @@ func (h AccessHandler) isOriginAllowed(origin string) bool {
 
 func (h *AccessHandler) handleGetCSRFToken(c echo.Context) error {
 	token := ""
-	sessionID, err := c.Cookie(delivery.SessionIDCookieName)
+	session, err := c.Cookie(delivery.SessionCookieName)
 	if err != nil {
 		return h.Error(c, "no session cookie")
 	}
-	token, err = h.csrf.CreateTokenBySession(sessionID.Value)
+	token, err = h.csrf.CreateTokenBySession(session.Value)
 	if err != nil {
 		h.logger.Error(err)
 		return h.Error(c, "error generating token")

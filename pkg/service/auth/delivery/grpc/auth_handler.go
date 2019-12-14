@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
 	_ "github.com/jackc/pgx/stdlib"
 	_ "github.com/lib/pq"
@@ -37,18 +38,18 @@ func (h *AuthHandler) Serve(address string) error {
 
 func (h *AuthHandler) Login(ctx context.Context, params *auth.LoginParams) (result *auth.LoginResult, grpcErr error) {
 	result = &auth.LoginResult{}
-	sessionID, err := h.usecase.Login(params.Email, params.Password)
+	session, err := h.usecase.Login(params.Email, params.Password)
 	if err != nil {
 		result.Error = err.Error()
 		return
 	}
-	result.SessionId = sessionID
+	result.Session = session
 	return
 }
 
 func (h *AuthHandler) Logout(ctx context.Context, params *auth.LogoutParams) (result *auth.LogoutResult, grpcErr error) {
 	result = &auth.LogoutResult{}
-	err := h.usecase.Logout(params.SessionId)
+	err := h.usecase.Logout(params.Session)
 	if err != nil {
 		result.Error = err.Error()
 	}
@@ -61,5 +62,16 @@ func (h *AuthHandler) Register(ctx context.Context, params *auth.RegisterParams)
 	if err != nil {
 		result.Error = err.Error()
 	}
+	return
+}
+
+func (h *AuthHandler) GetUser(ctx context.Context, params *auth.GetUserParams) (result *auth.GetUserResult, grpcErr error) {
+	result = &auth.GetUserResult{}
+	id, ok := h.usecase.GetUser(params.Session)
+	if !ok {
+		result.Error = consts.ErrNotFound.Error()
+		return
+	}
+	result.Id = int32(id)
 	return
 }

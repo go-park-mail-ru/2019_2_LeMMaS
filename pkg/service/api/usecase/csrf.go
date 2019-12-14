@@ -29,12 +29,12 @@ type tokenData struct {
 	Expires int64
 }
 
-func (u csrfUsecase) CreateTokenBySession(sessionID string) (string, error) {
-	return u.createToken(sessionID, csrfTokenExpire)
+func (u csrfUsecase) CreateTokenBySession(session string) (string, error) {
+	return u.createToken(session, csrfTokenExpire)
 }
 
-func (u csrfUsecase) CheckTokenBySession(token string, sessionID string) (bool, error) {
-	return u.checkToken(token, sessionID)
+func (u csrfUsecase) CheckTokenBySession(token string, session string) (bool, error) {
+	return u.checkToken(token, session)
 }
 
 func (u csrfUsecase) createToken(payload string, expire time.Duration) (string, error) {

@@ -76,13 +76,13 @@ package usecase
 //	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(&userToLogin, nil)
 //	sessionRepo.EXPECT().Add(gomock.Any(), userToLogin.ID).Return(nil)
 //
-//	sessionID, err := server.Login(userToLogin.Email, test.Password)
-//	assert.NotEmpty(t, sessionID)
+//	session, err := server.Login(userToLogin.Email, test.Password)
+//	assert.NotEmpty(t, session)
 //	assert.Nil(t, err)
 //
 //	userRepo.EXPECT().GetByEmail(userToLogin.Email).Return(nil, nil)
-//	sessionID, err = server.Login(userToLogin.Email, test.Password)
-//	assert.Empty(t, sessionID)
+//	session, err = server.Login(userToLogin.Email, test.Password)
+//	assert.Empty(t, session)
 //	assert.EqualError(t, err, "incorrect email")
 //}
 //
@@ -98,8 +98,8 @@ package usecase
 //	sessionRepo.EXPECT().Add(gomock.Any(), userToLogin.ID).Return(nil)
 //	sessionRepo.EXPECT().Get(gomock.Any()).Return(userToLogin.ID, true)
 //
-//	sessionID, _ := server.Login(userToLogin.Email, test.Password)
-//	userBySession, err := server.GetUserBySession(sessionID)
+//	session, _ := server.Login(userToLogin.Email, test.Password)
+//	userBySession, err := server.GetUserBySession(session)
 //	assert.NotNil(t, userBySession)
 //	if userBySession != nil {
 //		assert.Equal(t, *userBySession, userToLogin)

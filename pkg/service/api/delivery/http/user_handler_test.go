@@ -78,9 +78,9 @@ package http
 //func TestUserHandler_HandleUserLogout(t *testing.T) {
 //	s.StartTest(t)
 //
-//	sessionID := "sess"
-//	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(sessionID, nil)
-//	s.ExpectUsecase().Logout(sessionID).Return(nil)
+//	session := "sess"
+//	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(session, nil)
+//	s.ExpectUsecase().Logout(session).Return(nil)
 //
 //	s.TestUserLogin(
 //		`{"email":"testik1@mail.ru","password":"ssc-tuatara"}`,

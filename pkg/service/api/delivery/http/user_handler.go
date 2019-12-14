@@ -60,7 +60,7 @@ func (h *UserHandler) handleUserByID(c echo.Context) error {
 }
 
 func (h *UserHandler) handleUserUpdate(c echo.Context) error {
-	currentUser, err := h.currentUser(c)
+	id, err := h.currentUserID(c)
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
@@ -68,7 +68,7 @@ func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return h.Error(c, "unknown error")
 	}
-	err = h.user.Update(currentUser.ID, u.Password, u.Name)
+	err = h.user.Update(id, u.Password, u.Name)
 	if err != nil {
 		return h.Error(c, "error updating user")
 	}
@@ -76,7 +76,7 @@ func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 }
 
 func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
-	currentUser, err := h.currentUser(c)
+	id, err := h.currentUserID(c)
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
@@ -91,7 +91,7 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()
-	err = h.user.UpdateAvatar(currentUser.ID, avatarFile)
+	err = h.user.UpdateAvatar(id, avatarFile)
 	if err != nil {
 		return h.Error(c, "error updating avatar")
 	}
@@ -144,35 +144,39 @@ func (h *UserHandler) handleUserLogin(c echo.Context) error {
 	if ok, errs := h.Validate(u); !ok {
 		return h.Errors(c, errs)
 	}
-	sessionID, err := h.auth.Login(u.Email, u.Password)
+	session, err := h.auth.Login(u.Email, u.Password)
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
-	h.SetCookie(c, delivery.SessionIDCookieName, sessionID, time.Now().Add(delivery.SessionIDCookieExpire))
+	h.SetCookie(c, delivery.SessionCookieName, session, time.Now().Add(delivery.SessionCookieExpire))
 	return h.Ok(c)
 }
 
 func (h *UserHandler) handleUserLogout(c echo.Context) error {
-	sessionIDCookie, err := c.Cookie(delivery.SessionIDCookieName)
+	sessionCookie, err := c.Cookie(delivery.SessionCookieName)
 	if err != nil {
 		return h.Error(c, "no session cookie")
 	}
-	h.DeleteCookie(c, delivery.SessionIDCookieName)
-	err = h.auth.Logout(sessionIDCookie.Value)
+	h.DeleteCookie(c, delivery.SessionCookieName)
+	err = h.auth.Logout(sessionCookie.Value)
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
 	return h.Ok(c)
 }
 
-func (h *UserHandler) currentUser(c echo.Context) (*model.User, error) {
-	sessionIDCookie, err := c.Cookie(delivery.SessionIDCookieName)
+func (h *UserHandler) currentUserID(c echo.Context) (int, error) {
+	cookie, err := c.Cookie(delivery.SessionCookieName)
 	if err != nil {
-		return nil, errors.New("no session cookie")
+		return 0, errors.New("no session cookie")
 	}
-	currentUser, _ := h.auth.GetUserBySession(sessionIDCookie.Value)
-	if currentUser == nil {
-		return nil, errors.New("invalid session id")
+	return h.auth.GetUserID(cookie.Value)
+}
+
+func (h *UserHandler) currentUser(c echo.Context) (*model.User, error) {
+	id, err := h.currentUserID(c)
+	if err != nil {
+		return nil, err
 	}
-	return currentUser, nil
+	return h.user.GetByID(id)
 }

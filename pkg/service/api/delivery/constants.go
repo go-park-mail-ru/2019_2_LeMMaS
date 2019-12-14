@@ -25,8 +25,8 @@ const (
 )
 
 const (
-	SessionIDCookieName   = "session_id"
-	SessionIDCookieExpire = 10 * time.Hour
+	SessionCookieName   = "session_id"
+	SessionCookieExpire = 10 * time.Hour
 )
 
 func IsPrivatePath(path string) bool {

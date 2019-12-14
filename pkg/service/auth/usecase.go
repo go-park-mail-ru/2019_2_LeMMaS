@@ -1,7 +1,8 @@
 package auth
 
 type AuthUsecase interface {
-	Login(email, password string) (sessionID string, err error)
-	Logout(sessionID string) error
+	Login(email, password string) (session string, err error)
+	Logout(session string) error
 	Register(email, password, name string) error
+	GetUser(session string) (int, bool)
 }
