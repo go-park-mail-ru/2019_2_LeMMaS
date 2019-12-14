@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
 	"github.com/gomodule/redigo/redis"
@@ -29,8 +30,9 @@ func (r *sessionRepo) Add(session string, user int) error {
 	_, err := r.redis.Do(set, session, user)
 	if err != nil {
 		r.logger.Error(err)
+		return consts.ErrStorageError
 	}
-	return err
+	return nil
 }
 
 func (r *sessionRepo) Get(session string) (int, bool) {
@@ -55,6 +57,7 @@ func (r *sessionRepo) Delete(session string) error {
 	_, err := r.redis.Do(del, session)
 	if err != nil {
 		r.logger.Error(err)
+		return consts.ErrStorageError
 	}
-	return err
+	return nil
 }

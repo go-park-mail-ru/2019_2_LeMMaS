@@ -13,6 +13,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
 	"github.com/labstack/echo"
 	"google.golang.org/grpc"
+	"os"
 )
 
 // Injectors from wire.go:
@@ -99,9 +100,7 @@ func NewLogger() (logger.Logger, error) {
 }
 
 func NewAuthGRPC() (*grpc.ClientConn, error) {
-	conn, err := grpc.Dial(
-		"auth:8080", grpc.WithInsecure(),
-	)
+	conn, err := grpc.Dial(os.Getenv("AUTH_URL"), grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}

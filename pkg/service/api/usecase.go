@@ -7,19 +7,19 @@ import (
 	"io"
 )
 
-type UserUsecase interface {
-	GetAllUsers() ([]model.User, error)
-	GetUserByID(userID int) (*model.User, error)
-	UpdateUser(id int, password, name string) error
-	UpdateUserAvatar(user *model.User, avatarFile io.Reader) error
-	GetAvatarUrlByName(name string) string
-}
-
 type AuthUsecase interface {
 	Login(email, password string) (sessionID string, err error)
 	Logout(sessionID string) error
 	Register(email, password, name string) error
-	GetUserBySessionID(sessionID string) (*model.User, error)
+	GetUserBySession(sessionID string) (*model.User, error)
+}
+
+type UserUsecase interface {
+	GetAllUsers() ([]model.User, error)
+	GetUserByID(userID int) (*model.User, error)
+	UpdateUser(userID int, password, name string) error
+	UpdateUserAvatar(userID int, avatarFile io.Reader) error
+	GetSpecialAvatar(name string) string
 }
 
 type CsrfUsecase interface {

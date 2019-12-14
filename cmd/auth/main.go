@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/cmd"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/factory"
 	"log"
+	"os"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 		cmd.Fatal(l, err)
 	}
 
-	err = h.Serve()
+	err = h.Serve(":" + os.Getenv("PORT"))
 	if err != nil {
 		cmd.Fatal(l, err)
 	}

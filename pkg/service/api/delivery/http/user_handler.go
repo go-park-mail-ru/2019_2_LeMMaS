@@ -32,21 +32,13 @@ func NewUserHandler(e *echo.Echo, user api.UserUsecase, auth api.AuthUsecase, lo
 	return &h
 }
 
-type userToOutput struct {
-	ID         int    `json:"id"`
-	Email      string `json:"email"`
-	Name       string `json:"name"`
-	AvatarPath string `json:"avatar_path"`
-}
-
 func (h *UserHandler) handleUserList(c echo.Context) error {
 	users, err := h.user.GetAllUsers()
 	if err != nil {
 		return h.Error(c, "error loading users")
 	}
-	usersToOutput := h.convertUsersForOutput(users)
 	return h.OkWithBody(c, map[string]interface{}{
-		"users": usersToOutput,
+		"users": delivery.OutputUsers(users),
 	})
 }
 
@@ -63,30 +55,8 @@ func (h *UserHandler) handleUserByID(c echo.Context) error {
 		return h.Error(c, "user with this id not found")
 	}
 	return h.OkWithBody(c, map[string]interface{}{
-		"user": h.convertUserForOutput(*userByID),
+		"user": delivery.OutputUser(*userByID),
 	})
-}
-
-func (h *UserHandler) convertUsersForOutput(users []model.User) []userToOutput {
-	usersToOutput := make([]userToOutput, 0, len(users))
-	for _, u := range users {
-		usersToOutput = append(usersToOutput, h.convertUserForOutput(u))
-	}
-	return usersToOutput
-}
-
-func (h *UserHandler) convertUserForOutput(user model.User) userToOutput {
-	return userToOutput{
-		ID:         user.ID,
-		Email:      user.Email,
-		Name:       user.Name,
-		AvatarPath: user.AvatarPath,
-	}
-}
-
-type userToUpdate struct {
-	Password string `json:"password"`
-	Name     string `json:"name"`
 }
 
 func (h *UserHandler) handleUserUpdate(c echo.Context) error {
@@ -94,11 +64,11 @@ func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
-	userToUpdate := &userToUpdate{}
-	if err := c.Bind(userToUpdate); err != nil {
+	u := &delivery.UserUpdate{}
+	if err := c.Bind(u); err != nil {
 		return h.Error(c, "unknown error")
 	}
-	err = h.user.UpdateUser(currentUser.ID, userToUpdate.Password, userToUpdate.Name)
+	err = h.user.UpdateUser(currentUser.ID, u.Password, u.Name)
 	if err != nil {
 		return h.Error(c, "error updating user")
 	}
@@ -121,7 +91,7 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()
-	err = h.user.UpdateUserAvatar(currentUser, avatarFile)
+	err = h.user.UpdateUserAvatar(currentUser.ID, avatarFile)
 	if err != nil {
 		return h.Error(c, "error updating avatar")
 	}
@@ -130,7 +100,7 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 
 func (h *UserHandler) handleGetAvatarByName(c echo.Context) error {
 	name := c.FormValue("name")
-	avatarUrl := h.user.GetAvatarUrlByName(name)
+	avatarUrl := h.user.GetSpecialAvatar(name)
 	return h.OkWithBody(c, map[string]string{
 		"avatar_url": avatarUrl,
 	})
@@ -144,45 +114,34 @@ func (h *UserHandler) handleUserProfile(c echo.Context) error {
 		})
 	}
 	return h.OkWithBody(c, map[string]interface{}{
-		"user": h.convertUserForOutput(*currentUser),
+		"user": delivery.OutputUser(*currentUser),
 	})
 }
 
-type userToRegister struct {
-	Email    string `json:"email" valid:"email,required"`
-	Password string `json:"password" valid:"required"`
-	Name     string `json:"name" valid:"required"`
-}
-
 func (h *UserHandler) handleUserRegister(c echo.Context) error {
-	userToRegister := &userToRegister{}
-	if err := c.Bind(userToRegister); err != nil {
+	u := &delivery.UserRegister{}
+	if err := c.Bind(u); err != nil {
 		return h.Error(c, err.Error())
 	}
-	if ok, errs := h.Validate(userToRegister); !ok {
+	if ok, errs := h.Validate(u); !ok {
 		return h.Errors(c, errs)
 	}
-	err := h.auth.Register(userToRegister.Email, userToRegister.Password, userToRegister.Name)
+	err := h.auth.Register(u.Email, u.Password, u.Name)
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
 	return h.Ok(c)
 }
 
-type userToLogin struct {
-	Email    string `json:"email" valid:"email,required"`
-	Password string `json:"password" valid:"required"`
-}
-
 func (h *UserHandler) handleUserLogin(c echo.Context) error {
-	userToLogin := &userToLogin{}
-	if err := c.Bind(userToLogin); err != nil {
+	u := &delivery.UserLogin{}
+	if err := c.Bind(u); err != nil {
 		return err
 	}
-	if ok, errs := h.Validate(userToLogin); !ok {
+	if ok, errs := h.Validate(u); !ok {
 		return h.Errors(c, errs)
 	}
-	sessionID, err := h.auth.Login(userToLogin.Email, userToLogin.Password)
+	sessionID, err := h.auth.Login(u.Email, u.Password)
 	if err != nil {
 		return h.Error(c, err.Error())
 	}
@@ -208,7 +167,7 @@ func (h *UserHandler) currentUser(c echo.Context) (*model.User, error) {
 	if err != nil {
 		return nil, errors.New("no session cookie")
 	}
-	currentUser, _ := h.auth.GetUserBySessionID(sessionIDCookie.Value)
+	currentUser, _ := h.auth.GetUserBySession(sessionIDCookie.Value)
 	if currentUser == nil {
 		return nil, errors.New("invalid session id")
 	}

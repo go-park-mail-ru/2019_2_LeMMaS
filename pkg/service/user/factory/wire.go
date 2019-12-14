@@ -1,11 +1,13 @@
-package user
+package factory
 
 import (
 	"github.com/jmoiron/sqlx"
 	"os"
 )
 
-func NewDB() (*sqlx.DB, error) {
+func NewUserHandler()
+
+func newDB() (*sqlx.DB, error) {
 	db, err := sqlx.Connect("pgx", os.Getenv("POSTGRES_DSN"))
 	if err != nil {
 		return nil, err

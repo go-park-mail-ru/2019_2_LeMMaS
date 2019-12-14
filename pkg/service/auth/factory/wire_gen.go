@@ -9,7 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/delivery/grpc"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/repository"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/server"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth/usecase"
 	"github.com/gomodule/redigo/redis"
 	"os"
 )
@@ -27,15 +27,19 @@ func NewAuthHandler() (*grpc.AuthHandler, error) {
 		return nil, err
 	}
 	sessionRepository := repository.NewSessionRepository(conn, logger)
-	authServer := server.NewAuthServer(userRepository, sessionRepository)
-	authHandler := grpc.NewAuthHandler(authServer)
+	authUsecase := usecase.NewAuthUsecase(userRepository, sessionRepository, logger)
+	authHandler := grpc.NewAuthHandler(authUsecase)
 	return authHandler, nil
 }
 
 // wire.go:
 
 func NewLogger() (logger.Logger, error) {
-	return logger.NewSentryLogger()
+	sentry, err := logger.NewSentryLogger()
+	if err != nil {
+		return nil, err
+	}
+	return logger.NewCombinedLogger(sentry, logger.NewStdoutLogger()), nil
 }
 
 func newRedis() (redis.Conn, error) {

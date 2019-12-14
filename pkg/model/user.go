@@ -1,9 +1,9 @@
 package model
 
 type User struct {
-	ID           int    `db:"id"`
-	Email        string `db:"email"`
-	PasswordHash string `db:"password_hash"`
-	Name         string `db:"name"`
-	AvatarPath   string `db:"avatar_path"`
+	ID           int    `json:"id"`
+	Email        string `json:"email"`
+	PasswordHash string `json:"-"`
+	Name         string `json:"name"`
+	AvatarPath   string `json:"avatar_path"`
 }

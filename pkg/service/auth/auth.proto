@@ -6,12 +6,8 @@ package auth;
 
 service Auth {
     rpc Login (LoginParams) returns (LoginResult) {}
-    rpc Logout (LogoutParams) returns (Nothing) {}
-    rpc RegisterUser (RegisterParams) returns (Nothing) {}
-}
-
-message Nothing {
-    bool nothing = 1;
+    rpc Logout (LogoutParams) returns (LogoutResult) {}
+    rpc Register (RegisterParams) returns (RegisterResult) {}
 }
 
 message LoginParams {
@@ -20,15 +16,24 @@ message LoginParams {
 }
 
 message LoginResult {
-    string sessionID = 1;
+    string session_id = 1;
+    string error = 2;
 }
 
 message LogoutParams {
-    string sessionID = 1;
+    string session_id = 1;
+}
+
+message LogoutResult {
+    string error = 1;
 }
 
 message RegisterParams {
     string email = 1;
     string password = 2;
     string name = 3;
+}
+
+message RegisterResult {
+    string error = 1;
 }

@@ -170,7 +170,7 @@ func (h *GameHandler) currentUser(c echo.Context) (*model.User, error) {
 	if err != nil {
 		return nil, errors.New("no session cookie")
 	}
-	currentUser, _ := h.auth.GetUserBySessionID(sessionIDCookie.Value)
+	currentUser, _ := h.auth.GetUserBySession(sessionIDCookie.Value)
 	if currentUser == nil {
 		return nil, errors.New("invalid session id")
 	}

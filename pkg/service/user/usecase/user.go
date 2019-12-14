@@ -15,6 +15,7 @@ import (
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/net/context"
 	"os"
+	"os/user"
 	"strings"
 )
 
@@ -24,27 +25,6 @@ type UserManager struct {
 	repository        user3.Repository
 	fileRepository    user3.FileRepository
 	sessionRepository user3.SessionRepository
-}
-
-func NewUserManager() *UserManager {
-	db, err := newDB()
-	if err != nil {
-		log.Error(err)
-	}
-	repository := repository3.NewDatabaseRepository(db)
-
-	conn, err := newRedis()
-	if err != nil {
-		log.Error(err)
-	}
-	sessionRepository := repository2.NewSessionRepository(conn)
-
-	fileRepository := repository3.NewS3Repository()
-	return &UserManager{
-		repository:        repository,
-		fileRepository:    fileRepository,
-		sessionRepository: sessionRepository,
-	}
 }
 
 func (u *UserManager) GetUserByID(ctx context.Context, userID *user.UserID) (*user.UserAndError, error) {

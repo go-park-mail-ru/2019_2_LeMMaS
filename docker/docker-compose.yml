@@ -1,29 +1,24 @@
 version: '2.4'
 services:
-  #  api:
-  #    build: images/api
-  #    environment:
-  #      AUTH_URL: auth:8081
-  #      PORT: 8080
-  #    env_file: images/api/.env
-  #    working_dir: /app/cmd/api
-  ##    depends_on:
-  ##      - auth
-  #    volumes:
-  #      - ../.:/app
-  #    ports:
-  #      - 8080:8080
+  api:
+    build: images/api
+    env_file: images/api/.env
+    working_dir: /app/cmd/api
+    depends_on:
+      - auth
+    volumes:
+      - ../.:/app
+    ports:
+      - 8080:8080
 
   auth:
     build: images/auth
     working_dir: /app/cmd/auth
+    env_file: images/auth/.env
     volumes:
       - ../.:/app
-    environment:
-      PORT: 8081
-    env_file: images/auth/.env
-    ports:
-      - 8081:8081
+    expose:
+      - 8081
 
   #  game:
   #    build: images/game

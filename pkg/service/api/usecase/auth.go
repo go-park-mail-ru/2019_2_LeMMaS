@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
@@ -9,35 +10,52 @@ import (
 
 type authUsecase struct {
 	auth auth.AuthClient
+	ctx  context.Context
 }
 
 func NewAuthUsecase(auth auth.AuthClient) api.AuthUsecase {
 	return &authUsecase{
 		auth: auth,
+		ctx:  context.Background(),
 	}
 }
 
 func (u *authUsecase) Register(email, password, name string) error {
-	userData := &auth.UserDataRegister{email, password, name}
-	_, err := u.auth.RegisterUser(context.Background(), userData)
-	return err
+	params := &auth.RegisterParams{Email: email, Password: password, Name: name}
+	res, err := u.auth.Register(u.ctx, params)
+	if err != nil {
+		return err
+	}
+	if res.Error != "" {
+		return errors.New(res.Error)
+	}
+	return nil
 }
 
 func (u *authUsecase) Login(email, password string) (sessionID string, err error) {
-	userData := &auth.UserAuth{email, password}
-	result, err := u.auth.Login(context.Background(), userData)
+	params := &auth.LoginParams{Email: email, Password: password}
+	res, err := u.auth.Login(u.ctx, params)
 	if err != nil {
 		return "", err
 	}
-	return result.SessionID.ID, err
+	if res.Error != "" {
+		return "", errors.New(res.Error)
+	}
+	return res.SessionId, nil
 }
 
 func (u *authUsecase) Logout(sessionID string) error {
-	userData := &auth.SessionID{sessionID}
-	_, err := u.auth.Logout(context.Background(), userData)
-	return err
+	params := &auth.LogoutParams{SessionId: sessionID}
+	res, err := u.auth.Logout(u.ctx, params)
+	if err != nil {
+		return err
+	}
+	if res.Error != "" {
+		return errors.New(res.Error)
+	}
+	return nil
 }
 
-func (u *authUsecase) GetUserBySessionID(sessionID string) (*model.User, error) {
+func (u *authUsecase) GetUserBySession(sessionID string) (*model.User, error) {
 	return nil, nil
 }

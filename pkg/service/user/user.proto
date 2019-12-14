@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package user;
+
+service User {
+    rpc GetByID(GetByIDParams) returns (GetByIDResult) {}
+    rpc GetBySession(GetBySessionParams) returns (GetBySessionResult) {}
+    rpc Update(UpdateParams) returns (UpdateResult) {}
+    rpc UpdateAvatar(UpdateAvatarParams) returns (UpdateAvatarResult) {}
+    rpc GetSpecialAvatar(GetSpecialAvatarParams) returns (GetSpecialAvatarResult) {}
+}
+
+message UserData {
+    string email = 1;
+    string password = 2;
+    string name = 3;
+}
+
+message GetByIDParams {
+    int32 id = 1;
+}
+
+message GetByIDResult {
+    UserData user = 1;
+    string error = 2;
+}
+
+message GetBySessionParams {
+    string session_id = 1;
+}
+
+message GetBySessionResult {
+    UserData user = 1;
+    string error = 2;
+}
+
+message UpdateParams {
+    int32 user_id = 1;
+    string password = 2;
+    string name = 3;
+}
+
+message UpdateResult {
+    string error = 1;
+}
+
+message UpdateAvatarParams {
+    string user_id = 1;
+    string avatar_path = 2;
+}
+
+message UpdateAvatarResult {
+    string error = 1;
+}
+
+message GetSpecialAvatarParams {
+    string name = 1;
+}
+
+message GetSpecialAvatarResult {
+    string avatar_url = 1;
+}

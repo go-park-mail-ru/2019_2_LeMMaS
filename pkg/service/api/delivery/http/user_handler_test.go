@@ -54,7 +54,7 @@ package http
 //	s.StartTest(t)
 //
 //	s.ExpectUsecase().Login("testik1@mail.ru", "ssc-tuatara").Return(test.SessionID, nil)
-//	s.ExpectUsecase().GetUserBySessionID(test.SessionID).Return(&model.User{ID: 1}, nil)
+//	s.ExpectUsecase().GetUserBySession(test.SessionID).Return(&model.User{ID: 1}, nil)
 //	s.ExpectUsecase().UpdateUser(1, "", "New Name").Return(nil)
 //
 //	s.TestUserLogin(

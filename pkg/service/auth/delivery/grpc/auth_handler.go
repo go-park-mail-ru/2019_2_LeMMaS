@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
 	_ "github.com/jackc/pgx/stdlib"
@@ -8,27 +9,57 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"net"
-	"os"
 	"time"
 )
 
 type AuthHandler struct {
-	server *grpc.Server
+	usecase auth.AuthUsecase
+	server  *grpc.Server
 }
 
-func NewAuthHandler(s auth.AuthServer) *AuthHandler {
-	h := AuthHandler{}
+func NewAuthHandler(usecase auth.AuthUsecase) *AuthHandler {
+	h := AuthHandler{usecase: usecase}
 	h.server = grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
 		MaxConnectionIdle: 5 * time.Minute,
 	}))
-	auth.RegisterAuthServer(h.server, s)
+	auth.RegisterAuthServer(h.server, &h)
 	return &h
 }
 
-func (h *AuthHandler) Serve() error {
-	listener, err := net.Listen("tcp", os.Getenv("PORT"))
+func (h *AuthHandler) Serve(address string) error {
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
-		return fmt.Errorf("cant listen port: %w", err)
+		return err
 	}
+	fmt.Println("listening " + address)
 	return h.server.Serve(listener)
+}
+
+func (h *AuthHandler) Login(ctx context.Context, params *auth.LoginParams) (result *auth.LoginResult, grpcErr error) {
+	result = &auth.LoginResult{}
+	sessionID, err := h.usecase.Login(params.Email, params.Password)
+	if err != nil {
+		result.Error = err.Error()
+		return
+	}
+	result.SessionId = sessionID
+	return
+}
+
+func (h *AuthHandler) Logout(ctx context.Context, params *auth.LogoutParams) (result *auth.LogoutResult, grpcErr error) {
+	result = &auth.LogoutResult{}
+	err := h.usecase.Logout(params.SessionId)
+	if err != nil {
+		result.Error = err.Error()
+	}
+	return
+}
+
+func (h *AuthHandler) Register(ctx context.Context, params *auth.RegisterParams) (result *auth.RegisterResult, grpcErr error) {
+	result = &auth.RegisterResult{}
+	err := h.usecase.Register(params.Email, params.Password, params.Name)
+	if err != nil {
+		result.Error = err.Error()
+	}
+	return
 }

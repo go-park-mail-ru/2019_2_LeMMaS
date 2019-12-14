@@ -99,7 +99,7 @@ package usecase
 //	sessionRepo.EXPECT().Get(gomock.Any()).Return(userToLogin.ID, true)
 //
 //	sessionID, _ := server.Login(userToLogin.Email, test.Password)
-//	userBySession, err := server.GetUserBySessionID(sessionID)
+//	userBySession, err := server.GetUserBySession(sessionID)
 //	assert.NotNil(t, userBySession)
 //	if userBySession != nil {
 //		assert.Equal(t, *userBySession, userToLogin)
@@ -117,7 +117,7 @@ package usecase
 //
 //func TestUserUsecase_GetAvatarUrlByName(t *testing.T) {
 //	server := NewUserUsecase(nil, nil, nil, nil)
-//	url := server.GetAvatarUrlByName("trump")
+//	url := server.GetSpecialAvatar("trump")
 //	assert.Regexp(t, `^http`, url)
 //}
 //
