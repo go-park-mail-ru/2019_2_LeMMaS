@@ -48,11 +48,11 @@ func NewGameHandler() (*ws.GameHandler, error) {
 	if err != nil {
 		return nil, err
 	}
-	authUsecase := usecase.NewAuthUsecase(authClient)
 	logger, err := NewLogger()
 	if err != nil {
 		return nil, err
 	}
+	authUsecase := usecase.NewAuthUsecase(authClient, logger)
 	gameHandler := ws.NewGameHandler(echo, gameUsecase, authUsecase, logger)
 	return gameHandler, nil
 }
@@ -68,12 +68,12 @@ func NewUserHandler() (*http.UserHandler, error) {
 		return nil, err
 	}
 	fileRepository := repository.NewS3Repository(logger)
-	userUsecase := usecase.NewUserUsecase(userClient, fileRepository)
+	userUsecase := usecase.NewUserUsecase(userClient, fileRepository, logger)
 	authClient, err := newAuthClient()
 	if err != nil {
 		return nil, err
 	}
-	authUsecase := usecase.NewAuthUsecase(authClient)
+	authUsecase := usecase.NewAuthUsecase(authClient, logger)
 	userHandler := http.NewUserHandler(echo, userUsecase, authUsecase, logger)
 	return userHandler, nil
 }

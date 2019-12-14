@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user"
@@ -12,21 +13,25 @@ import (
 type userUsecase struct {
 	fileRepo api.FileRepository
 	user     user.UserClient
-	ctx      context.Context
+	logger   logger.Logger
+
+	c context.Context
 }
 
-func NewUserUsecase(user user.UserClient, fileRepo api.FileRepository) api.UserUsecase {
+func NewUserUsecase(user user.UserClient, fileRepo api.FileRepository, logger logger.Logger) api.UserUsecase {
 	return &userUsecase{
 		user:     user,
 		fileRepo: fileRepo,
-		ctx:      context.Background(),
+		logger:   logger,
+		c:        context.Background(),
 	}
 }
 
 func (u *userUsecase) GetAll() ([]*model.User, error) {
 	params := user.GetAllParams{}
-	res, err := u.user.GetAll(u.ctx, &params)
+	res, err := u.user.GetAll(u.c, &params)
 	if err != nil {
+		u.logger.Error(err)
 		return nil, err
 	}
 	if res.Error != "" {
@@ -37,8 +42,9 @@ func (u *userUsecase) GetAll() ([]*model.User, error) {
 
 func (u *userUsecase) GetByID(id int) (*model.User, error) {
 	params := user.GetByIDParams{Id: int32(id)}
-	res, err := u.user.GetByID(u.ctx, &params)
+	res, err := u.user.GetByID(u.c, &params)
 	if err != nil {
+		u.logger.Error(err)
 		return nil, err
 	}
 	if res.Error != "" {
@@ -53,8 +59,9 @@ func (u *userUsecase) Update(id int, passwordHash, name string) error {
 		PasswordHash: passwordHash,
 		Name:         name,
 	}
-	res, err := u.user.Update(u.ctx, &params)
+	res, err := u.user.Update(u.c, &params)
 	if err != nil {
+		u.logger.Error(err)
 		return err
 	}
 	if res.Error != "" {
@@ -72,8 +79,9 @@ func (u *userUsecase) UpdateAvatar(id int, avatar io.Reader) error {
 		Id:         int32(id),
 		AvatarPath: path,
 	}
-	res, err := u.user.UpdateAvatar(u.ctx, &params)
+	res, err := u.user.UpdateAvatar(u.c, &params)
 	if err != nil {
+		u.logger.Error(err)
 		return err
 	}
 	if res.Error != "" {
@@ -84,8 +92,9 @@ func (u *userUsecase) UpdateAvatar(id int, avatar io.Reader) error {
 
 func (u *userUsecase) GetSpecialAvatar(name string) (string, error) {
 	params := user.GetSpecialAvatarParams{Name: name}
-	res, err := u.user.GetSpecialAvatar(u.ctx, &params)
+	res, err := u.user.GetSpecialAvatar(u.c, &params)
 	if err != nil {
+		u.logger.Error(err)
 		return "", err
 	}
 	return res.AvatarUrl, nil

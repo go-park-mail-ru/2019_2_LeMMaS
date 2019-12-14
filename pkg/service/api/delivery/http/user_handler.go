@@ -68,9 +68,12 @@ func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return h.Error(c, "unknown error")
 	}
-	passwordHash, err := h.auth.GetPasswordHash(u.Password)
-	if err != nil {
-		return h.Error(c, "error updating user")
+	passwordHash := ""
+	if u.Password != "" {
+		passwordHash, err = h.auth.GetPasswordHash(u.Password)
+		if err != nil {
+			return h.Error(c, "error updating user")
+		}
 	}
 	err = h.user.Update(id, passwordHash, u.Name)
 	if err != nil {
@@ -103,8 +106,7 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 }
 
 func (h *UserHandler) handleGetAvatarByName(c echo.Context) error {
-	name := c.FormValue("name")
-	avatarUrl, err := h.user.GetSpecialAvatar(name)
+	avatarUrl, err := h.user.GetSpecialAvatar(c.FormValue("name"))
 	if err != nil {
 		return h.Error(c, err.Error())
 	}

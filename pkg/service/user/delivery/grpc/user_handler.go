@@ -78,12 +78,14 @@ func (h *UserHandler) Update(ctx context.Context, params *user.UpdateParams) (re
 	return
 }
 
-func (h *UserHandler) UpdateAvatar(context.Context, *user.UpdateAvatarParams) (*user.UpdateAvatarResult, error) {
+func (h *UserHandler) UpdateAvatar(ctx context.Context, params *user.UpdateAvatarParams) (*user.UpdateAvatarResult, error) {
 	return nil, nil
 }
 
-func (h *UserHandler) GetSpecialAvatar(context.Context, *user.GetSpecialAvatarParams) (*user.GetSpecialAvatarResult, error) {
-	return nil, nil
+func (h *UserHandler) GetSpecialAvatar(ctx context.Context, params *user.GetSpecialAvatarParams) (*user.GetSpecialAvatarResult, error) {
+	return &user.GetSpecialAvatarResult{
+		AvatarUrl: h.usecase.GetSpecialAvatar(params.Name),
+	}, nil
 }
 
 func (h *UserHandler) convertUsers(users []*model.User) []*user.UserData {
