@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user"
 	"strings"
@@ -28,27 +29,24 @@ func (u *userUsecase) GetByEmail(email string) (*model.User, error) {
 	return u.repo.GetByEmail(email)
 }
 
-func (u *userUsecase) Update(userID int, password, name string) error {
-	return nil
-	//userToUpdate, err := u.repository.GetByID(int(pbUserToUpdate.UserID))
-	//if err != nil {
-	//	return &user.Error{"unknown error"}, err
-	//}
-	//if pbUserToUpdate.Password != "" {
-	//	userToUpdate.PasswordHash = u.getPasswordHash(pbUserToUpdate.Password)
-	//}
-	//if pbUserToUpdate.Name != "" && userToUpdate.Name != pbUserToUpdate.Name {
-	//	userToUpdate.Name = pbUserToUpdate.Name
-	//	avatarPath, _ := u.GetAvatarUrlByName(ctx, &user.UserName{pbUserToUpdate.Name})
-	//	if avatarPath.AvatarUrl != "" {
-	//		userToUpdate.AvatarPath = avatarPath.AvatarUrl
-	//	}
-	//}
-	//err = u.repository.Update(*userToUpdate)
-	//if err != nil {
-	//	return &user.Error{"unknown error"}, err
-	//}
-	//return &user.Error{"ok"}, nil
+func (u *userUsecase) Update(id int, passwordHash, name string) error {
+	usr, err := u.repo.GetByID(id)
+	if err == consts.ErrNotFound {
+		return err
+	}
+	if err != nil {
+		return consts.ErrStorageError
+	}
+	if passwordHash != "" {
+		usr.PasswordHash = passwordHash
+	}
+	if name != "" && usr.Name != name {
+		usr.Name = name
+		if avatar := u.GetSpecialAvatar(name); avatar != "" {
+			usr.AvatarPath = avatar
+		}
+	}
+	return u.repo.Update(usr)
 }
 
 func (u *userUsecase) UpdateAvatar(userID int, avatarPath string) error {

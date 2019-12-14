@@ -56,14 +56,14 @@ func (u *authUsecase) Register(email, password, name string) error {
 	if userWithSameEmail != nil {
 		return errors.New("user with this email already registered")
 	}
-	return u.userRepo.Register(email, u.getPasswordHash(password), name)
+	return u.userRepo.Register(email, u.GetPasswordHash(password), name)
 }
 
 func (u *authUsecase) GetUser(session string) (int, bool) {
 	return u.sessionRepo.Get(session)
 }
 
-func (u *authUsecase) getPasswordHash(password string) string {
+func (u *authUsecase) GetPasswordHash(password string) string {
 	salt := make([]byte, passwordSaltLength)
 	rand.Read(salt)
 	return u.getPasswordHashWithSalt(password, salt)

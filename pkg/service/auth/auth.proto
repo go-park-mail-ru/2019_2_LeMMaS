@@ -9,6 +9,7 @@ service Auth {
     rpc Logout (LogoutParams) returns (LogoutResult);
     rpc Register (RegisterParams) returns (RegisterResult);
     rpc GetUser (GetUserParams) returns (GetUserResult);
+    rpc GetPasswordHash (GetPasswordHashParams) returns (GetPasswordHashResult);
 }
 
 message LoginParams {
@@ -46,4 +47,11 @@ message GetUserParams {
 message GetUserResult {
     int32 id = 1;
     string error = 2;
+}
+
+message GetPasswordHashParams {
+    string password = 1;
+}
+message GetPasswordHashResult {
+    string password_hash = 1;
 }

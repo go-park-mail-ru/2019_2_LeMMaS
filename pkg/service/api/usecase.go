@@ -12,12 +12,13 @@ type AuthUsecase interface {
 	Logout(session string) error
 	Register(email, password, name string) error
 	GetUserID(session string) (int, error)
+	GetPasswordHash(password string) (string, error)
 }
 
 type UserUsecase interface {
 	GetAll() ([]*model.User, error)
 	GetByID(id int) (*model.User, error)
-	Update(id int, password, name string) error
+	Update(id int, passwordHash, name string) error
 	UpdateAvatar(id int, avatar io.Reader) error
 	GetSpecialAvatar(name string) (string, error)
 }

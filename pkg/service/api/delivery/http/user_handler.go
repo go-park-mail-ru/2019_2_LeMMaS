@@ -68,7 +68,11 @@ func (h *UserHandler) handleUserUpdate(c echo.Context) error {
 	if err := c.Bind(u); err != nil {
 		return h.Error(c, "unknown error")
 	}
-	err = h.user.Update(id, u.Password, u.Name)
+	passwordHash, err := h.auth.GetPasswordHash(u.Password)
+	if err != nil {
+		return h.Error(c, "error updating user")
+	}
+	err = h.user.Update(id, passwordHash, u.Name)
 	if err != nil {
 		return h.Error(c, "error updating user")
 	}

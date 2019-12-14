@@ -5,4 +5,5 @@ type AuthUsecase interface {
 	Logout(session string) error
 	Register(email, password, name string) error
 	GetUser(session string) (int, bool)
+	GetPasswordHash(password string) string
 }

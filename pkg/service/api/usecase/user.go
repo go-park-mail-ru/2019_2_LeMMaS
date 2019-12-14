@@ -47,11 +47,11 @@ func (u *userUsecase) GetByID(id int) (*model.User, error) {
 	return u.convertUser(res.User), nil
 }
 
-func (u *userUsecase) Update(id int, password, name string) error {
+func (u *userUsecase) Update(id int, passwordHash, name string) error {
 	params := user.UpdateParams{
-		UserId:   int32(id),
-		Password: password,
-		Name:     name,
+		Id:           int32(id),
+		PasswordHash: passwordHash,
+		Name:         name,
 	}
 	res, err := u.user.Update(u.ctx, &params)
 	if err != nil {
@@ -69,7 +69,7 @@ func (u *userUsecase) UpdateAvatar(id int, avatar io.Reader) error {
 		return err
 	}
 	params := user.UpdateAvatarParams{
-		UserId:     int32(id),
+		Id:         int32(id),
 		AvatarPath: path,
 	}
 	res, err := u.user.UpdateAvatar(u.ctx, &params)

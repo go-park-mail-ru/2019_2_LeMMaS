@@ -49,8 +49,8 @@ message GetByEmailResult {
 }
 
 message UpdateParams {
-    int32 user_id = 1;
-    string password = 2;
+    int32 id = 1;
+    string password_hash = 2;
     string name = 3;
 }
 
@@ -59,7 +59,7 @@ message UpdateResult {
 }
 
 message UpdateAvatarParams {
-    int32 user_id = 1;
+    int32 id = 1;
     string avatar_path = 2;
 }
 

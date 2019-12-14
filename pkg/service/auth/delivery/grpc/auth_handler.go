@@ -75,3 +75,8 @@ func (h *AuthHandler) GetUser(ctx context.Context, params *auth.GetUserParams) (
 	result.Id = int32(id)
 	return
 }
+
+func (h *AuthHandler) GetPasswordHash(ctx context.Context, params *auth.GetPasswordHashParams) (*auth.GetPasswordHashResult, error) {
+	hash := h.usecase.GetPasswordHash(params.Password)
+	return &auth.GetPasswordHashResult{PasswordHash: hash}, nil
+}

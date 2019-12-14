@@ -69,8 +69,13 @@ func (h *UserHandler) GetByEmail(ctx context.Context, params *user.GetByEmailPar
 	return
 }
 
-func (h *UserHandler) Update(context.Context, *user.UpdateParams) (*user.UpdateResult, error) {
-	return nil, nil
+func (h *UserHandler) Update(ctx context.Context, params *user.UpdateParams) (result *user.UpdateResult, grpcErr error) {
+	result = &user.UpdateResult{}
+	err := h.usecase.Update(int(params.Id), params.PasswordHash, params.Name)
+	if err != nil {
+		result.Error = err.Error()
+	}
+	return
 }
 
 func (h *UserHandler) UpdateAvatar(context.Context, *user.UpdateAvatarParams) (*user.UpdateAvatarResult, error) {
