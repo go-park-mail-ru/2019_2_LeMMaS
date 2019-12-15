@@ -1,9 +1,23 @@
 package game
 
-const (
-	MaxPositionX = 1440
-	MaxPositionY = 900
+import "time"
 
+const (
+	FieldSizeX = 3000
+	FieldSizeY = 3000
+
+	Speed      = 1. / 700
+	FoodAmount = 200
+
+	EatFoodBonus   = 2
+	EatPlayerBonus = 5
+
+	EventStreamRate   = 50 * time.Millisecond
+	MaxPlayersInRoom  = 5
+	InitialPlayerSize = 20
+)
+
+const (
 	EventStop      = "stop"
 	EventMove      = "move"
 	EventNewPlayer = "new_player"

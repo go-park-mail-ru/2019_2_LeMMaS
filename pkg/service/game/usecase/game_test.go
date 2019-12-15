@@ -70,7 +70,7 @@ func TestGameUsecase_PlayerMove(t *testing.T) {
 		assert.Equal(t, userID, player["id"])
 		assert.Greater(t, player["x"], initialPosition.X)
 		assert.Equal(t, player["y"], initialPosition.Y)
-		t.Logf("player moved (%v, %v) -> (%v, %v) in %v", initialPosition.X, initialPosition.Y, player["x"], player["y"], eventStreamRate)
+		t.Logf("player moved (%v, %v) -> (%v, %v) in %v", initialPosition.X, initialPosition.Y, player["x"], player["y"], game.EventStreamRate)
 
 		done <- true
 	}()
@@ -148,7 +148,7 @@ func (s gameUsecaseTestSuite) newTestRoom() model.Room {
 		UserID:    userID,
 		Direction: direction,
 		Speed:     speed,
-		Position:  model.Position{X: game.MaxPositionX / 2, Y: game.MaxPositionY / 2},
+		Position:  model.Position{X: game.FieldSizeX / 2, Y: game.FieldSizeY / 2},
 	}
 	food1 := model.Food{ID: 1, Position: model.Position{X: 10, Y: 10}}
 	food2 := model.Food{ID: 2, Position: model.Position{X: 8, Y: 15}}

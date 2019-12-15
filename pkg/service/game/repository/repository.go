@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
-	game2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/quadtree"
 )
@@ -16,7 +16,7 @@ type repository struct {
 
 var errRoomNotFound = errors.New("room not found")
 
-func NewRepository() game2.Repository {
+func NewRepository() game.Repository {
 	return &repository{
 		rooms:        map[int]*model.Room{},
 		playersIndex: map[int]*quadtree.Quadtree{},
@@ -57,7 +57,7 @@ func (r *repository) CreateRoom() *model.Room {
 func (r *repository) initRoomIndexes(roomID int) {
 	bound := orb.Bound{
 		Min: orb.Point{0, 0},
-		Max: orb.Point{game2.MaxPositionX, game2.MaxPositionY},
+		Max: orb.Point{game.FieldSizeX, game.FieldSizeY},
 	}
 	r.foodIndex[roomID] = quadtree.New(bound)
 	r.playersIndex[roomID] = quadtree.New(bound)
