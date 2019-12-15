@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/game"
-	game2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
 	"math"
 	"math/rand"
 	"time"
@@ -36,12 +35,12 @@ var (
 
 type gameUsecase struct {
 	logger           logger.Logger
-	repository       game2.Repository
+	repository       game.Repository
 	roomsIDsByUserID map[int]int
 	events           eventsDispatcher
 }
 
-func NewGameUsecase(repository game2.Repository, logger logger.Logger) game.Usecase {
+func NewGameUsecase(repository game.Repository, logger logger.Logger) game.Usecase {
 	return &gameUsecase{
 		logger:           logger,
 		repository:       repository,
@@ -211,8 +210,8 @@ func (u *gameUsecase) newPlayer(userID int) model.Player {
 		UserID: userID,
 		Size:   initialPlayerSize,
 		Position: model.Position{
-			X: game2.MaxPositionX / 2,
-			Y: game2.MaxPositionY / 2,
+			X: game.MaxPositionX / 2,
+			Y: game.MaxPositionY / 2,
 		},
 	}
 }
@@ -249,11 +248,11 @@ func (u gameUsecase) getNewPosition(player *model.Player) model.Position {
 		X: int(math.Round(float64(oldPosition.X) + deltaX)),
 		Y: int(math.Round(float64(oldPosition.Y) + deltaY)),
 	}
-	if newPosition.X > game2.MaxPositionX {
-		newPosition.X = game2.MaxPositionX
+	if newPosition.X > game.MaxPositionX {
+		newPosition.X = game.MaxPositionX
 	}
-	if newPosition.Y > game2.MaxPositionY {
-		newPosition.Y = game2.MaxPositionY
+	if newPosition.Y > game.MaxPositionY {
+		newPosition.Y = game.MaxPositionY
 	}
 	if newPosition.X < 0 {
 		newPosition.X = 0
@@ -272,7 +271,7 @@ func (u gameUsecase) generateFood() []model.Food {
 		foodIDCounter++
 		foods = append(foods, model.Food{
 			ID:       foodIDCounter,
-			Position: model.Position{X: rand.Intn(game2.MaxPositionX), Y: rand.Intn(game2.MaxPositionY)},
+			Position: model.Position{X: rand.Intn(game.MaxPositionX), Y: rand.Intn(game.MaxPositionY)},
 		})
 	}
 	return foods

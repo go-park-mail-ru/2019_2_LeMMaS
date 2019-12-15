@@ -13,16 +13,16 @@ import (
 type userUsecase struct {
 	fileRepo api.FileRepository
 	user     user.UserClient
-	logger   logger.Logger
+	log      logger.Logger
 
 	c context.Context
 }
 
-func NewUserUsecase(user user.UserClient, fileRepo api.FileRepository, logger logger.Logger) api.UserUsecase {
+func NewUserUsecase(user user.UserClient, fileRepo api.FileRepository, log logger.Logger) api.UserUsecase {
 	return &userUsecase{
 		user:     user,
 		fileRepo: fileRepo,
-		logger:   logger,
+		log:      log,
 		c:        context.Background(),
 	}
 }
@@ -31,7 +31,7 @@ func (u *userUsecase) GetAll() ([]*model.User, error) {
 	params := user.GetAllParams{}
 	res, err := u.user.GetAll(u.c, &params)
 	if err != nil {
-		u.logger.Error(err)
+		u.log.Error(err)
 		return nil, err
 	}
 	if res.Error != "" {
@@ -44,7 +44,7 @@ func (u *userUsecase) GetByID(id int) (*model.User, error) {
 	params := user.GetByIDParams{Id: int32(id)}
 	res, err := u.user.GetByID(u.c, &params)
 	if err != nil {
-		u.logger.Error(err)
+		u.log.Error(err)
 		return nil, err
 	}
 	if res.Error != "" {
@@ -61,7 +61,7 @@ func (u *userUsecase) Update(id int, passwordHash, name string) error {
 	}
 	res, err := u.user.Update(u.c, &params)
 	if err != nil {
-		u.logger.Error(err)
+		u.log.Error(err)
 		return err
 	}
 	if res.Error != "" {
@@ -81,7 +81,7 @@ func (u *userUsecase) UpdateAvatar(id int, avatar io.Reader) error {
 	}
 	res, err := u.user.UpdateAvatar(u.c, &params)
 	if err != nil {
-		u.logger.Error(err)
+		u.log.Error(err)
 		return err
 	}
 	if res.Error != "" {
@@ -94,7 +94,7 @@ func (u *userUsecase) GetSpecialAvatar(name string) (string, error) {
 	params := user.GetSpecialAvatarParams{Name: name}
 	res, err := u.user.GetSpecialAvatar(u.c, &params)
 	if err != nil {
-		u.logger.Error(err)
+		u.log.Error(err)
 		return "", err
 	}
 	return res.AvatarUrl, nil

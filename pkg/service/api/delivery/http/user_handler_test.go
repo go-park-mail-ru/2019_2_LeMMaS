@@ -105,8 +105,8 @@ package http
 //func (s *UserHandlerTestSuite) StartTest(t *testing.T) {
 //	s.HandlerTestSuite.StartTest(t)
 //	s.server = user.NewMockUsecase(gomock.NewController(t))
-//	logger := testMock.NewMockLogger(t)
-//	s.handler = NewUserHandler(s.E, s.server, logger)
+//	log := testMock.NewMockLogger(t)
+//	s.handler = NewUserHandler(s.E, s.server, log)
 //}
 //
 //func (s *UserHandlerTestSuite) ExpectUsecase() *user.MockUsecaseMockRecorder {

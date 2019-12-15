@@ -101,8 +101,8 @@ package http
 //func (s *AccessHandlerTestSuite) StartTest(t *testing.T) {
 //	s.HandlerTestSuite.StartTest(t)
 //	s.server = access.NewMockCsrfUsecase(gomock.NewController(t))
-//	logger := testMock.NewMockLogger(t)
-//	s.handler = NewAccessHandler(s.E, s.server, logger)
+//	log := testMock.NewMockLogger(t)
+//	s.handler = NewAccessHandler(s.E, s.server, log)
 //}
 //
 //func (s AccessHandlerTestSuite) ExpectUsecase() *access.MockCsrfUsecaseMockRecorder {

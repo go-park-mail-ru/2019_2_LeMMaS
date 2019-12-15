@@ -13,13 +13,13 @@ import (
 
 type UserHandler struct {
 	delivery.Handler
-	user   api.UserUsecase
-	auth   api.AuthUsecase
-	logger logger.Logger
+	user api.UserUsecase
+	auth api.AuthUsecase
+	log  logger.Logger
 }
 
-func NewUserHandler(e *echo.Echo, user api.UserUsecase, auth api.AuthUsecase, logger logger.Logger) *UserHandler {
-	h := UserHandler{user: user, auth: auth, logger: logger}
+func NewUserHandler(e *echo.Echo, user api.UserUsecase, auth api.AuthUsecase, log logger.Logger) *UserHandler {
+	h := UserHandler{user: user, auth: auth, log: log}
 	e.GET(delivery.ApiV1UserListPath, h.handleUserList)
 	e.GET(delivery.ApiV1UserByIDPath, h.handleUserByID)
 	e.POST(delivery.ApiV1UserRegisterPath, h.handleUserRegister)
@@ -89,12 +89,12 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 	}
 	err = c.Request().ParseMultipartForm(32 << 20)
 	if err != nil {
-		h.logger.Error(err)
+		h.log.Error(err)
 		return h.Error(c, "bad request")
 	}
 	avatarFile, _, err := c.Request().FormFile("avatar")
 	if err != nil {
-		h.logger.Error(err)
+		h.log.Error(err)
 		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()

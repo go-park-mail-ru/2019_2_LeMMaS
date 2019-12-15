@@ -25,8 +25,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Position struct {
-	X int32 `protobuf:"varint,1,opt,name=X,proto3" json:"X,omitempty"`
-	Y int32 `protobuf:"varint,2,opt,name=Y,proto3" json:"Y,omitempty"`
+	X                    int32    `protobuf:"varint,1,opt,name=x,proto3" json:"x,omitempty"`
+	Y                    int32    `protobuf:"varint,2,opt,name=y,proto3" json:"y,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Position) Reset()         { *m = Position{} }
@@ -68,16 +71,90 @@ func (m *Position) GetY() int32 {
 	return 0
 }
 
+type Player struct {
+	UserId               int32     `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Size                 int32     `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	Direction            int32     `protobuf:"varint,3,opt,name=direction,proto3" json:"direction,omitempty"`
+	Speed                int32     `protobuf:"varint,4,opt,name=speed,proto3" json:"speed,omitempty"`
+	Position             *Position `protobuf:"bytes,5,opt,name=position,proto3" json:"position,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *Player) Reset()         { *m = Player{} }
+func (m *Player) String() string { return proto.CompactTextString(m) }
+func (*Player) ProtoMessage()    {}
+func (*Player) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38fc58335341d769, []int{1}
+}
+
+func (m *Player) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Player.Unmarshal(m, b)
+}
+func (m *Player) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Player.Marshal(b, m, deterministic)
+}
+func (m *Player) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Player.Merge(m, src)
+}
+func (m *Player) XXX_Size() int {
+	return xxx_messageInfo_Player.Size(m)
+}
+func (m *Player) XXX_DiscardUnknown() {
+	xxx_messageInfo_Player.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Player proto.InternalMessageInfo
+
+func (m *Player) GetUserId() int32 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *Player) GetSize() int32 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
+func (m *Player) GetDirection() int32 {
+	if m != nil {
+		return m.Direction
+	}
+	return 0
+}
+
+func (m *Player) GetSpeed() int32 {
+	if m != nil {
+		return m.Speed
+	}
+	return 0
+}
+
+func (m *Player) GetPosition() *Position {
+	if m != nil {
+		return m.Position
+	}
+	return nil
+}
+
 type Food struct {
-	Id       int32     `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Position *Position `protobuf:"bytes,2,opt,name=position,proto3" json:"position,omitempty"`
+	Id                   int32     `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Position             *Position `protobuf:"bytes,2,opt,name=position,proto3" json:"position,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *Food) Reset()         { *m = Food{} }
 func (m *Food) String() string { return proto.CompactTextString(m) }
 func (*Food) ProtoMessage()    {}
 func (*Food) Descriptor() ([]byte, []int) {
-	return fileDescriptor_38fc58335341d769, []int{1}
+	return fileDescriptor_38fc58335341d769, []int{2}
 }
 
 func (m *Food) XXX_Unmarshal(b []byte) error {
@@ -112,207 +189,18 @@ func (m *Food) GetPosition() *Position {
 	return nil
 }
 
-type Players struct {
-	Player []*Player `protobuf:"bytes,1,rep,name=player,proto3" json:"player,omitempty"`
-}
-
-func (m *Players) Reset()         { *m = Players{} }
-func (m *Players) String() string { return proto.CompactTextString(m) }
-func (*Players) ProtoMessage()    {}
-func (*Players) Descriptor() ([]byte, []int) {
-	return fileDescriptor_38fc58335341d769, []int{2}
-}
-
-func (m *Players) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Players.Unmarshal(m, b)
-}
-func (m *Players) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Players.Marshal(b, m, deterministic)
-}
-func (m *Players) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Players.Merge(m, src)
-}
-func (m *Players) XXX_Size() int {
-	return xxx_messageInfo_Players.Size(m)
-}
-func (m *Players) XXX_DiscardUnknown() {
-	xxx_messageInfo_Players.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Players proto.InternalMessageInfo
-
-func (m *Players) GetPlayer() []*Player {
-	if m != nil {
-		return m.Player
-	}
-	return nil
-}
-
-type Player struct {
-	UserID    *UserID   `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
-	Size      int32     `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	Position  *Position `protobuf:"bytes,3,opt,name=position,proto3" json:"position,omitempty"`
-	Direction int32     `protobuf:"varint,4,opt,name=direction,proto3" json:"direction,omitempty"`
-	Speed     int32     `protobuf:"varint,5,opt,name=speed,proto3" json:"speed,omitempty"`
-}
-
-func (m *Player) Reset()         { *m = Player{} }
-func (m *Player) String() string { return proto.CompactTextString(m) }
-func (*Player) ProtoMessage()    {}
-func (*Player) Descriptor() ([]byte, []int) {
-	return fileDescriptor_38fc58335341d769, []int{3}
-}
-
-func (m *Player) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Player.Unmarshal(m, b)
-}
-func (m *Player) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Player.Marshal(b, m, deterministic)
-}
-func (m *Player) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Player.Merge(m, src)
-}
-func (m *Player) XXX_Size() int {
-	return xxx_messageInfo_Player.Size(m)
-}
-func (m *Player) XXX_DiscardUnknown() {
-	xxx_messageInfo_Player.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Player proto.InternalMessageInfo
-
-func (m *Player) GetUserID() *UserID {
-	if m != nil {
-		return m.UserID
-	}
-	return nil
-}
-
-func (m *Player) GetSize() int32 {
-	if m != nil {
-		return m.Size
-	}
-	return 0
-}
-
-func (m *Player) GetPosition() *Position {
-	if m != nil {
-		return m.Position
-	}
-	return nil
-}
-
-func (m *Player) GetDirection() int32 {
-	if m != nil {
-		return m.Direction
-	}
-	return 0
-}
-
-func (m *Player) GetSpeed() int32 {
-	if m != nil {
-		return m.Speed
-	}
-	return 0
-}
-
-type UserAndSpeed struct {
-	UserID *UserID `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
-	Speed  int32   `protobuf:"varint,2,opt,name=speed,proto3" json:"speed,omitempty"`
-}
-
-func (m *UserAndSpeed) Reset()         { *m = UserAndSpeed{} }
-func (m *UserAndSpeed) String() string { return proto.CompactTextString(m) }
-func (*UserAndSpeed) ProtoMessage()    {}
-func (*UserAndSpeed) Descriptor() ([]byte, []int) {
-	return fileDescriptor_38fc58335341d769, []int{4}
-}
-
-func (m *UserAndSpeed) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UserAndSpeed.Unmarshal(m, b)
-}
-func (m *UserAndSpeed) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UserAndSpeed.Marshal(b, m, deterministic)
-}
-func (m *UserAndSpeed) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserAndSpeed.Merge(m, src)
-}
-func (m *UserAndSpeed) XXX_Size() int {
-	return xxx_messageInfo_UserAndSpeed.Size(m)
-}
-func (m *UserAndSpeed) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserAndSpeed.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UserAndSpeed proto.InternalMessageInfo
-
-func (m *UserAndSpeed) GetUserID() *UserID {
-	if m != nil {
-		return m.UserID
-	}
-	return nil
-}
-
-func (m *UserAndSpeed) GetSpeed() int32 {
-	if m != nil {
-		return m.Speed
-	}
-	return 0
-}
-
-type UserAndDirection struct {
-	UserID    *UserID `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
-	Direction int32   `protobuf:"varint,2,opt,name=direction,proto3" json:"direction,omitempty"`
-}
-
-func (m *UserAndDirection) Reset()         { *m = UserAndDirection{} }
-func (m *UserAndDirection) String() string { return proto.CompactTextString(m) }
-func (*UserAndDirection) ProtoMessage()    {}
-func (*UserAndDirection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_38fc58335341d769, []int{5}
-}
-
-func (m *UserAndDirection) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UserAndDirection.Unmarshal(m, b)
-}
-func (m *UserAndDirection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UserAndDirection.Marshal(b, m, deterministic)
-}
-func (m *UserAndDirection) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserAndDirection.Merge(m, src)
-}
-func (m *UserAndDirection) XXX_Size() int {
-	return xxx_messageInfo_UserAndDirection.Size(m)
-}
-func (m *UserAndDirection) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserAndDirection.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UserAndDirection proto.InternalMessageInfo
-
-func (m *UserAndDirection) GetUserID() *UserID {
-	if m != nil {
-		return m.UserID
-	}
-	return nil
-}
-
-func (m *UserAndDirection) GetDirection() int32 {
-	if m != nil {
-		return m.Direction
-	}
-	return 0
-}
-
 type UserID struct {
-	UserID int32 `protobuf:"varint,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserId               int32    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *UserID) Reset()         { *m = UserID{} }
 func (m *UserID) String() string { return proto.CompactTextString(m) }
 func (*UserID) ProtoMessage()    {}
 func (*UserID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_38fc58335341d769, []int{6}
+	return fileDescriptor_38fc58335341d769, []int{3}
 }
 
 func (m *UserID) XXX_Unmarshal(b []byte) error {
@@ -333,22 +221,25 @@ func (m *UserID) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UserID proto.InternalMessageInfo
 
-func (m *UserID) GetUserID() int32 {
+func (m *UserID) GetUserId() int32 {
 	if m != nil {
-		return m.UserID
+		return m.UserId
 	}
 	return 0
 }
 
 type Error struct {
-	Error string `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
+	Error                string   `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Error) Reset()         { *m = Error{} }
 func (m *Error) String() string { return proto.CompactTextString(m) }
 func (*Error) ProtoMessage()    {}
 func (*Error) Descriptor() ([]byte, []int) {
-	return fileDescriptor_38fc58335341d769, []int{7}
+	return fileDescriptor_38fc58335341d769, []int{4}
 }
 
 func (m *Error) XXX_Unmarshal(b []byte) error {
@@ -376,47 +267,261 @@ func (m *Error) GetError() string {
 	return ""
 }
 
+type GetPlayerResult struct {
+	Player               *Player  `protobuf:"bytes,1,opt,name=player,proto3" json:"player,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetPlayerResult) Reset()         { *m = GetPlayerResult{} }
+func (m *GetPlayerResult) String() string { return proto.CompactTextString(m) }
+func (*GetPlayerResult) ProtoMessage()    {}
+func (*GetPlayerResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38fc58335341d769, []int{5}
+}
+
+func (m *GetPlayerResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetPlayerResult.Unmarshal(m, b)
+}
+func (m *GetPlayerResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetPlayerResult.Marshal(b, m, deterministic)
+}
+func (m *GetPlayerResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetPlayerResult.Merge(m, src)
+}
+func (m *GetPlayerResult) XXX_Size() int {
+	return xxx_messageInfo_GetPlayerResult.Size(m)
+}
+func (m *GetPlayerResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetPlayerResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetPlayerResult proto.InternalMessageInfo
+
+func (m *GetPlayerResult) GetPlayer() *Player {
+	if m != nil {
+		return m.Player
+	}
+	return nil
+}
+
+type GetPlayersResult struct {
+	Players              []*Player `protobuf:"bytes,1,rep,name=players,proto3" json:"players,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *GetPlayersResult) Reset()         { *m = GetPlayersResult{} }
+func (m *GetPlayersResult) String() string { return proto.CompactTextString(m) }
+func (*GetPlayersResult) ProtoMessage()    {}
+func (*GetPlayersResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38fc58335341d769, []int{6}
+}
+
+func (m *GetPlayersResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetPlayersResult.Unmarshal(m, b)
+}
+func (m *GetPlayersResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetPlayersResult.Marshal(b, m, deterministic)
+}
+func (m *GetPlayersResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetPlayersResult.Merge(m, src)
+}
+func (m *GetPlayersResult) XXX_Size() int {
+	return xxx_messageInfo_GetPlayersResult.Size(m)
+}
+func (m *GetPlayersResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetPlayersResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetPlayersResult proto.InternalMessageInfo
+
+func (m *GetPlayersResult) GetPlayers() []*Player {
+	if m != nil {
+		return m.Players
+	}
+	return nil
+}
+
+type UserAndSpeed struct {
+	UserId               int32    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Speed                int32    `protobuf:"varint,2,opt,name=speed,proto3" json:"speed,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserAndSpeed) Reset()         { *m = UserAndSpeed{} }
+func (m *UserAndSpeed) String() string { return proto.CompactTextString(m) }
+func (*UserAndSpeed) ProtoMessage()    {}
+func (*UserAndSpeed) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38fc58335341d769, []int{7}
+}
+
+func (m *UserAndSpeed) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserAndSpeed.Unmarshal(m, b)
+}
+func (m *UserAndSpeed) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserAndSpeed.Marshal(b, m, deterministic)
+}
+func (m *UserAndSpeed) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserAndSpeed.Merge(m, src)
+}
+func (m *UserAndSpeed) XXX_Size() int {
+	return xxx_messageInfo_UserAndSpeed.Size(m)
+}
+func (m *UserAndSpeed) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserAndSpeed.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserAndSpeed proto.InternalMessageInfo
+
+func (m *UserAndSpeed) GetUserId() int32 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *UserAndSpeed) GetSpeed() int32 {
+	if m != nil {
+		return m.Speed
+	}
+	return 0
+}
+
+type UserAndDirection struct {
+	UserId               int32    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Direction            int32    `protobuf:"varint,2,opt,name=direction,proto3" json:"direction,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserAndDirection) Reset()         { *m = UserAndDirection{} }
+func (m *UserAndDirection) String() string { return proto.CompactTextString(m) }
+func (*UserAndDirection) ProtoMessage()    {}
+func (*UserAndDirection) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38fc58335341d769, []int{8}
+}
+
+func (m *UserAndDirection) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserAndDirection.Unmarshal(m, b)
+}
+func (m *UserAndDirection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserAndDirection.Marshal(b, m, deterministic)
+}
+func (m *UserAndDirection) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserAndDirection.Merge(m, src)
+}
+func (m *UserAndDirection) XXX_Size() int {
+	return xxx_messageInfo_UserAndDirection.Size(m)
+}
+func (m *UserAndDirection) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserAndDirection.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserAndDirection proto.InternalMessageInfo
+
+func (m *UserAndDirection) GetUserId() int32 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *UserAndDirection) GetDirection() int32 {
+	if m != nil {
+		return m.Direction
+	}
+	return 0
+}
+
+type GetFoodResult struct {
+	Food                 []*Food  `protobuf:"bytes,1,rep,name=food,proto3" json:"food,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetFoodResult) Reset()         { *m = GetFoodResult{} }
+func (m *GetFoodResult) String() string { return proto.CompactTextString(m) }
+func (*GetFoodResult) ProtoMessage()    {}
+func (*GetFoodResult) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38fc58335341d769, []int{9}
+}
+
+func (m *GetFoodResult) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetFoodResult.Unmarshal(m, b)
+}
+func (m *GetFoodResult) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetFoodResult.Marshal(b, m, deterministic)
+}
+func (m *GetFoodResult) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetFoodResult.Merge(m, src)
+}
+func (m *GetFoodResult) XXX_Size() int {
+	return xxx_messageInfo_GetFoodResult.Size(m)
+}
+func (m *GetFoodResult) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetFoodResult.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetFoodResult proto.InternalMessageInfo
+
+func (m *GetFoodResult) GetFood() []*Food {
+	if m != nil {
+		return m.Food
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Position)(nil), "game.Position")
-	proto.RegisterType((*Food)(nil), "game.Food")
-	proto.RegisterType((*Players)(nil), "game.Players")
 	proto.RegisterType((*Player)(nil), "game.Player")
-	proto.RegisterType((*UserAndSpeed)(nil), "game.UserAndSpeed")
-	proto.RegisterType((*UserAndDirection)(nil), "game.UserAndDirection")
+	proto.RegisterType((*Food)(nil), "game.Food")
 	proto.RegisterType((*UserID)(nil), "game.UserID")
 	proto.RegisterType((*Error)(nil), "game.Error")
+	proto.RegisterType((*GetPlayerResult)(nil), "game.GetPlayerResult")
+	proto.RegisterType((*GetPlayersResult)(nil), "game.GetPlayersResult")
+	proto.RegisterType((*UserAndSpeed)(nil), "game.UserAndSpeed")
+	proto.RegisterType((*UserAndDirection)(nil), "game.UserAndDirection")
+	proto.RegisterType((*GetFoodResult)(nil), "game.GetFoodResult")
 }
 
 func init() { proto.RegisterFile("game.proto", fileDescriptor_38fc58335341d769) }
 
 var fileDescriptor_38fc58335341d769 = []byte{
-	// 408 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xed, 0x6a, 0xd4, 0x40,
-	0x14, 0x4d, 0xd2, 0x24, 0x4d, 0xee, 0xc6, 0x52, 0x2e, 0x52, 0x82, 0x28, 0x2c, 0x83, 0x1f, 0xab,
-	0x62, 0x0b, 0x2b, 0x3e, 0x80, 0xd2, 0xba, 0x28, 0xfe, 0x28, 0x09, 0x4a, 0xfb, 0x33, 0x9a, 0x41,
-	0x02, 0x6e, 0x26, 0xcc, 0x8c, 0x82, 0x3e, 0x8e, 0x2f, 0xe8, 0x2b, 0xc8, 0xdc, 0x99, 0xcd, 0xee,
-	0xe4, 0xc7, 0x76, 0xff, 0xdd, 0x73, 0xef, 0x39, 0xe7, 0x9e, 0x5c, 0x32, 0x00, 0xdf, 0x9b, 0x35,
-	0x3f, 0x1f, 0xa4, 0xd0, 0x02, 0x63, 0x53, 0xb3, 0xa7, 0x90, 0x5d, 0x0b, 0xd5, 0xe9, 0x4e, 0xf4,
-	0x58, 0x40, 0x78, 0x53, 0x86, 0xf3, 0x70, 0x91, 0x54, 0xe1, 0x8d, 0x41, 0xb7, 0x65, 0x64, 0xd1,
-	0x2d, 0x7b, 0x07, 0xf1, 0x7b, 0x21, 0x5a, 0x3c, 0x81, 0xa8, 0x6b, 0x1d, 0x29, 0xea, 0x5a, 0x7c,
-	0x01, 0xd9, 0xe0, 0xf4, 0x44, 0x9e, 0x2d, 0x4f, 0xce, 0x69, 0xc9, 0xc6, 0xb5, 0x1a, 0xe7, 0xec,
-	0x02, 0x8e, 0xaf, 0x7f, 0x34, 0xbf, 0xb9, 0x54, 0xf8, 0x18, 0xd2, 0x81, 0xca, 0x32, 0x9c, 0x1f,
-	0x2d, 0x66, 0xcb, 0xc2, 0x89, 0xa8, 0x57, 0xb9, 0x19, 0xfb, 0x1b, 0x42, 0x6a, 0x5b, 0x46, 0xf0,
-	0x53, 0x71, 0xf9, 0xe1, 0x92, 0x76, 0x8f, 0x82, 0xcf, 0xd4, 0xab, 0xdc, 0x0c, 0x11, 0x62, 0xd5,
-	0xfd, 0xe1, 0x2e, 0x36, 0xd5, 0x5e, 0xc2, 0xa3, 0xfd, 0x09, 0xf1, 0x21, 0xe4, 0x6d, 0x27, 0xf9,
-	0x37, 0x22, 0xc7, 0x64, 0xb2, 0x6d, 0xe0, 0x7d, 0x48, 0xd4, 0xc0, 0x79, 0x5b, 0x26, 0x34, 0xb1,
-	0x80, 0x7d, 0x84, 0xc2, 0xa4, 0x78, 0xdb, 0xb7, 0xb5, 0xc1, 0x07, 0x26, 0x1d, 0xbd, 0xa2, 0x5d,
-	0xaf, 0x2f, 0x70, 0xea, 0xbc, 0x2e, 0xc7, 0xad, 0x87, 0xf9, 0x79, 0xc9, 0xa3, 0x49, 0x72, 0x36,
-	0x87, 0xd4, 0xf2, 0xf1, 0xcc, 0x73, 0x4b, 0x36, 0x7a, 0xf6, 0x08, 0x92, 0x2b, 0x29, 0x85, 0x34,
-	0xc1, 0xb8, 0x29, 0x68, 0x9e, 0x57, 0x16, 0x2c, 0xff, 0x45, 0x10, 0xaf, 0x9a, 0x35, 0xc7, 0x05,
-	0xe4, 0xb5, 0x6e, 0xa4, 0x26, 0xe0, 0x45, 0x79, 0x30, 0xb3, 0x88, 0x6c, 0x58, 0x80, 0xcf, 0x20,
-	0xab, 0xb5, 0x18, 0xee, 0x26, 0xbe, 0x81, 0xa2, 0xe6, 0x7a, 0xfb, 0xc1, 0x67, 0x5b, 0xf2, 0xee,
-	0x21, 0xa6, 0xb2, 0x57, 0x90, 0xd5, 0x5c, 0xdb, 0x9b, 0xa3, 0x27, 0xa1, 0xde, 0x94, 0xfe, 0x1c,
-	0xf2, 0x15, 0xd7, 0xee, 0x6f, 0xf2, 0xf3, 0x78, 0x3f, 0x1f, 0x0b, 0xf0, 0x25, 0xc0, 0x48, 0x55,
-	0x13, 0xee, 0xbd, 0x5d, 0xae, 0x62, 0x01, 0x3e, 0x81, 0xe3, 0x15, 0xd7, 0xf4, 0x36, 0x7c, 0x26,
-	0x58, 0x64, 0x26, 0x2c, 0xc0, 0x0b, 0x38, 0x35, 0xd7, 0xf8, 0xd4, 0x29, 0xcd, 0xfb, 0xab, 0x5f,
-	0xbc, 0xd7, 0x6a, 0xef, 0x55, 0xbe, 0xa6, 0xf4, 0x4a, 0x5f, 0xff, 0x0f, 0x00, 0x00, 0xff, 0xff,
-	0x6c, 0xc2, 0xc9, 0xff, 0xb3, 0x03, 0x00, 0x00,
+	// 429 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0x5f, 0x8b, 0xd3, 0x40,
+	0x1c, 0x24, 0xb9, 0x24, 0x4d, 0xa6, 0xf1, 0x3c, 0x56, 0x3d, 0x83, 0xa8, 0xd4, 0x45, 0xcb, 0xa1,
+	0x72, 0x4a, 0xee, 0x41, 0x10, 0x7c, 0x50, 0x4e, 0x4b, 0xdf, 0x4a, 0x82, 0xcf, 0x12, 0xcd, 0x2a,
+	0x81, 0xb6, 0x1b, 0x36, 0x5b, 0x68, 0xfd, 0x1e, 0x7e, 0x2a, 0xbf, 0x94, 0xec, 0x9f, 0x26, 0x4d,
+	0xa4, 0xf4, 0x6d, 0x67, 0xe7, 0x37, 0xdb, 0xf9, 0xcd, 0xa4, 0xc0, 0xaf, 0x62, 0xc5, 0xae, 0x6b,
+	0xc1, 0x25, 0x27, 0x9e, 0x3a, 0xd3, 0x29, 0xc2, 0x05, 0x6f, 0x2a, 0x59, 0xf1, 0x35, 0x89, 0xe1,
+	0x6c, 0x13, 0x67, 0xe2, 0x5c, 0xf9, 0x99, 0xb3, 0x55, 0x68, 0x97, 0xb8, 0x06, 0xed, 0xe8, 0x1f,
+	0x07, 0xc1, 0x62, 0x59, 0xec, 0x98, 0x20, 0x0f, 0x31, 0xda, 0x34, 0x4c, 0x7c, 0xab, 0x4a, 0x3b,
+	0x1c, 0x28, 0x38, 0x2f, 0x09, 0x81, 0xd7, 0x54, 0xbf, 0x99, 0x15, 0xe9, 0x33, 0x79, 0x8c, 0xa8,
+	0xac, 0x04, 0xfb, 0xa1, 0x7e, 0x20, 0x39, 0xd3, 0x44, 0x77, 0x41, 0xee, 0xc3, 0x6f, 0x6a, 0xc6,
+	0xca, 0xc4, 0xd3, 0x8c, 0x01, 0xe4, 0x25, 0xc2, 0xda, 0x7a, 0x4a, 0xfc, 0x89, 0x73, 0x35, 0x4e,
+	0xcf, 0xaf, 0xb5, 0xf1, 0xbd, 0xd3, 0xac, 0xe5, 0xe9, 0x27, 0x78, 0x5f, 0x38, 0x2f, 0xc9, 0x39,
+	0xdc, 0xd6, 0x8f, 0x5b, 0xf5, 0xdf, 0x70, 0x4f, 0xbc, 0xf1, 0x0c, 0xc1, 0x57, 0xb5, 0xc1, 0xed,
+	0xd1, 0xd5, 0xe8, 0x13, 0xf8, 0x9f, 0x85, 0xe0, 0x42, 0x39, 0x66, 0xea, 0xa0, 0xf9, 0x28, 0x33,
+	0x80, 0xbe, 0xc3, 0xdd, 0x19, 0x93, 0x26, 0x9f, 0x8c, 0x35, 0x9b, 0xa5, 0x24, 0xcf, 0x11, 0xd4,
+	0x1a, 0xeb, 0xc9, 0x71, 0x1a, 0xdb, 0x9f, 0x37, 0x33, 0x96, 0xa3, 0xef, 0x71, 0xd1, 0x0a, 0x1b,
+	0xab, 0x9c, 0x62, 0x64, 0xd8, 0x26, 0x71, 0x26, 0x67, 0xff, 0x49, 0xf7, 0x24, 0xfd, 0x80, 0x58,
+	0xd9, 0xfe, 0xb8, 0x2e, 0x73, 0x1d, 0xdb, 0xd1, 0x5e, 0xda, 0x94, 0xdd, 0x83, 0x94, 0xe9, 0x1c,
+	0x17, 0x56, 0x7e, 0xdb, 0xf6, 0x71, 0xf4, 0x89, 0x5e, 0x8d, 0xee, 0xa0, 0x46, 0xfa, 0x06, 0x77,
+	0x66, 0x4c, 0xaa, 0x1e, 0xec, 0x0a, 0x4f, 0xe1, 0xfd, 0xe4, 0xbc, 0xb4, 0xfe, 0x61, 0xfc, 0x6b,
+	0x5e, 0xdf, 0xa7, 0x7f, 0x5d, 0x78, 0xb3, 0x62, 0xc5, 0xc8, 0x14, 0x51, 0x2e, 0x0b, 0x21, 0x35,
+	0xb0, 0x7b, 0x9a, 0x2e, 0x1e, 0x8d, 0x0d, 0x32, 0xb1, 0xbf, 0x40, 0x98, 0x4b, 0x5e, 0x9f, 0x1a,
+	0xbb, 0x41, 0x9c, 0x33, 0xd9, 0xed, 0x73, 0xd9, 0x8d, 0x1e, 0xee, 0xd9, 0x17, 0xbd, 0x42, 0x98,
+	0x33, 0x69, 0x32, 0x24, 0x3d, 0x81, 0xbe, 0xeb, 0x0f, 0xbf, 0x45, 0xd4, 0x16, 0x36, 0x70, 0xf2,
+	0xc0, 0xa0, 0xe1, 0x87, 0x90, 0x02, 0x5d, 0xc5, 0x03, 0xc9, 0xe5, 0x40, 0xb2, 0xff, 0x04, 0x5e,
+	0x63, 0x64, 0x03, 0x1d, 0x08, 0xee, 0xb5, 0x82, 0x2e, 0xed, 0xef, 0x81, 0xfe, 0x43, 0xdf, 0xfc,
+	0x0b, 0x00, 0x00, 0xff, 0xff, 0xb3, 0x83, 0xe4, 0x93, 0xde, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -435,11 +540,9 @@ type GameClient interface {
 	StopGame(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Error, error)
 	SetDirection(ctx context.Context, in *UserAndDirection, opts ...grpc.CallOption) (*Error, error)
 	SetSpeed(ctx context.Context, in *UserAndSpeed, opts ...grpc.CallOption) (*Error, error)
-	GetPlayer(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Player, error)
-	GetPlayers(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Players, error)
-	GetFood(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Food, error)
-	//rpc ListenEvents(UserID) returns (Channel) {}
-	StopListenEvents(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Error, error)
+	GetPlayer(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*GetPlayerResult, error)
+	GetPlayers(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*GetPlayersResult, error)
+	GetFood(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*GetFoodResult, error)
 }
 
 type gameClient struct {
@@ -486,8 +589,8 @@ func (c *gameClient) SetSpeed(ctx context.Context, in *UserAndSpeed, opts ...grp
 	return out, nil
 }
 
-func (c *gameClient) GetPlayer(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Player, error) {
-	out := new(Player)
+func (c *gameClient) GetPlayer(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*GetPlayerResult, error) {
+	out := new(GetPlayerResult)
 	err := c.cc.Invoke(ctx, "/game.Game/GetPlayer", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -495,8 +598,8 @@ func (c *gameClient) GetPlayer(ctx context.Context, in *UserID, opts ...grpc.Cal
 	return out, nil
 }
 
-func (c *gameClient) GetPlayers(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Players, error) {
-	out := new(Players)
+func (c *gameClient) GetPlayers(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*GetPlayersResult, error) {
+	out := new(GetPlayersResult)
 	err := c.cc.Invoke(ctx, "/game.Game/GetPlayers", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -504,8 +607,8 @@ func (c *gameClient) GetPlayers(ctx context.Context, in *UserID, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *gameClient) GetFood(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Food, error) {
-	out := new(Food)
+func (c *gameClient) GetFood(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*GetFoodResult, error) {
+	out := new(GetFoodResult)
 	err := c.cc.Invoke(ctx, "/game.Game/GetFood", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -513,26 +616,15 @@ func (c *gameClient) GetFood(ctx context.Context, in *UserID, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *gameClient) StopListenEvents(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*Error, error) {
-	out := new(Error)
-	err := c.cc.Invoke(ctx, "/game.Game/StopListenEvents", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// GameServer is the delivery API for Game service.
+// GameServer is the server API for Game service.
 type GameServer interface {
 	StartGame(context.Context, *UserID) (*Error, error)
 	StopGame(context.Context, *UserID) (*Error, error)
 	SetDirection(context.Context, *UserAndDirection) (*Error, error)
 	SetSpeed(context.Context, *UserAndSpeed) (*Error, error)
-	GetPlayer(context.Context, *UserID) (*Player, error)
-	GetPlayers(context.Context, *UserID) (*Players, error)
-	GetFood(context.Context, *UserID) (*Food, error)
-	//rpc ListenEvents(UserID) returns (Channel) {}
-	StopListenEvents(context.Context, *UserID) (*Error, error)
+	GetPlayer(context.Context, *UserID) (*GetPlayerResult, error)
+	GetPlayers(context.Context, *UserID) (*GetPlayersResult, error)
+	GetFood(context.Context, *UserID) (*GetFoodResult, error)
 }
 
 // UnimplementedGameServer can be embedded to have forward compatible implementations.
@@ -551,17 +643,14 @@ func (*UnimplementedGameServer) SetDirection(ctx context.Context, req *UserAndDi
 func (*UnimplementedGameServer) SetSpeed(ctx context.Context, req *UserAndSpeed) (*Error, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSpeed not implemented")
 }
-func (*UnimplementedGameServer) GetPlayer(ctx context.Context, req *UserID) (*Player, error) {
+func (*UnimplementedGameServer) GetPlayer(ctx context.Context, req *UserID) (*GetPlayerResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayer not implemented")
 }
-func (*UnimplementedGameServer) GetPlayers(ctx context.Context, req *UserID) (*Players, error) {
+func (*UnimplementedGameServer) GetPlayers(ctx context.Context, req *UserID) (*GetPlayersResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPlayers not implemented")
 }
-func (*UnimplementedGameServer) GetFood(ctx context.Context, req *UserID) (*Food, error) {
+func (*UnimplementedGameServer) GetFood(ctx context.Context, req *UserID) (*GetFoodResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFood not implemented")
-}
-func (*UnimplementedGameServer) StopListenEvents(ctx context.Context, req *UserID) (*Error, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StopListenEvents not implemented")
 }
 
 func RegisterGameServer(s *grpc.Server, srv GameServer) {
@@ -694,24 +783,6 @@ func _Game_GetFood_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Game_StopListenEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServer).StopListenEvents(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/game.Game/StopListenEvents",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).StopListenEvents(ctx, req.(*UserID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Game_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "game.Game",
 	HandlerType: (*GameServer)(nil),
@@ -743,10 +814,6 @@ var _Game_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFood",
 			Handler:    _Game_GetFood_Handler,
-		},
-		{
-			MethodName: "StopListenEvents",
-			Handler:    _Game_StopListenEvents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

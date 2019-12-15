@@ -35,9 +35,9 @@ type GameUsecase interface {
 	SetDirection(userID int, direction int) error
 	SetSpeed(userID int, speed int) error
 
-	GetPlayer(userID int) *model.Player
-	GetPlayers(userID int) []*model.Player
-	GetFood(userID int) []model.Food
+	GetPlayer(userID int) (*model.Player, error)
+	GetPlayers(userID int) ([]*model.Player, error)
+	GetFood(userID int) ([]model.Food, error)
 
 	ListenEvents(userID int) (chan map[string]interface{}, error)
 	StopListenEvents(userID int) error

@@ -10,6 +10,7 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/repository"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/usecase"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user"
 	"github.com/google/wire"
 	"github.com/labstack/echo"
@@ -41,6 +42,7 @@ func NewGameHandler() (*ws.GameHandler, error) {
 		ws.NewGameHandler,
 		usecase.NewGameUsecase,
 		usecase.NewAuthUsecase,
+		newGameClient,
 		newAuthClient,
 		NewEcho,
 		NewLogger,
@@ -94,6 +96,11 @@ func newAuthClient() (auth.AuthClient, error) {
 func newUserClient() (user.UserClient, error) {
 	conn, err := newGRPC("user:" + os.Getenv("PORT"))
 	return user.NewUserClient(conn), err
+}
+
+func newGameClient() (game.GameClient, error) {
+	conn, err := newGRPC("game:" + os.Getenv("PORT"))
+	return game.NewGameClient(conn), err
 }
 
 func newGRPC(url string) (*grpc.ClientConn, error) {

@@ -1,8 +1,6 @@
 package game
 
-import (
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game/model"
-)
+import "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 
 type Usecase interface {
 	StartGame(userID int) error

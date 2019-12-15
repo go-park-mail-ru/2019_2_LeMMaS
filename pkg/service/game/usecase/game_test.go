@@ -2,8 +2,7 @@ package usecase
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/game"
-	game2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/test/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -64,7 +63,7 @@ func TestGameUsecase_PlayerMove(t *testing.T) {
 		events, err := s.usecase.ListenEvents(userID)
 		assert.NoError(t, err)
 		event := <-events
-		if !assert.Equal(t, game2.EventMove, event["type"]) {
+		if !assert.Equal(t, game.EventMove, event["type"]) {
 			return
 		}
 		player := event["player"].(map[string]interface{})
@@ -97,7 +96,7 @@ func TestGameUsecase_EatFood(t *testing.T) {
 		events, err := s.usecase.ListenEvents(userID)
 		assert.NoError(t, err)
 		event := <-events
-		if !assert.Equal(t, game2.EventMove, event["type"]) {
+		if !assert.Equal(t, game.EventMove, event["type"]) {
 			return
 		}
 		assert.Equal(t, foodIDs, event["eatenFood"])
@@ -113,20 +112,20 @@ func TestGameUsecase_EatFood(t *testing.T) {
 type gameUsecaseTestSuite struct {
 	t              *testing.T
 	usecase        game.Usecase
-	mockRepository *game2.MockRepository
+	mockRepository *game.MockRepository
 	controller     *gomock.Controller
 }
 
 func (s *gameUsecaseTestSuite) StartTest(t *testing.T) {
 	s.t = t
 	s.controller = gomock.NewController(t)
-	mockRepo := game2.NewMockRepository(s.controller)
+	mockRepo := game.NewMockRepository(s.controller)
 	s.usecase = NewGameUsecase(mockRepo, mock.NewMockLogger(t))
 	s.mockRepository = mockRepo
 	s.initTestGame()
 }
 
-func (s *gameUsecaseTestSuite) ExpectRepo() *game2.MockRepositoryMockRecorder {
+func (s *gameUsecaseTestSuite) ExpectRepo() *game.MockRepositoryMockRecorder {
 	return s.mockRepository.EXPECT()
 }
 
@@ -149,7 +148,7 @@ func (s gameUsecaseTestSuite) newTestRoom() model.Room {
 		UserID:    userID,
 		Direction: direction,
 		Speed:     speed,
-		Position:  model.Position{X: game2.MaxPositionX / 2, Y: game2.MaxPositionY / 2},
+		Position:  model.Position{X: game.MaxPositionX / 2, Y: game.MaxPositionY / 2},
 	}
 	food1 := model.Food{ID: 1, Position: model.Position{X: 10, Y: 10}}
 	food2 := model.Food{ID: 2, Position: model.Position{X: 8, Y: 15}}

@@ -31,6 +31,15 @@ services:
     expose:
       - ${PORT}
 
+  game:
+    build: images/game
+    working_dir: /app/cmd/game
+    volumes:
+      - ../.:/app
+    env_file: .env
+    expose:
+      - ${PORT}
+
   postgres:
     image: postgres:11.5
     restart: always
