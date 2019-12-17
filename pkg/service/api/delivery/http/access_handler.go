@@ -47,18 +47,22 @@ func (h *AccessHandler) csrfMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		ok, err := h.csrf.CheckTokenBySession(csrfToken, session.Value)
 		if !ok {
-			message := fmt.Sprintf("recieved incorrect CSRF token %v, session id %v", csrfToken, session.Value)
-			if err != nil {
-				message += "\n" + err.Error()
-			}
-			h.log.Warnf(message)
+			h.warnIncorrectCSRF(csrfToken, c.Path(), err)
 			return h.Error(c, "incorrect CSRF token")
 		}
 		return next(c)
 	}
 }
 
-func (h AccessHandler) corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (h *AccessHandler) warnIncorrectCSRF(token, path string, err error) {
+	message := fmt.Sprintf("recieved incorrect CSRF token %v, path %v", token, path)
+	if err != nil {
+		message += "\n" + err.Error()
+	}
+	h.log.Warnf(message)
+}
+
+func (h *AccessHandler) corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		origin := c.Request().Header.Get(echo.HeaderOrigin)
 		var allowOrigin string
@@ -83,7 +87,7 @@ func (h AccessHandler) corsMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func (h AccessHandler) isOriginAllowed(origin string) bool {
+func (h *AccessHandler) isOriginAllowed(origin string) bool {
 	isNowSh, _ := regexp.MatchString(`^https:\/\/20192lemmas.*\.now\.sh$`, origin)
 	isLocalhost, _ := regexp.MatchString(`^http:\/\/localhost:\d*$`, origin)
 	return isNowSh || isLocalhost

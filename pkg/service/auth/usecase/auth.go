@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
 	"github.com/google/uuid"
@@ -16,14 +15,14 @@ const passwordSaltLength = 8
 type authUsecase struct {
 	userRepo    auth.UserRepository
 	sessionRepo auth.SessionRepository
-	logger      logger.Logger
+	log         logger.Logger
 }
 
-func NewAuthUsecase(userRepo auth.UserRepository, sessionRepo auth.SessionRepository, logger logger.Logger) auth.AuthUsecase {
+func NewAuthUsecase(userRepo auth.UserRepository, sessionRepo auth.SessionRepository, log logger.Logger) auth.AuthUsecase {
 	return &authUsecase{
 		userRepo:    userRepo,
 		sessionRepo: sessionRepo,
-		logger:      logger,
+		log:         log,
 	}
 }
 
@@ -50,14 +49,14 @@ func (u *authUsecase) Logout(session string) error {
 }
 
 func (u *authUsecase) Register(email, password, name string) error {
-	userWithSameEmail, err := u.userRepo.GetByEmail(email)
-	if err != nil && err != consts.ErrNotFound {
+	withSameEmail, err := u.userRepo.GetByEmail(email)
+	if err != nil {
 		return err
 	}
-	if userWithSameEmail != nil {
+	if withSameEmail != nil {
 		return errors.New("user with this email already registered")
 	}
-	return u.userRepo.Register(email, u.GetPasswordHash(password), name)
+	return u.userRepo.Create(email, u.GetPasswordHash(password), name)
 }
 
 func (u *authUsecase) GetUser(session string) (int, bool) {

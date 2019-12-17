@@ -56,13 +56,13 @@ func (h *AuthHandler) Logout(ctx context.Context, params *auth.LogoutParams) (re
 	return
 }
 
-func (h *AuthHandler) Register(ctx context.Context, params *auth.RegisterParams) (result *auth.RegisterResult, grpcErr error) {
-	result = &auth.RegisterResult{}
+func (h *AuthHandler) Register(ctx context.Context, params *auth.RegisterParams) (*auth.RegisterResult, error) {
+	result := &auth.RegisterResult{}
 	err := h.usecase.Register(params.Email, params.Password, params.Name)
 	if err != nil {
 		result.Error = err.Error()
 	}
-	return
+	return result, nil
 }
 
 func (h *AuthHandler) GetUser(ctx context.Context, params *auth.GetUserParams) (result *auth.GetUserResult, grpcErr error) {

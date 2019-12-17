@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
@@ -23,7 +24,7 @@ func NewUserRepository(u user.UserClient, log logger.Logger) auth.UserRepository
 	}
 }
 
-func (r *userRepository) Register(email string, passwordHash string, name string) error {
+func (r *userRepository) Create(email string, passwordHash string, name string) error {
 	params := user.CreateParams{
 		Email:        email,
 		PasswordHash: passwordHash,
@@ -44,6 +45,9 @@ func (r *userRepository) GetByEmail(email string) (*model.User, error) {
 	res, err := r.u.GetByEmail(r.c, &params)
 	if err != nil {
 		return nil, err
+	}
+	if res.Error == consts.ErrNotFound.Error() {
+		return nil, nil
 	}
 	if res.Error != "" {
 		return nil, errors.New(res.Error)

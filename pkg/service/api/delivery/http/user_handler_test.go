@@ -26,7 +26,7 @@ package http
 //	s.StartTest(t)
 //
 //	user1 := model.User{ID: 1, Email: "testik1@mail.ru", Name: "Test The Best 1"}
-//	s.ExpectUsecase().Register(user1.Email, test.Password, user1.Name).Return(nil)
+//	s.ExpectUsecase().Create(user1.Email, test.Password, user1.Name).Return(nil)
 //	s.ExpectUsecase().GetAll().Return([]model.User{user1}, nil)
 //
 //	s.TestUserRegister(
@@ -42,7 +42,7 @@ package http
 //		http.StatusBadRequest,
 //	)
 //
-//	s.ExpectUsecase().Register(user1.Email, test.Password, user1.Name).Return(fmt.Errorf("user already registered"))
+//	s.ExpectUsecase().Create(user1.Email, test.Password, user1.Name).Return(fmt.Errorf("user already registered"))
 //	s.TestUserRegister(
 //		`{"email": "testik1@mail.ru","name": "Test The Best 1","password": "ssc-tuatara"}`,
 //		s.Error("user already registered"),

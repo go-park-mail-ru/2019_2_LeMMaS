@@ -57,12 +57,12 @@ package usecase
 //
 //	userRepo.EXPECT().GetByEmail(email).Return(nil, nil)
 //	userRepo.EXPECT().Create(email, gomock.Any(), name)
-//	err := server.Register(email, password, name)
+//	err := server.Create(email, password, name)
 //	assert.Nil(t, err)
 //
 //	userWithSameEmail := model.User{}
 //	userRepo.EXPECT().GetByEmail(email).Return(&userWithSameEmail, nil)
-//	err = server.Register(email, password, name)
+//	err = server.Create(email, password, name)
 //	assert.EqualError(t, err, "user with this email already registered")
 //}
 //

@@ -17,13 +17,13 @@ type UserUpdate struct {
 }
 
 type UserRegister struct {
-	Email    string `json:"email" valid:"email,required"`
+	Email    string `json:"email" valid:"required"`
 	Password string `json:"password" valid:"required"`
 	Name     string `json:"name" valid:"required"`
 }
 
 type UserLogin struct {
-	Email    string `json:"email" valid:"email,required"`
+	Email    string `json:"email" valid:"required"`
 	Password string `json:"password" valid:"required"`
 }
 
