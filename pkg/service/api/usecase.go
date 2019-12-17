@@ -39,6 +39,6 @@ type GameUsecase interface {
 	GetPlayers(userID int) ([]*model.Player, error)
 	GetFood(userID int) ([]model.Food, error)
 
-	ListenEvents(userID int) (chan map[string]interface{}, error)
+	ListenEvents(userID int) (<-chan map[string]interface{}, error)
 	StopListenEvents(userID int) error
 }

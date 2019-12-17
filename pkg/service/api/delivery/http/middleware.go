@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery"
-	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/monitoring"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/metrics"
 	"github.com/labstack/echo"
 	"time"
 )
@@ -17,7 +17,7 @@ type Middleware struct {
 func NewMiddleware(e *echo.Echo, log logger.Logger) Middleware {
 	handler := Middleware{delivery.Handler{}, e, log}
 	e.Use(handler.panicMiddleware)
-	e.Use(handler.prometheusMiddleware)
+	//e.Use(handler.prometheusMiddleware)
 	return handler
 }
 
@@ -41,12 +41,8 @@ func (h Middleware) prometheusMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 		if err != nil {
 			status = err.(*echo.HTTPError).Code
 		}
-		prometheus.ApiMetrics.ObserveResponseTime(status, c.Request().Method, c.Path(), time.Since(start).Seconds())
-		prometheus.ApiMetrics.IncHitOfResponse(status, c.Request().Method, c.Path())
-
-		if c.Path() == ApiV1UserRegisterPath && status == 200 {
-			prometheus.ApiMetrics.IncRegisteredUsers()
-		}
+		metrics.API.ObserveResponseTime(status, c.Request().Method, c.Path(), time.Since(start).Seconds())
+		metrics.API.IncHitOfResponse(status, c.Request().Method, c.Path())
 		return nil
 	}
 }

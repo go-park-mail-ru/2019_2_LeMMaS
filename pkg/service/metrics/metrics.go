@@ -1,4 +1,4 @@
-package prometheus
+package metrics
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
@@ -12,22 +12,22 @@ type Metrics struct {
 	Times           *prometheus.HistogramVec
 }
 
-var ApiMetrics Metrics
+var API Metrics
 
 func InitMetrics() {
-	ApiMetrics.RegisteredUsers = prometheus.NewCounter(
+	API.RegisteredUsers = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "count_of_users",
 		})
-	ApiMetrics.HitsTotal = prometheus.NewCounter(
+	API.HitsTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "hits_total",
 		})
-	ApiMetrics.Hits = prometheus.NewCounterVec(
+	API.Hits = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "hits"},
 		[]string{"status", "method", "path"})
-	ApiMetrics.Times = prometheus.NewHistogramVec(
+	API.Times = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name: "times"},
 		[]string{"status", "method", "path"})
@@ -51,10 +51,10 @@ func (m *Metrics) ObserveResponseTime(status int, method, path string, observeTi
 
 func InitHandler() {
 	InitMetrics()
-	prometheus.MustRegister(ApiMetrics.HitsTotal)
-	prometheus.MustRegister(ApiMetrics.Hits)
-	prometheus.MustRegister(ApiMetrics.Times)
-	prometheus.MustRegister(ApiMetrics.RegisteredUsers)
+	prometheus.MustRegister(API.HitsTotal)
+	prometheus.MustRegister(API.Hits)
+	prometheus.MustRegister(API.Times)
+	prometheus.MustRegister(API.RegisteredUsers)
 	// Add Go module build info.
 	prometheus.MustRegister(prometheus.NewBuildInfoCollector())
 }

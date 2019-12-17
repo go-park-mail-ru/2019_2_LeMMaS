@@ -2,21 +2,21 @@ package http
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
-	prometheus "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/monitoring"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/metrics"
 	"github.com/labstack/echo"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const MetricsPath = "/metrics"
 
-type PrometheusHandler struct {
+type MetricsHandler struct {
 	e      *echo.Echo
 	logger logger.Logger
 }
 
-func NewPrometheusHandler(e *echo.Echo, logger logger.Logger) *PrometheusHandler {
-	prometheus.InitHandler()
-	handler := PrometheusHandler{
+func NewMetricsHandler(e *echo.Echo, logger logger.Logger) *MetricsHandler {
+	metrics.InitHandler()
+	handler := MetricsHandler{
 		e:      e,
 		logger: logger,
 	}

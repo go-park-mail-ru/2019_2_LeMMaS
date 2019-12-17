@@ -16,8 +16,8 @@ service Game {
 
     rpc GetFood(UserID) returns (GetFoodResult);
 
-    //rpc ListenEvents(UserID) returns (Channel);
-//    rpc StopListenEvents(UserID) returns (Error);
+    rpc ListenEvents(UserID) returns (stream Event);
+    rpc StopListenEvents(UserID) returns (Error);
 }
 
 message Position {
@@ -66,4 +66,9 @@ message UserAndDirection {
 
 message GetFoodResult {
     repeated Food food = 1;
+}
+
+message Event {
+    string params = 1;
+    string error = 2;
 }

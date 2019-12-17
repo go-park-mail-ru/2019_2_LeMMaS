@@ -21,7 +21,7 @@ func NewGameHandler() (*grpc.GameHandler, error) {
 		return nil, err
 	}
 	gameUsecase := usecase.NewGameUsecase(gameRepository, logger)
-	gameHandler := grpc.NewGameHandler(gameUsecase)
+	gameHandler := grpc.NewGameHandler(gameUsecase, logger)
 	return gameHandler, nil
 }
 

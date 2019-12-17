@@ -3,7 +3,7 @@ package usecase
 import (
 	"errors"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
-	game2 "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
 )
 
 var errNoEventListeners = errors.New("no event listeners")
@@ -52,14 +52,14 @@ func (u *eventsDispatcher) sendEvent(roomID int, event map[string]interface{}) {
 
 func (u *eventsDispatcher) sendStop(roomID, userID int) {
 	u.sendEvent(roomID, map[string]interface{}{
-		"type":    game2.EventStop,
+		"type":    game.EventStop,
 		"user_id": userID,
 	})
 }
 
 func (u *eventsDispatcher) sendMove(roomID int, userID int, newPosition model.Position, newSize int, eatenFood []int) {
 	u.sendEvent(roomID, map[string]interface{}{
-		"type": game2.EventMove,
+		"type": game.EventMove,
 		"player": map[string]interface{}{
 			"id":   userID,
 			"x":    newPosition.X,
@@ -72,14 +72,14 @@ func (u *eventsDispatcher) sendMove(roomID int, userID int, newPosition model.Po
 
 func (u *eventsDispatcher) sendNewPlayer(roomID int, player model.Player) {
 	u.sendEvent(roomID, map[string]interface{}{
-		"type":   game2.EventNewPlayer,
+		"type":   game.EventNewPlayer,
 		"player": player,
 	})
 }
 
 func (u *eventsDispatcher) sendNewFood(roomID int, food []model.Food) {
 	u.sendEvent(roomID, map[string]interface{}{
-		"type": game2.EventNewFood,
+		"type": game.EventNewFood,
 		"food": food,
 	})
 }
