@@ -6,12 +6,12 @@ notifications:
 script:
 - eval "$(ssh-agent -s)"
 - ssh-keyscan -H 95.163.212.121 >> ~/.ssh/known_hosts
-- chmod 600 $HOME/.ssh/2019_1_LeMMaS_id_rsa
-- ssh-add $HOME/.ssh/2019_1_LeMMaS_id_rsa
+- chmod 600 $HOME/.ssh/2019_1_LeMMaS_id_rsa.pem
+- ssh-add $HOME/.ssh/2019_1_LeMMaS_id_rsa.pem
 - go build .
 - scp -r . ubuntu@95.163.212.121:/home/l-mozhevikina/back/2019_2_LeMMaS
 before_install:
 - pwd
 - ls
 - sudo openssl aes-256-cbc -K $encrypted_b973021a3057_key -iv $encrypted_b973021a3057_iv
-  -in 2019_1_LeMMaS_id_rsa.pem.enc -out $HOME/.ssh/2019_1_LeMMaS_id_rsa -d
+  -in 2019_1_LeMMaS_id_rsa.pem.enc -out ~\/.ssh/2019_1_LeMMaS_id_rsa.pem -d
