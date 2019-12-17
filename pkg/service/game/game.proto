@@ -5,19 +5,19 @@ syntax = "proto3";
 package game;
 
 service Game {
-    rpc StartGame(UserID) returns (Error);
-    rpc StopGame(UserID) returns (Error);
+    rpc StartGame (UserID) returns (Error);
+    rpc StopGame (UserID) returns (Error);
 
-    rpc SetDirection(UserAndDirection) returns (Error);
-    rpc SetSpeed(UserAndSpeed) returns (Error);
+    rpc SetDirection (UserAndDirection) returns (Error);
+    rpc SetSpeed (UserAndSpeed) returns (Error);
 
-    rpc GetPlayer(UserID) returns (GetPlayerResult);
-    rpc GetPlayers(UserID) returns (GetPlayersResult);
+    rpc GetPlayer (UserID) returns (GetPlayerResult);
+    rpc GetPlayers (UserID) returns (GetPlayersResult);
 
-    rpc GetFood(UserID) returns (GetFoodResult);
+    rpc GetFood (UserID) returns (GetFoodResult);
 
-    rpc ListenEvents(UserID) returns (stream Event);
-    rpc StopListenEvents(UserID) returns (Error);
+    rpc ListenEvents (UserID) returns (stream Event);
+    rpc StopListenEvents (UserID) returns (Error);
 }
 
 message Position {

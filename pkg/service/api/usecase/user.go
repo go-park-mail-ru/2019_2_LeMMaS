@@ -75,11 +75,10 @@ func (u *userUsecase) UpdateAvatar(id int, avatar io.Reader) error {
 	if err != nil {
 		return err
 	}
-	params := user.UpdateAvatarParams{
+	res, err := u.user.UpdateAvatar(u.c, &user.UpdateAvatarParams{
 		Id:         int32(id),
 		AvatarPath: path,
-	}
-	res, err := u.user.UpdateAvatar(u.c, &params)
+	})
 	if err != nil {
 		u.log.Error(err)
 		return err

@@ -36,7 +36,16 @@ func (h *UserHandler) Serve(address string) error {
 	return h.server.Serve(listener)
 }
 
-func (h *UserHandler) GetAll(ctx context.Context, params *user.GetAllParams) (result *user.GetAllResult, grpcErr error) {
+func (h *UserHandler) Create(c context.Context, params *user.CreateParams) (*user.CreateResult, error) {
+	result := &user.CreateResult{}
+	err := h.usecase.Create(params.Email, params.PasswordHash, params.Name)
+	if err != nil {
+		result.Error = err.Error()
+	}
+	return result, nil
+}
+
+func (h *UserHandler) GetAll(c context.Context, params *user.GetAllParams) (result *user.GetAllResult, grpcErr error) {
 	result = &user.GetAllResult{}
 	users, err := h.usecase.GetAll()
 	if err != nil {
@@ -47,7 +56,7 @@ func (h *UserHandler) GetAll(ctx context.Context, params *user.GetAllParams) (re
 	return
 }
 
-func (h *UserHandler) GetByID(ctx context.Context, params *user.GetByIDParams) (result *user.GetByIDResult, grpcErr error) {
+func (h *UserHandler) GetByID(c context.Context, params *user.GetByIDParams) (result *user.GetByIDResult, grpcErr error) {
 	result = &user.GetByIDResult{}
 	u, err := h.usecase.GetByID(int(params.Id))
 	if err != nil {
@@ -58,7 +67,7 @@ func (h *UserHandler) GetByID(ctx context.Context, params *user.GetByIDParams) (
 	return
 }
 
-func (h *UserHandler) GetByEmail(ctx context.Context, params *user.GetByEmailParams) (result *user.GetByEmailResult, grpcErr error) {
+func (h *UserHandler) GetByEmail(c context.Context, params *user.GetByEmailParams) (result *user.GetByEmailResult, grpcErr error) {
 	result = &user.GetByEmailResult{}
 	u, err := h.usecase.GetByEmail(params.Email)
 	if err != nil {
@@ -69,7 +78,7 @@ func (h *UserHandler) GetByEmail(ctx context.Context, params *user.GetByEmailPar
 	return
 }
 
-func (h *UserHandler) Update(ctx context.Context, params *user.UpdateParams) (result *user.UpdateResult, grpcErr error) {
+func (h *UserHandler) Update(c context.Context, params *user.UpdateParams) (result *user.UpdateResult, grpcErr error) {
 	result = &user.UpdateResult{}
 	err := h.usecase.Update(int(params.Id), params.PasswordHash, params.Name)
 	if err != nil {
@@ -78,11 +87,16 @@ func (h *UserHandler) Update(ctx context.Context, params *user.UpdateParams) (re
 	return
 }
 
-func (h *UserHandler) UpdateAvatar(ctx context.Context, params *user.UpdateAvatarParams) (*user.UpdateAvatarResult, error) {
-	return nil, nil
+func (h *UserHandler) UpdateAvatar(c context.Context, params *user.UpdateAvatarParams) (*user.UpdateAvatarResult, error) {
+	res := &user.UpdateAvatarResult{}
+	err := h.usecase.UpdateAvatar(int(params.Id), params.AvatarPath)
+	if err != nil {
+		res.Error = err.Error()
+	}
+	return res, nil
 }
 
-func (h *UserHandler) GetSpecialAvatar(ctx context.Context, params *user.GetSpecialAvatarParams) (*user.GetSpecialAvatarResult, error) {
+func (h *UserHandler) GetSpecialAvatar(c context.Context, params *user.GetSpecialAvatarParams) (*user.GetSpecialAvatarResult, error) {
 	return &user.GetSpecialAvatarResult{
 		AvatarUrl: h.usecase.GetSpecialAvatar(params.Name),
 	}, nil

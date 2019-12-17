@@ -17,6 +17,10 @@ func NewUserUsecase(repo user.Repository) user.UserUsecase {
 	}
 }
 
+func (u *userUsecase) Create(email string, passwordHash string, name string) error {
+	return u.repo.Create(email, passwordHash, name)
+}
+
 func (u *userUsecase) GetAll() ([]*model.User, error) {
 	return u.repo.GetAll()
 }
@@ -50,7 +54,7 @@ func (u *userUsecase) Update(id int, passwordHash, name string) error {
 }
 
 func (u *userUsecase) UpdateAvatar(userID int, avatarPath string) error {
-	return nil
+	return u.repo.UpdateAvatar(userID, avatarPath)
 }
 
 func (u *userUsecase) GetSpecialAvatar(name string) string {

@@ -10,26 +10,38 @@ import (
 )
 
 type userRepository struct {
-	u      user.UserClient
-	logger logger.Logger
-	ctx    context.Context
+	u   user.UserClient
+	log logger.Logger
+	c   context.Context
 }
 
-func NewUserRepository(u user.UserClient, logger logger.Logger) auth.UserRepository {
+func NewUserRepository(u user.UserClient, log logger.Logger) auth.UserRepository {
 	return &userRepository{
-		u:      u,
-		logger: logger,
-		ctx:    context.Background(),
+		u:   u,
+		log: log,
+		c:   context.Background(),
 	}
 }
 
 func (r *userRepository) Register(email string, passwordHash string, name string) error {
+	params := user.CreateParams{
+		Email:        email,
+		PasswordHash: passwordHash,
+		Name:         name,
+	}
+	res, err := r.u.Create(r.c, &params)
+	if err != nil {
+		return err
+	}
+	if res.Error != "" {
+		return errors.New(res.Error)
+	}
 	return nil
 }
 
 func (r *userRepository) GetByEmail(email string) (*model.User, error) {
 	params := user.GetByEmailParams{Email: email}
-	res, err := r.u.GetByEmail(r.ctx, &params)
+	res, err := r.u.GetByEmail(r.c, &params)
 	if err != nil {
 		return nil, err
 	}

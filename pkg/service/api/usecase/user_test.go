@@ -143,7 +143,7 @@ package usecase
 //	avatarFile := io.LimitedReader{}
 //	avatarFileLocation := "2ad2.jpg"
 //	userFileRepo.EXPECT().Store(&avatarFile).Return(avatarFileLocation, nil)
-//	userRepo.EXPECT().UpdateAvatarPath(userToUpdate.ID, avatarFileLocation)
+//	userRepo.EXPECT().UpdateAvatar(userToUpdate.ID, avatarFileLocation)
 //	err := server.UpdateAvatar(&userToUpdate, &avatarFile)
 //	assert.Nil(t, err)
 //}

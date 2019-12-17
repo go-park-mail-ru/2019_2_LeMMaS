@@ -5,6 +5,7 @@ import (
 )
 
 type UserUsecase interface {
+	Create(email string, passwordHash string, name string) error
 	GetAll() ([]*model.User, error)
 	GetByID(id int) (*model.User, error)
 	GetByEmail(email string) (*model.User, error)

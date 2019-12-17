@@ -119,7 +119,7 @@ func TestDatabaseUserRepository_UpdateAvatarPath(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(int64(user.ID), 1))
 
 	repo := newTestDatabaseRepository(t, db)
-	err = repo.UpdateAvatarPath(user.ID, user.AvatarPath)
+	err = repo.UpdateAvatar(user.ID, user.AvatarPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

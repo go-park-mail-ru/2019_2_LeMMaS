@@ -12,21 +12,21 @@ import (
 const userTable = "user"
 
 type databaseRepository struct {
-	db     *sqlx.DB
-	logger logger.Logger
+	db  *sqlx.DB
+	log logger.Logger
 }
 
-func NewDatabaseRepository(db *sqlx.DB, logger logger.Logger) user2.Repository {
+func NewDatabaseRepository(db *sqlx.DB, log logger.Logger) user2.Repository {
 	return &databaseRepository{
 		db,
-		logger,
+		log,
 	}
 }
 
 func (r *databaseRepository) Create(email string, passwordHash string, name string) error {
 	_, err := r.db.Exec(`insert into "`+userTable+`" (email, password_hash, name) values ($1, $2, $3)`, email, passwordHash, name)
 	if err != nil {
-		r.logger.Error(err)
+		r.log.Error(err)
 	}
 	return err
 }
@@ -37,18 +37,18 @@ func (r *databaseRepository) Update(user *model.User) error {
 		user.Email, user.PasswordHash, user.Name, user.AvatarPath, user.ID,
 	)
 	if err != nil {
-		r.logger.Error(err)
+		r.log.Error(err)
 	}
 	return err
 }
 
-func (r *databaseRepository) UpdateAvatarPath(id int, avatarPath string) error {
+func (r *databaseRepository) UpdateAvatar(id int, avatarPath string) error {
 	_, err := r.db.Exec(
 		`update "`+userTable+`" set avatar_path=$1 where id=$2`,
 		avatarPath, id,
 	)
 	if err != nil {
-		r.logger.Error(err)
+		r.log.Error(err)
 	}
 	return err
 }
@@ -57,7 +57,7 @@ func (r *databaseRepository) GetAll() ([]*model.User, error) {
 	var users []*model.User
 	err := r.db.Select(&users, `select * from "`+userTable+`" order by id`)
 	if err != nil {
-		r.logger.Error(err)
+		r.log.Error(err)
 		return nil, err
 	}
 	return users, nil
@@ -70,7 +70,7 @@ func (r *databaseRepository) GetByID(id int) (*model.User, error) {
 		return nil, consts.ErrNotFound
 	}
 	if err != nil {
-		r.logger.Error(err)
+		r.log.Error(err)
 		return nil, err
 	}
 	return &userByID, nil
@@ -83,7 +83,7 @@ func (r *databaseRepository) GetByEmail(email string) (*model.User, error) {
 		return nil, consts.ErrNotFound
 	}
 	if err != nil {
-		r.logger.Error(err)
+		r.log.Error(err)
 		return nil, err
 	}
 	return &userByEmail, nil

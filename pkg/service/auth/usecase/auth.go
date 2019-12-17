@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/consts"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/auth"
 	"github.com/google/uuid"
@@ -50,7 +51,7 @@ func (u *authUsecase) Logout(session string) error {
 
 func (u *authUsecase) Register(email, password, name string) error {
 	userWithSameEmail, err := u.userRepo.GetByEmail(email)
-	if err != nil {
+	if err != nil && err != consts.ErrNotFound {
 		return err
 	}
 	if userWithSameEmail != nil {

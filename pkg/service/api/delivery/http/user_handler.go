@@ -94,7 +94,6 @@ func (h *UserHandler) handleAvatarUpload(c echo.Context) error {
 	}
 	avatarFile, _, err := c.Request().FormFile("avatar")
 	if err != nil {
-		h.log.Error(err)
 		return h.Error(c, "bad request")
 	}
 	defer avatarFile.Close()
