@@ -11,5 +11,4 @@ script:
   - go build .
   - scp -r . ubuntu@95.163.212.121:/home/l-mozhevikina/back/2019_2_LeMMaS
 before_install:
-- openssl aes-256-cbc -K $encrypted_a59696580062_key -iv $encrypted_a59696580062_iv
-  -in 2019_1_LeMMaS_id_rsa.pem.enc -out ~/.ssh/2019_1_LeMMaS_id_rsa -d
+- openssl aes-256-cbc -K $encrypted_a59696580062_key -iv $encrypted_a59696580062_iv -in 2019_1_LeMMaS_id_rsa.pem.enc -out ~/.ssh/2019_1_LeMMaS_id_rsa -d
