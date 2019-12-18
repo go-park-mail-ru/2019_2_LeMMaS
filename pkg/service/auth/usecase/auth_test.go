@@ -58,8 +58,8 @@ func TestUserUsecase_GetUserBySessionID(t *testing.T) {
 func TestUserUsecase_Logout(t *testing.T) {
 	sessionRepo := auth.NewMockSessionRepository(gomock.NewController(t))
 	usecase := NewAuthUsecase(nil, sessionRepo, mock.NewMockLogger(t))
-	sessionRepo.EXPECT().Delete(test.SessionID).Return(nil)
-	err := usecase.Logout(test.SessionID)
+	sessionRepo.EXPECT().Delete(test.Session).Return(nil)
+	err := usecase.Logout(test.Session)
 	assert.Nil(t, err)
 }
 

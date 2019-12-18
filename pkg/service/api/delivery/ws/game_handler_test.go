@@ -29,7 +29,7 @@ func TestGameHandler(t *testing.T) {
 
 	players := []*model.Player{{UserID: userID}}
 	foods := []model.Food{{ID: 1, Position: model.Position{0, 100}}}
-	s.auth.EXPECT().GetUserID(test.SessionID).Return(userID, nil)
+	s.auth.EXPECT().GetUserID(test.Session).Return(userID, nil)
 	s.game.EXPECT().StartGame(userID).Return(nil)
 	s.game.EXPECT().StopGame(userID).Return(nil)
 	s.game.EXPECT().GetPlayers(userID).Return(players, nil)
@@ -53,7 +53,7 @@ func TestGameHandler(t *testing.T) {
 func TestGameHandler_UnknownRequest(t *testing.T) {
 	s := NewHandlerTestSuite(t)
 
-	s.auth.EXPECT().GetUserID(test.SessionID).Return(userID, nil)
+	s.auth.EXPECT().GetUserID(test.Session).Return(userID, nil)
 
 	conn, err := s.Connect()
 	assert.NoError(t, err)
@@ -129,7 +129,7 @@ func (s *HandlerTestSuite) runServer() error {
 	}
 	request.AddCookie(&http.Cookie{
 		Name:  delivery.SessionCookieName,
-		Value: test.SessionID,
+		Value: test.Session,
 	})
 	response := newResponseRecorder(s.server)
 	return s.handler.handleGame(s.e.NewContext(request, response))

@@ -46,8 +46,8 @@ func TestUserHandler_HandleUserRegister(t *testing.T) {
 func TestUserHandler_HandleUserUpdate(t *testing.T) {
 	us.StartTest(t)
 
-	us.auth.EXPECT().Login("testik1@mail.ru", "ssc-tuatara").Return(test.SessionID, nil)
-	us.auth.EXPECT().GetUserID(test.SessionID).Return(1, nil)
+	us.auth.EXPECT().Login("testik1@mail.ru", "ssc-tuatara").Return(test.Session, nil)
+	us.auth.EXPECT().GetUserID(test.Session).Return(1, nil)
 	us.user.EXPECT().Update(1, "", "New Name").Return(nil)
 
 	us.TestUserLogin(

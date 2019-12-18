@@ -17,11 +17,11 @@ var as = NewAccessHandlerTestSuite()
 func TestAccessHandler_HandleGetCSRFToken(t *testing.T) {
 	as.StartTest(t)
 
-	as.Expect().CreateTokenBySession(test.SessionID).Return(test.CSRFToken, nil)
+	as.Expect().CreateTokenBySession(test.Session).Return(test.CSRFToken, nil)
 
 	as.TestGetCSRFToken(as.Error("no session cookie"), http.StatusBadRequest)
 
-	as.AddCookie(delivery.SessionCookieName, test.SessionID)
+	as.AddCookie(delivery.SessionCookieName, test.Session)
 	as.TestGetCSRFToken(`{"status":"ok","body":{"token":"`+test.CSRFToken+`"}}`, http.StatusOK)
 }
 
@@ -41,14 +41,14 @@ func TestAccessHandler_CsrfMiddleware(t *testing.T) {
 	middleware(as.NewContext())
 	as.TestResponse(as.Error("csrf token required"), http.StatusBadRequest)
 
-	as.Expect().CheckTokenBySession(test.CSRFToken, test.SessionID).Return(true, nil)
-	as.AddCookie(delivery.SessionCookieName, test.SessionID)
+	as.Expect().CheckTokenBySession(test.CSRFToken, test.Session).Return(true, nil)
+	as.AddCookie(delivery.SessionCookieName, test.Session)
 	as.SetupRequest(http.MethodPost, delivery.ApiV1UserLogoutPath, "")
 	as.Request.Header.Add(csrfTokenHeader, test.CSRFToken)
 	middleware(as.NewContext())
 	as.TestResponse("middleware passed", http.StatusOK)
 
-	as.Expect().CheckTokenBySession(test.CSRFToken, test.SessionID).Return(false, nil)
+	as.Expect().CheckTokenBySession(test.CSRFToken, test.Session).Return(false, nil)
 	as.SetupRequest(http.MethodPost, delivery.ApiV1UserLogoutPath, "")
 	as.Request.Header.Add(csrfTokenHeader, test.CSRFToken)
 	middleware(as.NewContext())
