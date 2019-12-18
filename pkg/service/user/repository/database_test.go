@@ -18,7 +18,7 @@ func TestDatabaseUserRepository_GetAll(t *testing.T) {
 	}
 	defer db.Close()
 
-	expectedUsers := []model.User{{ID: 1, Email: "test1@m.ru"}, {ID: 2, Email: "test2@m.ru"}}
+	expectedUsers := []*model.User{{ID: 1, Email: "test1@m.ru"}, {ID: 2, Email: "test2@m.ru"}}
 	expectedRows := sqlmock.NewRows([]string{"id", "email"})
 	for _, user := range expectedUsers {
 		expectedRows.AddRow(user.ID, user.Email)

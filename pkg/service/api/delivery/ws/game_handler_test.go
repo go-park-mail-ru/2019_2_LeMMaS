@@ -3,10 +3,10 @@ package ws
 import (
 	"bufio"
 	"errors"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/game"
-	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/component/user"
-	delivery "github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/game"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/test"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/test/mock"
 	"github.com/golang/mock/gomock"
@@ -29,12 +29,12 @@ func TestGameHandler(t *testing.T) {
 
 	players := []*model.Player{{UserID: userID}}
 	foods := []model.Food{{ID: 1, Position: model.Position{0, 100}}}
-	s.userUsecase.EXPECT().GetUserBySessionID(test.SessionID).Return(&model.User{ID: userID}, nil)
-	s.gameUsecase.EXPECT().StartGame(userID).Return(nil)
-	s.gameUsecase.EXPECT().StopGame(userID).Return(nil)
-	s.gameUsecase.EXPECT().GetPlayers(userID).Return(players)
-	s.gameUsecase.EXPECT().GetFood(userID).Return(foods)
-	s.gameUsecase.EXPECT().ListenEvents(userID).Return(make(chan map[string]interface{}), nil)
+	s.auth.EXPECT().GetUserID(test.SessionID).Return(userID, nil)
+	s.game.EXPECT().StartGame(userID).Return(nil)
+	s.game.EXPECT().StopGame(userID).Return(nil)
+	s.game.EXPECT().GetPlayers(userID).Return(players, nil)
+	s.game.EXPECT().GetFood(userID).Return(foods, nil)
+	s.game.EXPECT().ListenEvents(userID).Return(make(chan map[string]interface{}), nil)
 
 	conn, err := s.Connect()
 	assert.NoError(t, err)
@@ -53,7 +53,7 @@ func TestGameHandler(t *testing.T) {
 func TestGameHandler_UnknownRequest(t *testing.T) {
 	s := NewHandlerTestSuite(t)
 
-	s.userUsecase.EXPECT().GetUserBySessionID(test.SessionID).Return(&model.User{ID: userID}, nil)
+	s.auth.EXPECT().GetUserID(test.SessionID).Return(userID, nil)
 
 	conn, err := s.Connect()
 	assert.NoError(t, err)
@@ -62,9 +62,9 @@ func TestGameHandler_UnknownRequest(t *testing.T) {
 }
 
 type HandlerTestSuite struct {
-	handler     *GameHandler
-	gameUsecase *game.MockUsecase
-	userUsecase *user.MockUsecase
+	handler *GameHandler
+	game    *api.MockGameUsecase
+	auth    *api.MockAuthUsecase
 
 	server net.Conn
 	dialer *websocket.Dialer
@@ -74,15 +74,15 @@ type HandlerTestSuite struct {
 }
 
 func NewHandlerTestSuite(t *testing.T) *HandlerTestSuite {
-	suite := HandlerTestSuite{
-		e: echo.New(),
-		t: t,
-	}
 	controller := gomock.NewController(t)
-	suite.gameUsecase = game.NewMockUsecase(controller)
-	suite.userUsecase = user.NewMockUsecase(controller)
+	suite := HandlerTestSuite{
+		e:    echo.New(),
+		t:    t,
+		game: api.NewMockGameUsecase(controller),
+		auth: api.NewMockAuthUsecase(controller),
+	}
 	logger := mock.NewMockLogger(t)
-	suite.handler = NewGameHandler(suite.e, suite.gameUsecase, suite.userUsecase, logger)
+	suite.handler = NewGameHandler(suite.e, suite.game, suite.auth, logger)
 
 	client, server := net.Pipe()
 	suite.dialer = &websocket.Dialer{NetDial: func(network, addr string) (net.Conn, error) { return client, nil }}
@@ -128,7 +128,7 @@ func (s *HandlerTestSuite) runServer() error {
 		return err
 	}
 	request.AddCookie(&http.Cookie{
-		Name:  delivery.SessionIDCookieName,
+		Name:  delivery.SessionCookieName,
 		Value: test.SessionID,
 	})
 	response := newResponseRecorder(s.server)

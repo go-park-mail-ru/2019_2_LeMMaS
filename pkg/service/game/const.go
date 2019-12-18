@@ -18,7 +18,9 @@ const (
 )
 
 const (
+	EventStart     = "start"
 	EventStop      = "stop"
+	EventError     = "error"
 	EventMove      = "move"
 	EventNewPlayer = "new_player"
 	EventNewFood   = "new_food"
