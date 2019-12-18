@@ -8,6 +8,7 @@ services:
   api:
     build: images/api
     working_dir: /app/cmd/api
+    restart: always
     volumes:
       - ../.:/app
     env_file: .env
@@ -17,6 +18,7 @@ services:
   auth:
     build: images/auth
     working_dir: /app/cmd/auth
+    restart: always
     volumes:
       - ../.:/app
     env_file: .env
@@ -28,6 +30,7 @@ services:
   user:
     build: images/user
     working_dir: /app/cmd/user
+    restart: always
     volumes:
       - ../.:/app
     env_file: .env
@@ -39,6 +42,7 @@ services:
   game:
     build: images/game
     working_dir: /app/cmd/game
+    restart: always
     volumes:
       - ../.:/app
     env_file: .env
@@ -82,8 +86,6 @@ services:
       - prometheus
     ports:
       - 3030:3000
-    restart:
-      always
     volumes:
       - ./grafana/data:/var/lib/grafana
     environment:
@@ -104,4 +106,3 @@ services:
       - '^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
     ports:
       - 9100:9100
-    restart: always
