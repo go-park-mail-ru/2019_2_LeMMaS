@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 //protoc --go_out=plugins=grpc:. *.proto
+//mockgen -source=user.pb.go -destination=user_mock.pb.go -package=user -self_package=github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/user
 
 package user;
 
