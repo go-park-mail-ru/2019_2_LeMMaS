@@ -2,8 +2,8 @@
 
 source `dirname $0`/env.sh
 
-if [ $# -lt 2 ]; then
-  echo 1>&2 "usage: $0 CONTAINER"
+if [ $# -lt 1 ]; then
+  echo "usage: $0 CONTAINER"
   exit 2
 fi
 

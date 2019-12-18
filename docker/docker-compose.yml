@@ -5,18 +5,45 @@ networks:
     driver: bridge
 
 services:
-  web:
-    build: images/web
-    env_file: ../.env
-    working_dir: /home/app/cmd/web
-    restart: on-failure
-    depends_on:
-      - postgres
-      - redis
+  api:
+    build: images/api
+    working_dir: /app/cmd/api
     volumes:
-      - ../.:/home/app
+      - ../.:/app
+    env_file: .env
     ports:
-      - 8080:8080
+      - ${PORT}:${PORT}
+
+  auth:
+    build: images/auth
+    working_dir: /app/cmd/auth
+    volumes:
+      - ../.:/app
+    env_file: .env
+    environment:
+      REDIS_DSN: redis://redis:6379
+    expose:
+      - ${PORT}
+
+  user:
+    build: images/user
+    working_dir: /app/cmd/user
+    volumes:
+      - ../.:/app
+    env_file: .env
+    environment:
+      POSTGRES_DSN: host=postgres port=5432 dbname=lemmas user=root password=temppassword
+    expose:
+      - ${PORT}
+
+  game:
+    build: images/game
+    working_dir: /app/cmd/game
+    volumes:
+      - ../.:/app
+    env_file: .env
+    expose:
+      - ${PORT}
 
   postgres:
     image: postgres:11.5
@@ -31,13 +58,11 @@ services:
   redis:
     build: images/redis
     expose:
-    - 6379
+      - 6379
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    depends_on:
-      - web
     volumes:
       - ./prometheus/conf:/etc/prometheus/
       - ./prometheus/data:/prometheus
