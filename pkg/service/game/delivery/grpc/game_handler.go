@@ -129,6 +129,10 @@ func (h *GameHandler) StopListenEvents(ctx context.Context, params *game.UserID)
 	return
 }
 
+func (h *GameHandler) convertUserID(id int) *game.UserID {
+	return &game.UserID{UserId: int32(id)}
+}
+
 func (h *GameHandler) convertPlayer(player *model.Player) *game.Player {
 	return &game.Player{
 		UserId:    int32(player.UserID),
