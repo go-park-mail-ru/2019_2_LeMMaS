@@ -23,6 +23,11 @@ func main() {
 		cmd.Fatal(l, err)
 	}
 
+	_, err = factory.NewMetricsHandler()
+	if err != nil {
+		cmd.Fatal(l, err)
+	}
+
 	_, err = factory.NewAccessHandler()
 	if err != nil {
 		cmd.Fatal(l, err)

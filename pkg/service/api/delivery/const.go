@@ -25,6 +25,10 @@ const (
 )
 
 const (
+	MetricsPath = "/metrics"
+)
+
+const (
 	SessionCookieName   = "session_id"
 	SessionCookieExpire = 10 * time.Hour
 )

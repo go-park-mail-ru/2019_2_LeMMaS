@@ -7,6 +7,7 @@ package factory
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/ws"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/repository"
@@ -23,12 +24,22 @@ import (
 
 func NewMiddleware() (http.Middleware, error) {
 	echo := NewEcho()
+	metrics, err := api.NewMetrics()
+	if err != nil {
+		return http.Middleware{}, err
+	}
 	logger, err := NewLogger()
 	if err != nil {
 		return http.Middleware{}, err
 	}
-	middleware := http.NewMiddleware(echo, logger)
+	middleware := http.NewMiddleware(echo, metrics, logger)
 	return middleware, nil
+}
+
+func NewMetricsHandler() (*http.MetricsHandler, error) {
+	echo := NewEcho()
+	metricsHandler := http.NewMetricsHandler(echo)
+	return metricsHandler, nil
 }
 
 func NewAccessHandler() (*http.AccessHandler, error) {

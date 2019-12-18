@@ -5,6 +5,7 @@ package factory
 
 import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/logger"
+	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/http"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/delivery/ws"
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/service/api/repository"
@@ -21,10 +22,19 @@ import (
 func NewMiddleware() (http.Middleware, error) {
 	wire.Build(
 		http.NewMiddleware,
+		api.NewMetrics,
 		NewEcho,
 		NewLogger,
 	)
 	return http.Middleware{}, nil
+}
+
+func NewMetricsHandler() (*http.MetricsHandler, error) {
+	wire.Build(
+		http.NewMetricsHandler,
+		NewEcho,
+	)
+	return &http.MetricsHandler{}, nil
 }
 
 func NewAccessHandler() (*http.AccessHandler, error) {
