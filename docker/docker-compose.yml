@@ -84,7 +84,7 @@ services:
     depends_on:
       - prometheus
     volumes:
-      - ./grafana/data:/var/lib/grafana
+      - ./images/grafana/data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMAIN_PASSWORD=temppasword
     labels:
