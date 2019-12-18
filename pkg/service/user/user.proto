@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package user;
+
+service User {
+    rpc Create (CreateParams) returns (CreateResult);
+    rpc GetAll (GetAllParams) returns (GetAllResult);
+    rpc GetByID (GetByIDParams) returns (GetByIDResult);
+    rpc GetByEmail (GetByEmailParams) returns (GetByEmailResult);
+    rpc Update (UpdateParams) returns (UpdateResult);
+    rpc UpdateAvatar (UpdateAvatarParams) returns (UpdateAvatarResult);
+    rpc GetSpecialAvatar (GetSpecialAvatarParams) returns (GetSpecialAvatarResult);
+}
+
+message UserData {
+    int32 id = 1;
+    string email = 2;
+    string password_hash = 3;
+    string name = 4;
+    string avatar_path = 5;
+}
+
+message CreateParams {
+    string email = 1;
+    string password_hash = 2;
+    string name = 3;
+}
+
+message CreateResult {
+    string error = 1;
+}
+
+message GetAllParams {
+    bool nothing = 1;
+}
+
+message GetAllResult {
+    repeated UserData users = 1;
+    string error = 2;
+}
+
+message GetByIDParams {
+    int32 id = 1;
+}
+
+message GetByIDResult {
+    UserData user = 1;
+    string error = 2;
+}
+
+message GetByEmailParams {
+    string email = 1;
+}
+
+message GetByEmailResult {
+    UserData user = 1;
+    string error = 2;
+}
+
+message UpdateParams {
+    int32 id = 1;
+    string password_hash = 2;
+    string name = 3;
+}
+
+message UpdateResult {
+    string error = 1;
+}
+
+message UpdateAvatarParams {
+    int32 id = 1;
+    string avatar_path = 2;
+}
+
+message UpdateAvatarResult {
+    string error = 1;
+}
+
+message GetSpecialAvatarParams {
+    string name = 1;
+}
+
+message GetSpecialAvatarResult {
+    string avatar_url = 1;
+}

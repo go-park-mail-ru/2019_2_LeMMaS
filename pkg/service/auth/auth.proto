@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package auth;
+
+service Auth {
+    rpc Login (LoginParams) returns (LoginResult);
+    rpc Logout (LogoutParams) returns (LogoutResult);
+    rpc Register (RegisterParams) returns (RegisterResult);
+    rpc GetUser (GetUserParams) returns (GetUserResult);
+    rpc GetPasswordHash (GetPasswordHashParams) returns (GetPasswordHashResult);
+}
+
+message LoginParams {
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResult {
+    string session = 1;
+    string error = 2;
+}
+
+message LogoutParams {
+    string session = 1;
+}
+
+message LogoutResult {
+    string error = 1;
+}
+
+message RegisterParams {
+    string email = 1;
+    string password = 2;
+    string name = 3;
+}
+
+message RegisterResult {
+    string error = 1;
+}
+
+message GetUserParams {
+    string session = 1;
+}
+
+message GetUserResult {
+    int32 id = 1;
+    string error = 2;
+}
+
+message GetPasswordHashParams {
+    string password = 1;
+}
+message GetPasswordHashResult {
+    string password_hash = 1;
+}
