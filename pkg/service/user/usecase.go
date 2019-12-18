@@ -1,3 +1,5 @@
+//go:generate mockgen -source=$GOFILE -destination=usecase_mock.go -package=$GOPACKAGE
+
 package user
 
 import (
