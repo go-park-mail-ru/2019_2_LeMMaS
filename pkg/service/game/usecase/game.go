@@ -41,7 +41,9 @@ func NewGameUsecase(repository game.Repository, logger logger.Logger) game.Useca
 
 func (u *gameUsecase) StartGame(userID int) error {
 	if u.getPlayerRoom(userID) != nil {
-		return errors.New("start: game already started for this user")
+		if err := u.StopGame(userID); err != nil {
+			return err
+		}
 	}
 
 	room := u.getAvailableRoom()

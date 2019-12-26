@@ -3,17 +3,17 @@ package game
 import "time"
 
 const (
-	FieldSizeX = 3000
-	FieldSizeY = 3000
+	FieldSizeX = 1050
+	FieldSizeY = 1050
 
 	Speed      = 1. / 700
-	FoodAmount = 200
+	FoodAmount = 80
 
 	EatFoodBonus   = 2
 	EatPlayerBonus = 5
 
 	EventStreamRate   = 50 * time.Millisecond
-	MaxPlayersInRoom  = 5
+	MaxPlayersInRoom  = 7
 	InitialPlayerSize = 20
 )
 
