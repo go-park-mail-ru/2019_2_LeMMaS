@@ -7,6 +7,7 @@ networks:
 services:
   api:
     build: images/api
+    image: ledka17/lemmas:api-latest
     working_dir: /app/cmd/api
     restart: always
     volumes:
@@ -14,9 +15,12 @@ services:
     env_file: .env
     ports:
       - ${PORT}:${PORT}
+    container_name:
+      api
 
   auth:
     build: images/auth
+    image: ledka17/lemmas:auth-latest
     working_dir: /app/cmd/auth
     restart: always
     volumes:
@@ -29,6 +33,7 @@ services:
 
   user:
     build: images/user
+    image: ledka17/lemmas:user-latest
     working_dir: /app/cmd/user
     restart: always
     volumes:
@@ -41,6 +46,7 @@ services:
 
   game:
     build: images/game
+    image: ledka17/lemmas:game-latest
     working_dir: /app/cmd/game
     restart: always
     volumes:
