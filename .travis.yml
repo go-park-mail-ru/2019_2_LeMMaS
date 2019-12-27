@@ -9,7 +9,7 @@ script:
 - ls -la
 - ssh-keyscan -H 95.163.212.121 >> $HOME/.ssh/known_hosts
 - chmod 600 $HOME/.ssh/2019_1_LeMMaS_id_rsa.pem
-- docker login --username ledka17 --password $$DOCKER_PASSWORD
+- docker login --username ledka17 --password $DOCKER_PASSWORD
 - docker-compose up --build -d
 - docker-compose push
 - ssh-add $HOME/.ssh/2019_1_LeMMaS_id_rsa.pem
