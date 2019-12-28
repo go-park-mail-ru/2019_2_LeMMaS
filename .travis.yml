@@ -17,6 +17,8 @@ script:
 #- ssh -i $HOME/.ssh/2019_1_LeMMaS_id_rsa.pem ubuntu@95.163.212.121 "./backdeploy-2 && exit"
 
 before_install:
+- ls -la
+- ls -la ./docker
 - openssl aes-256-cbc -K $encrypted_a59696580062_key -iv $encrypted_a59696580062_iv
   -in ./docker/.env.enc -out ./docker/.env -d
 - openssl aes-256-cbc -K $encrypted_b973021a3057_key -iv $encrypted_b973021a3057_iv
