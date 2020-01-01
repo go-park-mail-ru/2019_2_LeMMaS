@@ -11,7 +11,7 @@
 
 Приложение имеет микросервисную архитектуру. Сервисы API, Game, User и Auth общаются по GRPC.
 
-<img width="450" alt="architecture" src="https://user-images.githubusercontent.com/6276455/71639698-51f0ca80-2c8c-11ea-9bc2-440eb96c3107.png">
+<img width="450" alt="architecture" src="https://user-images.githubusercontent.com/6276455/71639740-4520a680-2c8d-11ea-9b34-3c6910806d6d.png">
 
 ## Запуск
 
