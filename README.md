@@ -7,6 +7,12 @@
 
 [Документация по API](https://go-park-mail-ru.github.io/2019_2_LeMMaS).
 
+# Микросервисы
+
+Приложение имеет микросервисную архитектуру. Сервисы API, Game, User и Auth общаются по GRPC.
+
+<img width="450" alt="architecture" src="https://user-images.githubusercontent.com/6276455/71639698-51f0ca80-2c8c-11ea-9bc2-440eb96c3107.png">
+
 ## Запуск
 
 ```sh
