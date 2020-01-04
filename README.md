@@ -6,8 +6,8 @@
 
 ### Архитектура
 
-Проект следует принципам [чистой архитектуры](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).  Микросервисы API, Game, User и Auth общаются по GRPC.
-Используются *PostgreSQL, Redis, Sentry, Prometheus, Grafana.*
+Проект следует принципам [чистой архитектуры](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).  Используются PostgreSQL, Redis, Sentry, Prometheus, Grafana. 
+Микросервисы API, Game, User и Auth общаются с помощью gRPC.
 
 <img width="450" alt="architecture" src="https://user-images.githubusercontent.com/6276455/71639740-4520a680-2c8d-11ea-9b34-3c6910806d6d.png">
 
