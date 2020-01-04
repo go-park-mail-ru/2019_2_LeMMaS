@@ -1,23 +1,23 @@
 # LeMMaS Backend [![Build Status](https://travis-ci.org/go-park-mail-ru/2019_2_LeMMaS.svg?branch=master)](https://travis-ci.org/go-park-mail-ru/2019_2_LeMMaS)
 
-Игра про голодные шарики, вдохновленная Agar.io.
+Игра про голодные шарики, вдохновленная [Agar.io](http://agar.io/).
 
-[![image](https://user-images.githubusercontent.com/6276455/69713801-3a1aa980-1116-11ea-82db-902277aefbe3.png)](http://95.163.212.121/)
+[![image](https://user-images.githubusercontent.com/6276455/69713801-3a1aa980-1116-11ea-82db-902277aefbe3.png)](https://lemmas.ru/)
 
+### Архитектура
 
-[Документация по API](https://go-park-mail-ru.github.io/2019_2_LeMMaS).
-
-## Микросервисы
-
-Приложение имеет микросервисную архитектуру. Сервисы API, Game, User и Auth общаются по GRPC.
+Проект следует принципам [чистой архитектуры](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html).  Микросервисы API, Game, User и Auth общаются по GRPC.
+Используются *PostgreSQL, Redis, Sentry, Prometheus, Grafana.*
 
 <img width="450" alt="architecture" src="https://user-images.githubusercontent.com/6276455/71639740-4520a680-2c8d-11ea-9b34-3c6910806d6d.png">
 
-## Запуск
+### Тесты
 
-```sh
-./docker/bin/start
-```
+Все основные функции приложения протестированы (покрытие 40%).
+
+### Разработка
+
+Запуск: `./docker/bin/start` Документация по API [тут](https://go-park-mail-ru.github.io/2019_2_LeMMaS).
 
 ## Авторы
 
