@@ -11,11 +11,6 @@ import (
 type Handler struct {
 }
 
-type Response struct {
-	Status string      `json:"status"`
-	Body   interface{} `json:"body"`
-}
-
 func (h *Handler) Ok(c echo.Context) error {
 	response := Response{
 		Status: "ok",
@@ -29,10 +24,6 @@ func (h *Handler) OkWithBody(c echo.Context, body interface{}) error {
 		Body:   body,
 	}
 	return c.JSON(http.StatusOK, response)
-}
-
-type errorResponseBody struct {
-	Message string `json:"message"`
 }
 
 func (h *Handler) Error(c echo.Context, message string) error {

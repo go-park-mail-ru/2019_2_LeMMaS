@@ -4,6 +4,15 @@ import (
 	"github.com/go-park-mail-ru/2019_2_LeMMaS/pkg/model"
 )
 
+type Response struct {
+	Status string      `json:"status"`
+	Body   interface{} `json:"body"`
+}
+
+type errorResponseBody struct {
+	Message string `json:"message"`
+}
+
 type userOutput struct {
 	ID         int    `json:"id"`
 	Email      string `json:"email"`
